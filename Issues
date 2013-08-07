@@ -8,6 +8,7 @@ To Do List:
   * TEI header included into the autotagger code
   * add first div2
   * Linecount should start at 1 not 0
+  * page 371 empty p node?
 
 Fixed:
   * catching Line #: in body that isn't an error
