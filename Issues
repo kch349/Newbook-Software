@@ -5,6 +5,7 @@ To Do List:
   * line issue with double spaces print or not
   * Maybe include percentages of each type of error in the error messages
   * Initial, Middle, Final
+  * TEI header included into the autotagger code
 
 Fixed:
   * catching Line #: in body that isn't an error
