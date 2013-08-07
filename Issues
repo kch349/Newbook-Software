@@ -1,20 +1,22 @@
 ToDo List:
-  * asterisk with wrong unicode? -- example on page 66
-  * last few pages not printing
+  * One more div2 not being filled correctly
+  * last page not printing
   * incrementing div1s "n" attribute
   * line issue with double spaces print or not
   * Maybe include percentages of each type of error in the error messages
   * Initial, Middle, Final
   * TEI header included into the autotagger code
-  * add first div2
   * Linecount should start at 1 not 0
   * page 371 empty p node?
   * make a create_div1 method to clean up code, like the create_div2 method
-  * if there are more div2s left than there are *s, then print 
-    a warning message that the file may have too many or too few stars (maybe do the same for div1s)
+  * Include an error message about having too few or too many stars on a page, or in the file. 
+    Maybe do that for div1s too.
 
 Fixed:
   * catching Line #: in body that isn't an error
+  * asterisk skipping problem. Wasn't unicode, was the try clause. Also errors in transcription file
+  * add first div2
+  * last 8 pages not printing
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:
