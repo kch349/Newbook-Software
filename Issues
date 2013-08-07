@@ -6,6 +6,7 @@ To Do List:
   * Maybe include percentages of each type of error in the error messages
   * Initial, Middle, Final
   * TEI header included into the autotagger code
+  * add first div2
 
 Fixed:
   * catching Line #: in body that isn't an error
