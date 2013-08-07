@@ -1,4 +1,4 @@
-To Do List:
+ToDo List:
   * asterisk with wrong unicode? -- example on page 66
   * last few pages not printing
   * incrementing div1s "n" attribute
@@ -13,3 +13,6 @@ To Do List:
 Fixed:
   * catching Line #: in body that isn't an error
 
+Desiderata for future iterations:
+  * provide configuration model for autotagger:
+    ** first option here is 'multilinugal=yes/no'
