@@ -9,6 +9,7 @@ ToDo List:
   * add first div2
   * Linecount should start at 1 not 0
   * page 371 empty p node?
+  * make a create_div1 method to clean up code, like the create_div2 method
 
 Fixed:
   * catching Line #: in body that isn't an error
