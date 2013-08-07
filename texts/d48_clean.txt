@@ -1044,7 +1044,7 @@ till midnight; we stopped
 discharging cargo at sunset, 
 	Light n.w. & fine cool
 weather ; 
-	Light n.w. & very cool 
+	*Light n.w. & very cool 
 morning ~ our steersman
 came down with an 
 
@@ -1188,7 +1188,7 @@ ride in tomorrow early
 	The Comet kept working 
 and heaving over the shoal 
 at night; 
-	Light n.w. & fine ~ 
+	*Light n.w. & fine ~ 
 The Comet got over the Shoal
 this morning; the Khalifah
 is lightning herself on
@@ -3412,7 +3412,7 @@ warmer, I had to sleep up
 on the house, Jeboory Asfar
 went to his house ~ 
 we coaled ship at night;
-	Light n.w. & fine weather, 
+	*Light n.w. & fine weather, 
 The Indian Marine Residency 
 Steamer of Bushire the Lawrence
 came up at 6 1/2 am from 
@@ -5011,12 +5011,13 @@ in the Verandah
 
 Page 143
             Margins:
-            DivLine: 4 Tuesd Therm@74
-            DivLine: 3 Mond
+	DivLine: 3 Mond
+	DivLine: 4 Tuesd Therm@74
+            
 
  
 
-            Light air & fine ~ at
+            *Light air & fine ~ at
 
 7 ½ am came on board
 
@@ -5463,7 +5464,7 @@ DivLine 4: 8 Satur
 Very light air & clouds
 on the horyzon ~ We 
 remained at Coot for the night; 
-	Light S. Ely breeze with 
+	*Light S. Ely breeze with 
 some clouds on the horyzon, 
 	At 5,,30 Am. we left
 Coot the Mossul also following
@@ -8810,7 +8811,7 @@ the people there making
 merry, the Jewish music
 or Brass band & the
 Tabul playing, they
-* danced & did all sorts
+danced & did all sorts
 of amusements; but
 the people were sorry 
 to see me in this state 
@@ -12740,7 +12741,7 @@ at Amara landed 11 passengers
 Tons Coal~
 	At 9,,30 left Amara,  
 fine moonlight & clear night,
-	& At 0,,30 am we dropped
+	*& At 0,,30 am we dropped
 anchor above Kalat  Saleh,
 	At 5,,30 proceeded, 
 S. Erly breeze & clouds on

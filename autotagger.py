@@ -225,6 +225,7 @@ def create_dom_nodes(tf):
         # matched a Divline, create a new div2
         part="N" # what's part="N"? I though these values were "I" and "F"
         div2s.append(create_div2(str(div_count),part,m.group(1)))
+        print("created Div2, page " + str(page.num), file=sys.stderr)
         div_count += 1
         		
       else:
@@ -273,7 +274,7 @@ def create_dom_nodes(tf):
           #div1_exists = True
           div1 = newdoc.createElement('div1')
           div1s.append(div1)
-          print("created div1 and appended to the list", file=sys.stderr)
+          #print("created div1 and appended to the list", file=sys.stderr)
           div1.setAttribute('type','journey')
           div1.setAttribute('n',str(div1_count))
           head = newdoc.createElement('head')
@@ -353,7 +354,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         #if current_div1 < (len(div1s) - 1):
           #current_div1 += 1
         body.appendChild(div1s[0])
-        print("appended div1", file=sys.stderr)
+        #print("appended div1", file=sys.stderr)
         if len(div1s) > 1:
           div1s.pop(0)  
         new_trip = True
@@ -383,11 +384,12 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       #attribute issue
       m = STAR_RE.match(l) 
       if m: 
-        try: 
-          if linecount < int(current_lineheader[2]):
-            continue
-        except: 
-    	    """problem in screening each line for margin headers"""
+        print("asterisk, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
+        #try: 
+         # if linecount < int(current_lineheader[2]):
+          #  continue
+        #except: 
+    	 #   """problem in screening each line for margin headers"""
 
         #####if div2 is empty (no content), strip it. 
         
@@ -411,7 +413,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
           #for h in headCheck:
            # print(h.toxml(None), file=sys.stderr)
           div2s.pop(0)
-          #print("New div2 diary entry, page:" + str(page.num) + "line " + str(linecount), file=sys.stderr)
+          #print("moved to next div2, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
         
         #if len(div2headers) > 0:
           #current_div2 = div2s[0]
@@ -435,6 +437,8 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
     current_prose[-1].appendChild(pb)
       # print([c.toxml() for c in current_prose],file=sys.stderr)
   # done looping, everything organized so stick the nodes onto the document
+  div2s[0].childNodes.extend(current_prose)
+  div1s[0].childNodes.extend(div2s)
   body.childNodes.extend(div1s)
 
 if __name__ in "__main__":
