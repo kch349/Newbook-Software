@@ -1,0 +1,11 @@
+To Do List:
+  * asterisk with wrong unicode?
+  * last few pages not printing
+  * incrementing div1s "n" attribute
+  * line issue with double spaces print or not
+  * Maybe include percentages of each type of error in the error messages
+  * Initial, Middle, Final
+
+Fixed:
+  * catching Line #: in body that isn't an error
+
