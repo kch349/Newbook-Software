@@ -10,6 +10,8 @@ ToDo List:
   * Linecount should start at 1 not 0
   * page 371 empty p node?
   * make a create_div1 method to clean up code, like the create_div2 method
+  * if there are more div2s left than there are *s, then print 
+    a warning message that the file may have too many or too few stars (maybe do the same for div1s)
 
 Fixed:
   * catching Line #: in body that isn't an error
