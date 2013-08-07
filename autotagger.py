@@ -15,9 +15,6 @@ import sys
 import re
 from xml.dom.minidom import *
 
-## VERSION
-#VERSION = "0.08"
-
 ## some regexes that we need
 PAGE_RE = re.compile('^Page\s+(\d+)')
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
@@ -217,6 +214,12 @@ def create_dom_nodes(tf):
       if m:
         continue 
       
+      part="N" # what's part="N"? I though these values were "I" and "F"
+      if len(div2s)==0:
+        ## create first div2
+        div2s.append(create_div2(str(div_count),part,"First diary entry, no title given in text."))
+        div_count += 1
+
       m = DIVLINE_RE.match(l)
       if m:
         # matched a Divline, create a new div2
@@ -259,14 +262,18 @@ def create_dom_nodes(tf):
       #if "Text:" matched and if "Line #:" is found right after "Text:", or it  
       #is the first line of the entire file, create a div 1 and add it to the list div1s 
       m = TEXT_RE.match(l)
-      mm = TEXTLINE_RE.match(l) 
-      if m and mm or len(div1s) == 0:
+      if m:
+        text_found = True
+        continue
+      m = TEXTLINE_RE.match(l) 
+      if (m and text_found) or len(div1s) == 0:
         #print("text line found" + page.num,file=sys.stderr)
         if not previous_text: #and div1_exists:
           div1_count += 1 
           #div1_exists = True
           div1 = newdoc.createElement('div1')
           div1s.append(div1)
+          print("created div1 and appended to the list", file=sys.stderr)
           div1.setAttribute('type','journey')
           div1.setAttribute('n',str(div1_count))
           head = newdoc.createElement('head')
@@ -284,13 +291,13 @@ def create_dom_nodes(tf):
             div_count += 1
         #if it is the first line in the file, just create a generic and arbitrary div1
         #to hold diary entries until the first real div1 trip heading is found.  
-        if not mm:
-          print("initial trip",file=sys.stderr)
+        if not text_found:
+          #print("initial trip",file=sys.stderr)
           text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
         #if it actually is a trip heading, print the text as the header (and added in the
         #line number here just in case, since I don't know if that is important or not
         else:
-          text = newdoc.createTextNode("Line " + mm.group(1) + ': ' + mm.group(2))
+          text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
         current_head.appendChild(text)
         
         #if div1text_count > 0:
@@ -299,14 +306,13 @@ def create_dom_nodes(tf):
         #text = newdoc.createTextNode(m.group(2))
         #current_head.appendChild(text)
         #div1text_count += 1
-      #elif not m: 
-        #text_found = False
+    
       else:
         #text line for trip header isn't matched, variables set accordingly.
         previous_text = False
         div1text_count = 0 
         div1_exists = False 
-        
+        text_found = False
       
   #print(div2headers, marginheaders)
   return div1s, div2s, marginheaders
@@ -338,7 +344,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       #organizing div1s
       m = TEXT_RE.match(l)
       if m:
-        print("Next trip heading", file=sys.stderr)
+        #print("Next trip heading", file=sys.stderr)
         div2s[0].childNodes.extend(current_prose)
         # create a new next paragaraph
         current_prose = create_p(current_prose, fresh=True) 
@@ -347,6 +353,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         #if current_div1 < (len(div1s) - 1):
           #current_div1 += 1
         body.appendChild(div1s[0])
+        print("appended div1", file=sys.stderr)
         if len(div1s) > 1:
           div1s.pop(0)  
         new_trip = True
@@ -361,7 +368,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         #removes last div, and puts the new medial/final div2 in the list
         if len(div2s) > 1:
           headCheck = div2s[0].getElementsByTagName('head')
-          print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
+          #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
           div2s.pop(0)
         #div2s.insert(0, next_div2)
         continue
@@ -400,9 +407,9 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         current_prose = create_p(current_prose,[re.sub('\s+\*','',l),linecount],fresh=True)
         if len(div2s) > 1:
           headCheck = div2s[0].getElementsByTagName('head')
-          print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
-          for h in headCheck:
-            print(h.toxml(None), file=sys.stderr)
+          #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
+          #for h in headCheck:
+           # print(h.toxml(None), file=sys.stderr)
           div2s.pop(0)
           #print("New div2 diary entry, page:" + str(page.num) + "line " + str(linecount), file=sys.stderr)
         
@@ -428,12 +435,14 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
     current_prose[-1].appendChild(pb)
       # print([c.toxml() for c in current_prose],file=sys.stderr)
   # done looping, everything organized so stick the nodes onto the document
-  #body.childNodes.extend(div1s)
+  body.childNodes.extend(div1s)
 
 if __name__ in "__main__":
   # accept svoboda transcription format file
   # on stdin
+
   try:
+    filename = sys.argv[1]
     infilelines = open(filename, 'r').readlines()
   except:
     infilelines = sys.stdin.readlines()
