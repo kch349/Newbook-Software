@@ -1,4 +1,4 @@
-To Do List:
+ToDo List:
   * asterisk with wrong unicode? -- example on page 66
   * last few pages not printing
   * incrementing div1s "n" attribute
@@ -8,7 +8,11 @@ To Do List:
   * TEI header included into the autotagger code
   * add first div2
   * Linecount should start at 1 not 0
+  * page 371 empty p node?
 
 Fixed:
   * catching Line #: in body that isn't an error
 
+Desiderata for future iterations:
+  * provide configuration model for autotagger:
+    ** first option here is 'multilinugal=yes/no'
