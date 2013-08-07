@@ -22,3 +22,15 @@ text is found in `texts/`
 This invocation should produce two files, a TEI compliant XML
 file called `d48.xml` and a list of error/warning messages 
 called `err`.
+
+Input File Description
+----------------------
+
+
+Authors
+-------
+Kelsie Haakenson
+Justin Yoon
+Rachel Brown
+Joshua Crowgey
+Tori Wellington
