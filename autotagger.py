@@ -28,6 +28,12 @@ TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 
 AMP_RE = re.compile('\&')
 
+#regexes for incorrect formatting (e.g. Line #, #, #:)
+MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),')
+MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-') 
+PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
+PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
+
 
 impl = getDOMImplementation()
 #doctype = <!DOCTYPE TEI PUBLIC "-//OTAP//DTD TEI Transitional//EN" "http://www.tei-c.org/release/xml/tei/custom/schema/dtd/teilite.dtd">
@@ -66,11 +72,14 @@ class TranscriptionFile:
     p = [] 
     n = -1
     while len(lines) > 0:
-      m = PAGE_RE.match(lines[0])
-      if m:
+      m1 = PAGE_RE.match(lines[0])
+     # m2 = PAGENOTES_RE.match(lines[0])
+     # m3 = PAGETABBED_RE.match(lines[0])
+      if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
-
+      #  if m2:
+       #   error_protocol(m2.group(1), -1, lines[0], 5)
         # if n==-1, we're on the first page, so keep going
         # if n is already defined, we've found a new page, so
         #    process the old one
@@ -78,11 +87,16 @@ class TranscriptionFile:
           self.pages.append(TranscriptionPage(str(n),p))
           p = []
           lines.pop(0)
-          n = int(m.group(1))
+          n = int(m1.group(1))
         else:
-          n = int(m.group(1))
+          n = int(m1.group(1))
           lines.pop(0)
-
+     # elif m3:
+      #  error_protocol(m3.group(1), -1, lines[0], 5)
+       # self.pages.append(TranscriptionPage(str(n), p))
+       # p = []
+       # n = int(m3.group(1))
+       # lines.pop(0)
       else:
         p.append(lines[0])
         lines.pop(0)
@@ -122,50 +136,79 @@ class TranscriptionPage:
 	               #true means we've switched to body
 					  
     length = len(lines)
+    text = False #true if previous line was Text:
     for i in range(0, length): 
       m1 = MARGINS_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
       m3 = MARGINLINE_RE.match(lines[i])
-      if not switch:
+      m5 = MARGINLINELIST_RE.match(lines[i])
+      m6 = MARGINLINERANGE_RE.match(lines[i])
+      if m5 or m6:
+        error_protocol(self.num, i, lines[i], 4)
+      elif not switch:
         if m1 or m2 or m3:
           h.append(lines[i])
         elif lines[i].strip() == "":
           switch = True		
         else:	
-          self.error_protocol(i, lines[i], 1)
+          error_protocol(self.num, i, lines[i], 1)
       else:
-        if m1 or m2:
-          self.error_protocol(i, lines[i], 2)
-        else:		  
-          b.append(lines[i])
+        if text:
+          if m3:
+            b.append(lines[i])
+          else:
+            error_protocol(self.num, i, lines[i], 3)
+          text = False
+        else:
+          m4 = TEXT_RE.match(lines[i])
+          if m4:
+            text = True
+            b.append(lines[i])
+          elif m1 or m2 or m3:
+            error_protocol(self.num, i, lines[i], 2)
+          else:		  
+            b.append(lines[i])
     self.head = h
     self.body = b	
 
-  def error_protocol(self, line_num, line, error_code):
-    """sets errors_found variable to True and prints an error message."""
+def error_protocol(page_num, line_num, line, error_code):
+  """sets errors_found variable to True and prints an error message."""
 	
-    global errors_found
-    errors_found = True
-    self.print_errors(line_num, line, error_code)
+  global errors_found
+  errors_found = True
+  print_errors(page_num, line_num, line, error_code)
 	
-  def print_errors(self, line_num, line, error_code):
-    """prints an error message. Contains the line and page number, the faulty line,
-	and what the error is."""
+def print_errors(page_num, line_num, line, error_code):
+  """prints an error message. Contains the line and page number, the faulty line,
+  and what the error is."""
 	
-    print("An error was found on page " + str(self.num) +
+  print("An error was found on page " + str(page_num) +
 	", line " +  str(line_num + 1) + ":", 
 	file=sys.stderr)
-    print("	" + line.strip(), file=sys.stderr)
-    if error_code == 1:
-      print("Error with head section. Please add either \"Line #\" or \"DivLine\"" +
+  print("	" + line.strip(), file=sys.stderr)
+  if error_code == 1:
+    print("Error with head section. Please add either \"Line #\" or \"DivLine\"" +
      	 " to the indicated line.\nPlease make sure to format these exactly as shown.\n" +
 		 "If this line belongs in the body, please remember to put a space before it.\n",
 		 file=sys.stderr) 
-    elif error_code == 2:
-      print("This line belongs in the head. If you meant for this to be in the head," +
+  elif error_code == 2:
+    print("This line belongs in the head. If you meant for this to be in the head," +
          " there may be an issue with the spacing.\nMake sure there are no spaces between" +
-		  " the lines \"Page #:\" and \"Margin:\".\n", file=sys.stderr)
-
+		  " the lines \"Page #:\" and \"Margin:\" and that you don't use double spacing.\n" + 
+		  "If this is a diary entry header, make sure to use \"*\" " +
+		  "rather than \"DivLine\".\nIf this is a journey header, add the line \"Text:\" before it.\n"
+		  , file=sys.stderr)
+  elif error_code == 3:
+    print("This line should be a journey header. If it is, please make sure to begin " +
+         "it with \"Line #\". If not, please put in a journey header before this line.",
+    	 file=sys.stderr)
+  elif error_code == 4:
+    print("Lines cannot be formatted like \"Line #, #, #:\" or \"Lines #-#\" or any similar " +
+         "format.\nEach part of the line must get its own line and must begin with \"Line #:\".\n",
+         file=sys.stderr)	
+  elif error_code == 5:
+    print("This line must be formatted \"Page #\". No additional formatting is allowed.\n", file=sys.stderr)  
+		 
 def create_div2(n,part,content):
   div2 = newdoc.createElement('div2')
   div2.setAttribute('type','diaryentry')
