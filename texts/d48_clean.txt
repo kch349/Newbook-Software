@@ -1614,7 +1614,7 @@ Page 56:
     Margin:
     Line 1: 1898
     Line 2: Augst 
-    Line 6-16: Commodore Ismail Beg died on 9th Instt
+    Line 6: Commodore Ismail Beg died on 9th Instt
     Line 19: 21
     Line 20: Tuesd
 
@@ -3590,7 +3590,7 @@ a float & left at 11 ~
 Page 105
     Margin:
     Line 1: [The engineer of the Wilaya = مهندس الولاية]
-    Line 3-17: Difficulty in closing canals
+    Line 3: Difficulty in closing canals
     Line 19: [al-Btera = البتيرة]
 
 Missat Effendi the Turkish
@@ -3761,7 +3761,7 @@ Page 110:
     Margin:
     Line 1: 1898
     Line 2: Septr
-    Line 13, 14, 15:  [The tents of the Christians at Gherrareh and the names of their owners = خيام المسيحيين في كرارة و اسماء اصحابها]
+    Line 13:  [The tents of the Christians at Gherrareh and the names of their owners = خيام المسيحيين في كرارة و اسماء اصحابها]
     
 
 till 1,,50 when we passed
@@ -4706,7 +4706,6 @@ Page 138
             Line 1: 1898
             Line 2: Octor
             Line 3: Also Mahomed Pasha al-Daghestany and Abduljebbar (Khayat) bought there and made use of it and other things = و مشترى محمد پاشا الداغستاني و عبد الجبار (خياط) بها و استغلالها و غير ذلك ] 
-
             Line 10: Gutnyeh Property
 
  
@@ -9547,7 +9546,7 @@ Page 296:
 	Margin:	
 	Line 1: 1898
 	Line 2: Decr
-	Line 8, 9: [The return of his wife rom Basreh =عودة زوجته من البصرة ]
+	Line 8: [The return of his wife rom Basreh =عودة زوجته من البصرة ]
 	Line 9: 
 
 him a Return Ticket, and
@@ -10324,7 +10323,7 @@ Wratislaw has been for
 
 Page 321
 	Margins:
-	Line 1, 2: Arabic [The Consul speaks many languages=  القنصل يتكلم عدة لغات] 
+	Line 1: Arabic [The Consul speaks many languages=  القنصل يتكلم عدة لغات] 
 	Line 2: Arabic
 	DivLine: 8 Sund
 
@@ -10583,7 +10582,7 @@ fasting month for the
 Page 329
 	Margins:
 	Line 1: Passgr 137,,; Okes 113,423; G S.Piast 18,795 ¾; Draft 3,,9
-	Line 19, 20: [A Swiss silk merchant = تاجر حرير سوسري] 
+	Line 19: [A Swiss silk merchant = تاجر حرير سوسري] 
 	Line 20: [Jemil Beg the Motserrif of Hassa and the son of Said Pasha = جميل بك ابن سعيد پاشا متصرف الاحساء] 
 	Line 23: Arabic
 	Line 24: Arabic
