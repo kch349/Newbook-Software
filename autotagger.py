@@ -166,6 +166,17 @@ class TranscriptionPage:
          " there may be an issue with the spacing.\nMake sure there are no spaces between" +
 		  " the lines \"Page #:\" and \"Margin:\".\n", file=sys.stderr)
 
+
+def create_div1(n): 
+  div1 = newdoc.createElement('div1')
+  div1.setAttribute('type','journey')
+  div1.setAttribute('n',n)
+  head = newdoc.createElement('head')
+  div1.appendChild(head)
+  head.setAttribute('type','journey')
+  return head, div1
+ 
+
 def create_div2(n,part,content):
   div2 = newdoc.createElement('div2')
   div2.setAttribute('type','diaryentry')
@@ -201,20 +212,20 @@ def create_dom_nodes(tf):
   div1s = [] # contains all trip div headers
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
-  #div1 = newdoc.createElement('div1')
-  #div1s.append(div1)
   
+  div2_printed_count = 0
   div_count = 0
   marginline_count = 0
   for page in tf.pages:	
     for l in page.head:
-       # divLine: "..." are 'diaryentry' headers
+       # DivLine: "..." are 'diaryentry' headers
        # Line: "..." are 'margin_note' headers
       m = MARGINS_RE.match(l)
       if m:
         continue 
       
       part="N" # what's part="N"? I though these values were "I" and "F"
+      #Part N means the node isn't fragmented at all.
       if len(div2s)==0:
         ## create first div2
         div2s.append(create_div2(str(div_count),part,"First diary entry, no title given in text."))
@@ -225,7 +236,8 @@ def create_dom_nodes(tf):
         # matched a Divline, create a new div2
         part="N" # what's part="N"? I though these values were "I" and "F"
         div2s.append(create_div2(str(div_count),part,m.group(1)))
-        print("created Div2, page " + str(page.num), file=sys.stderr)
+        #print("created Div2, page " + str(page.num), file=sys.stderr)
+        div2_printed_count += 1
         div_count += 1
         		
       else:
@@ -253,12 +265,7 @@ def create_dom_nodes(tf):
     current_head = None
     text_found = False
     for l in page.body:
-    # need line number stored in an attribute??
-      #previous_text = False
-      #current_head = None
-      #text_found = False
-      #div1_exists = False
-      #untitled_div1 = False
+    # need line number stored in an attribute? 
       
       #if "Text:" matched and if "Line #:" is found right after "Text:", or it  
       #is the first line of the entire file, create a div 1 and add it to the list div1s 
@@ -267,46 +274,36 @@ def create_dom_nodes(tf):
         text_found = True
         continue
       m = TEXTLINE_RE.match(l) 
-      if (m and text_found) or len(div1s) == 0:
-        #print("text line found" + page.num,file=sys.stderr)
-        if not previous_text: #and div1_exists:
-          div1_count += 1 
-          #div1_exists = True
-          div1 = newdoc.createElement('div1')
+      
+      #if it is the first line in the file, just create a generic and arbitrary div1
+      #to hold diary entries until the first real div1 trip heading is found.  
+      if len(div1s) == 0:
+        current_head, div1 = create_div1(str(div_count))
+        div1s.append(div1)
+        text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
+        current_head.appendChild(text)
+        
+      if m and text_found:
+        if not previous_text:  
+          current_head, div1 = create_div1(str(div1_count))
           div1s.append(div1)
-          #print("created div1 and appended to the list", file=sys.stderr)
-          div1.setAttribute('type','journey')
-          div1.setAttribute('n',str(div1_count))
-          head = newdoc.createElement('head')
-          div1.appendChild(head)
-          head.setAttribute('type','journey')
-          current_head = head
-          previous_text = True
-          div1_count += 1 
+          div1_count += 1
           
+          #creates a cloned div2 with all its nodes to serve as the medial or final part
+          #then labeled as the next number in the div_count
           if len(div2s) >= 2:
             next_div2 = div2s[div_count - 1].cloneNode(True)
             #print("created final node, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
             next_div2.setAttribute('n', str(div_count))
+            #next_div2.setAttribute('part', 'M')
             div2s.append(next_div2)
             div_count += 1
-        #if it is the first line in the file, just create a generic and arbitrary div1
-        #to hold diary entries until the first real div1 trip heading is found.  
-        if not text_found:
-          #print("initial trip",file=sys.stderr)
-          text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
+            
         #if it actually is a trip heading, print the text as the header (and added in the
         #line number here just in case, since I don't know if that is important or not
-        else:
-          text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
+        text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
         current_head.appendChild(text)
-        
-        #if div1text_count > 0:
-         # lb = newdoc.createElement('lb')
-         # current_head.appendChild(lb)
-        #text = newdoc.createTextNode(m.group(2))
-        #current_head.appendChild(text)
-        #div1text_count += 1
+        previous_text = True
     
       else:
         #text line for trip header isn't matched, variables set accordingly.
@@ -314,8 +311,8 @@ def create_dom_nodes(tf):
         div1text_count = 0 
         div1_exists = False 
         text_found = False
-      
-  #print(div2headers, marginheaders)
+  
+  #print(div2_printed_count, file=sys.stderr)
   return div1s, div2s, marginheaders
    
 def organize_nodes(tf, div1s, div2s, marginheaders):
@@ -327,10 +324,10 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
   new_trip = False
   current_div1 = 0
   for page in tf.pages:
-    linecount = -1  
+    linecount = 0  
     for l in page.body:
       linecount += 1
-      if linecount == 0:
+      if linecount == 1:
         div1s[0].appendChild(div2s[0])
         
       if len(marginheaders) > 0:
@@ -345,7 +342,6 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       #organizing div1s
       m = TEXT_RE.match(l)
       if m:
-        #print("Next trip heading", file=sys.stderr)
         div2s[0].childNodes.extend(current_prose)
         # create a new next paragaraph
         current_prose = create_p(current_prose, fresh=True) 
@@ -354,25 +350,18 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         #if current_div1 < (len(div1s) - 1):
           #current_div1 += 1
         body.appendChild(div1s[0])
-        #print("appended div1", file=sys.stderr)
         if len(div1s) > 1:
           div1s.pop(0)  
         new_trip = True
-       
+        
         #div2s[0].setAttribute('part', 'I')
         
-        #creates a cloned div2 without all its nodes to serve as the medial or final part 
-        #that div2 if need be. It is inserted into the list. 
-        #next_div2 = div2s[0].cloneNode(False)
-        #print("created final node, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
-        #next_div2.setAttribute('part', 'M')
-        #removes last div, and puts the new medial/final div2 in the list
         if len(div2s) > 1:
           headCheck = div2s[0].getElementsByTagName('head')
           #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
           div2s.pop(0)
-        #div2s.insert(0, next_div2)
         continue
+        
       m = TEXTLINE_RE.match(l)
       if m:
         new_trip = True
@@ -384,14 +373,14 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       #attribute issue
       m = STAR_RE.match(l) 
       if m: 
-        print("asterisk, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
+        #print("asterisk, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
         #try: 
          # if linecount < int(current_lineheader[2]):
           #  continue
         #except: 
     	 #   """problem in screening each line for margin headers"""
 
-        #####if div2 is empty (no content), strip it. 
+        #if div2 is empty (no content), strip it. 
         
         
         #tries to delete the extra medial/final node created if it isn't necessary, as is true if the 
@@ -464,7 +453,7 @@ if __name__ in "__main__":
   # print("---------", file=sys.stderr)
  
   #to_xml_dom(tf)
-  div1s, div2s, marginheaders = create_dom_nodes(tf)
+  #div1s, div2s, marginheaders = create_dom_nodes(tf)
 
   ## okay, this is too verbose for now :)
   #for d in div1s:
