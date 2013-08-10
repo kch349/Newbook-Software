@@ -84,6 +84,7 @@ class TranscriptionFile:
         # if n is already defined, we've found a new page, so
         #    process the old one
         if n > -1:
+          print(m1.group(1) + " found page", file=sys.stderr)
           self.pages.append(TranscriptionPage(str(n),p))
           p = []
           lines.pop(0)
@@ -100,6 +101,11 @@ class TranscriptionFile:
       else:
         p.append(lines[0])
         lines.pop(0)
+      
+   # try: 
+    self.pages.append(TranscriptionPage(str(n), p))
+    #except:
+     # """Error with page creation. There is not another page to append."""
     
 
  
@@ -119,6 +125,7 @@ class TranscriptionPage:
     # sys.stderr.write("process transcription page ... ")
     self.num = num
     self.parse_lines(lines)
+    print(self.num + " page created", file=sys.stderr)
 
     # check
 
