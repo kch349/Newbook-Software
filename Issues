@@ -11,6 +11,8 @@ ToDo List:
   * make a create_div1 method to clean up code, like the create_div2 method
   * Include an error message about having too few or too many stars on a page, or in the file. 
     Maybe do that for div1s too.
+  * Add warning if double spacing is found in the body.	
+  * Program crashes for unknown reason.
 
 Fixed:
   * catching Line #: in body that isn't an error
