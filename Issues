@@ -1,10 +1,7 @@
 ToDo List:
-  * One more div2 not being filled correctly
   * last page not printing
   * incrementing div1s "n" attribute
   * line issue with double spaces print or not
-  * Maybe include percentages of each type of error in the error messages
-  * Initial, Middle, Final
   * TEI header included into the autotagger code
   * page 371 empty p node?
   * Include an error message about having too few or too many stars on a page, or in the file. 
@@ -13,6 +10,8 @@ ToDo List:
   * Program crashes for unknown reason.
   * At some point diary entries are not getting correct content.
   * Maybe have page, div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
+  * Maybe include percentages of each type of error in the error messages
+  * Initial, Middle, Final
 
 Fixed:
   * catching Line #: in body that isn't an error
@@ -22,6 +21,7 @@ Fixed:
   * Last half of pg. 399 - end is repeated in output.
   * make a create_div1 method to clean up code, like the create_div2 method
   * Linecount should start at 1 not 0
+  * One more div2 not being filled correctly
   
 Desiderata for future iterations:
   * provide configuration model for autotagger:
