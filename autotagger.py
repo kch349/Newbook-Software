@@ -283,7 +283,7 @@ def create_dom_nodes(tf):
         # matched a Divline, create a new div2
         part="N" # what's part="N"? I though these values were "I" and "F"
         div2s.append(create_div2(str(div_count),part,m.group(1)))
-        #print("created Div2, page " + str(page.num), file=sys.stderr)
+        #print("d " + str(page.num) + " " + m.group(1), file=sys.stderr)
         div2_printed_count += 1
         div_count += 1
         		
@@ -335,7 +335,7 @@ def create_dom_nodes(tf):
           #then labeled as the next number in the div_count
           if len(div2s) >= 2:
             next_div2 = div2s[div_count - 1].cloneNode(True)
-            print("created final node, page " + str(page.num), file=sys.stderr)
+            #print("d " + str(page.num) + " split", file=sys.stderr)
             next_div2.setAttribute('n', str(div_count))
             #next_div2.setAttribute('part', 'M')
             div2s.append(next_div2)
@@ -531,4 +531,7 @@ if __name__ in "__main__":
   
     organize_nodes(tf, div1s, div2s, marginheaders)
     print(document.toprettyxml('\t', '\n', None))
+    #for d in div2s:
+     # print(d.toxml(),file=sys.stderr)
+      #print("\n\n",file=sys.stderr)
 
