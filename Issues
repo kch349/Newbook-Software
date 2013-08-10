@@ -6,14 +6,13 @@ ToDo List:
   * Maybe include percentages of each type of error in the error messages
   * Initial, Middle, Final
   * TEI header included into the autotagger code
-  * Linecount should start at 1 not 0
   * page 371 empty p node?
-  * make a create_div1 method to clean up code, like the create_div2 method
   * Include an error message about having too few or too many stars on a page, or in the file. 
     Maybe do that for div1s too.
   * Add warning if double spacing is found in the body.	
   * Program crashes for unknown reason.
   * At some point diary entries are not getting correct content.
+  * Maybe have page, div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
 
 Fixed:
   * catching Line #: in body that isn't an error
@@ -21,7 +20,9 @@ Fixed:
   * add first div2
   * last 8 pages not printing
   * Last half of pg. 399 - end is repeated in output.
-
+  * make a create_div1 method to clean up code, like the create_div2 method
+  * Linecount should start at 1 not 0
+  
 Desiderata for future iterations:
   * provide configuration model for autotagger:
     ** first option here is 'multilinugal=yes/no'
