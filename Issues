@@ -13,12 +13,14 @@ ToDo List:
     Maybe do that for div1s too.
   * Add warning if double spacing is found in the body.	
   * Program crashes for unknown reason.
+  * At some point diary entries are not getting correct content.
 
 Fixed:
   * catching Line #: in body that isn't an error
   * asterisk skipping problem. Wasn't unicode, was the try clause. Also errors in transcription file
   * add first div2
   * last 8 pages not printing
+  * Last half of pg. 399 - end is repeated in output.
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:

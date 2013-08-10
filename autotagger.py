@@ -137,6 +137,7 @@ class TranscriptionPage:
 					  
     length = len(lines)
     text = False #true if previous line was Text:
+    multi_headers = False #true if multiple "Lines" are allowed	
     for i in range(0, length): 
       m1 = MARGINS_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
@@ -156,6 +157,7 @@ class TranscriptionPage:
         if text:
           if m3:
             b.append(lines[i])
+            multi_headers = True
           else:
             error_protocol(self.num, i, lines[i], 3)
           text = False
@@ -164,10 +166,13 @@ class TranscriptionPage:
           if m4:
             text = True
             b.append(lines[i])
+          elif multi_headers and m3:
+            b.append(lines[i])
           elif m1 or m2 or m3:
             error_protocol(self.num, i, lines[i], 2)
           else:		  
             b.append(lines[i])
+            multi_headers = False
     self.head = h
     self.body = b	
 
@@ -294,11 +299,6 @@ def create_dom_nodes(tf):
             head.setAttributeNode(xml_id)
             text = newdoc.createTextNode(m.group(2))
             head.appendChild(text)
-					
-        else:
-                print("found something weird in page header (not divLine or Line)\n"+\
-                    "on transcription page: "+page.num+"\n"+\
-                    "content: "+l, file=sys.stderr)
 
     # now looping through page body to find div1s, which we may want to figure out how to 
     # do in the organize_nodes method later so as not to loop through the file as much.                
@@ -335,7 +335,7 @@ def create_dom_nodes(tf):
           #then labeled as the next number in the div_count
           if len(div2s) >= 2:
             next_div2 = div2s[div_count - 1].cloneNode(True)
-            #print("created final node, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
+            print("created final node, page " + str(page.num), file=sys.stderr)
             next_div2.setAttribute('n', str(div_count))
             #next_div2.setAttribute('part', 'M')
             div2s.append(next_div2)
@@ -469,7 +469,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       # print([c.toxml() for c in current_prose],file=sys.stderr)
   # done looping, everything organized so stick the nodes onto the document
   div2s[0].childNodes.extend(current_prose)
-  div1s[0].childNodes.extend(div2s)
+  #div1s[0].childNodes.extend(div2s) 
   body.childNodes.extend(div1s)
 
 if __name__ in "__main__":
