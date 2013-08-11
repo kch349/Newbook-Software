@@ -25,7 +25,7 @@ MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
 #new regexes looking for "Text:" or the "Line #:" indicating trip headings in body text
 TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
 TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
-
+EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
 
 #regexes for incorrect formatting (e.g. Line #, #, #:)
@@ -372,6 +372,8 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
 
   new_trip = False
   current_div1 = 0
+  empty_lines = 0
+  last_empty = False
   for page in tf.pages:
     linecount = 0  
     for l in page.body:
@@ -389,6 +391,20 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         #print("ran out of marginheaders",file=sys.stderr)
       
       #organizing div1s
+      m = EMPTYLINE_RE.match(l)
+      if m:
+        #found empty line
+        last_empty = True
+        empty_lines += 1
+        continue
+      elif last_empty:
+        for i in range(1, empty_lines + 1):
+          lb = newdoc.createElement('lb')
+          lb.setAttribute('n',str((linecount - empty_lines + (i - 1)))) 
+          current_prose[-1].appendChild(lb)
+        last_empty = False
+        empty_lines = 0
+          
       m = TEXT_RE.match(l)
       if m:
         div2s[0].childNodes.extend(current_prose)
@@ -470,6 +486,8 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
           current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break before creating 
     #the next page to fix that bug?
+    last_empty = False
+    empty_lines = 0
     pb = newdoc.createElement('pb')
     pb.setAttribute('n',str(page.num))
     current_prose[-1].appendChild(pb)
