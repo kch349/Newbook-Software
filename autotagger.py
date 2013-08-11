@@ -555,7 +555,7 @@ if __name__ in "__main__":
     #   print("\n\n",file=sys.stderr)
   
     organize_nodes(tf, div1s, div2s, marginheaders)
-    print(document.toprettyxml('\t', '\n', None))
+    print(newdoc.toprettyxml('\t', '\n', None))
     #for d in div2s:
      # print(d.toxml(),file=sys.stderr)
       #print("\n\n",file=sys.stderr)
