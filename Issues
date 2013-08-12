@@ -38,6 +38,8 @@ Desiderata for future iterations:
   * provide configuration model for autotagger:
     ** first option here is 'multilinugal=yes/no'
   * Maybe include percentages of each type of error in the error messages
-  * Reorganize as python module
   * Regression test
-  * Option for verbose developper output
+  * Code Reorganization:
+    **Reorganize as python module
+    **Option for verbose developper output
+    **Lessen the number of times the program loops through the file
