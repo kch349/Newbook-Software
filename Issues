@@ -1,5 +1,5 @@
 ToDo List:
-  * Regression test
+
   * Keep a hash of ids to robustly check for duplicates
   * create TEI header method adding nodes
   * incrementing div1s "n" attribute
@@ -42,3 +42,4 @@ Desiderata for future iterations:
     ** first option here is 'multilinugal=yes/no'
   * Maybe include percentages of each type of error in the error messages
   * Reorganize as python module
+  * Regression test
