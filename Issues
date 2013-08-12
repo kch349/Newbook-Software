@@ -1,5 +1,6 @@
 ToDo List:
   * Keep a hash of ids to robustly check for duplicates
+  * create TEI header method adding nodes
   ***Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
      autotagger creates a well-formed XML file, but one with encoding set at '?' in the XML Declaration.
      But with encoding of 'utf-8', tab and newline characters are actually printed as '\t' and '\n',
