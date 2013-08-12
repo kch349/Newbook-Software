@@ -1,6 +1,7 @@
 ToDo List:
 
-  * Keep a hash of ids to robustly check for duplicates
+  * Keep a hash of ids to robustly check for duplicates (add "i" on duplicates)
+  * Warning for duplicate pages ^and ids
   * create TEI header method adding nodes
   * incrementing div1s "n" attribute
   * Program crashes for unknown reason with error message that is commented out
