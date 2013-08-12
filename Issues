@@ -1,4 +1,5 @@
 ToDo List:
+  * Regression test
   * Keep a hash of ids to robustly check for duplicates
   * create TEI header method adding nodes
   ***Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
