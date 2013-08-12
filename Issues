@@ -1,5 +1,4 @@
 ToDo List:
-
   * Keep a hash of ids to robustly check for duplicates (add "i" on duplicates)
   * Warning for duplicate pages ^and ids
   * create TEI header method adding nodes
@@ -12,15 +11,12 @@ ToDo List:
   * Div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
   * Comment out debugging printing to stderr
 
- 
-  
 Questions:
  *   Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
      autotagger creates a well-formed XML file, but one with encoding set at '?' in the XML Declaration.
      But with encoding of 'utf-8', tab and newline characters are actually printed as '\t' and '\n',
      making the file all one line that isn't well-formed according to Exchanger XML. 
  * Should multiple lines at the beginning of a page be stripped? Or just at the end after the text and before the next page?
-
 
 Fixed:
   * catching Line #: in body that isn't an error
@@ -44,3 +40,4 @@ Desiderata for future iterations:
   * Maybe include percentages of each type of error in the error messages
   * Reorganize as python module
   * Regression test
+  * Option for verbose developper output
