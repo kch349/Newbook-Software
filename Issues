@@ -10,7 +10,6 @@ ToDo List:
       -----At what point does the diary content become incorrect?
   
   * Should multiple lines at the beginning of a page be stripped? Or just at the end after the text and before the next page?
-  * page 371 empty p node?
   * Include an error message about having too few or too many stars on a page, or in the file. 
     Maybe do that for div1s too.
   * Add warning if double spacing is found in the body.	
@@ -31,6 +30,7 @@ Fixed:
   * last page not printing
   * line issue with double spaces print or not
   * TEI header included into the autotagger code
+  * page 371 empty p node?
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:
