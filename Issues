@@ -9,6 +9,7 @@ ToDo List:
     Maybe do that for div1s too.
   * Add warning if double spacing is found in the body.	
   * Div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
+  * Comment out debugging printing to stderr
 
  
   
@@ -40,3 +41,4 @@ Desiderata for future iterations:
   * provide configuration model for autotagger:
     ** first option here is 'multilinugal=yes/no'
   * Maybe include percentages of each type of error in the error messages
+  * Reorganize as python module
