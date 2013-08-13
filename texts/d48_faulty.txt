@@ -477,8 +477,8 @@ write to his agent at
 
 Page 19
  Margins:
+ 
   DivLine: 7th Sund Ther@4.84  
-  
 Constple not to pay any
 money to Alexander should
 he send to him that letter
@@ -592,8 +592,8 @@ Eliza & came home,
 
 Page 23
  Margin:
+
  DivLine: 8 Mond Ther@4.84
- 
  Eliza & I are so sorry &
 have lost our head at this
 matter & we are so down
@@ -776,7 +776,7 @@ telegram
 
 Page 29
  Margin:
- Line 1: *must fiancér
+ Line 1-6: *must fiancér
 
 Inevitable lui autorisèr
 financer venir Bagdad
@@ -805,6 +805,7 @@ a strong answer and
 a warning to Alexander
 
 Page 30: 
+
 	Margin: 
 Line 1: 1890 Aug
 
@@ -834,6 +835,7 @@ the telegram of London
 & what answer I 
 
 Page 31: 
+
 	Margin: 
 Line 6: 
 
@@ -861,19 +863,20 @@ Light N.W. fine cool
 night ~ 
 
 Page 32: 
+
 	Margin: 
 Line 1: 1898 Augt 11 Thursd
 Line 9: Draft 4.2
 Line 13: G. S. Piasters 18145 ,,
 Line 18: Okes 83,132
 Line 22: Passg189
-Line 23: Arabic : [the death of Parfit’s wife = وفاة زوجة پارفت] 
+Arabic : [the death of Parfit’s wife = وفاة زوجة پارفت] 
 
 	Light N.W. breeze & fine
 cool weather ~ at 4 am
 I came on board ~ 
-	Text:
-	Line 4: Baghdad to Basrah 
+
+Line 4: Baghdad to Basrah 
 	At 4,,40 Am. left Baghdad 
 & proceeded~ 
 	At 6,,55 touched on a Shoal
@@ -896,6 +899,7 @@ influenza ~
 passengers all Deck, 
 
 Page 33: 
+
 	Margin: 
 Line 23: 12 " Friday March Ther @ 4,72
 
@@ -926,6 +930,7 @@ cold, I felt it so cold in
 bed that I had to come 
 
 Page 34: 
+
 	Margin: 
 Line 1: 1898 Aug 
 
@@ -956,8 +961,9 @@ the new Actg; Consul General
 for Baghdad; - 
 
 Page 35: 
+
 	Margin: 
-	Line 1: arabic: [Sheikh of Beni Ajail = شيخ بني عجيل] 
+arabic: [Sheikh of Beni Ajail = شيخ بني عجيل] 
 
 	We have over 83,000 Okes
 drawing 4 feet 2 Inches which 
@@ -988,6 +994,7 @@ Beshlics on condition
 that he is to be here 
 
 Page 36: 
+
 	Margin: 
 Line 1: 1898 Aug
 
@@ -1017,8 +1024,10 @@ down to the East bank
 of Dawer just to where 
 
 Page 37: 
+
 	Margin: 
-	Line 1: arabic: [The remembrance of his shooting in 1885 = ١٨٨٥   ذكرى لصيده في سنة ]
+arabic: [The remembrance of his shooting in 1885 = ١٨٨٥ 
+  ذكرى لصيده في سنة ]
   DivLine 24: 13 Satur Ther @ 5.73
 
 I was encamped out shooting
@@ -1044,11 +1053,12 @@ till midnight; we stopped
 discharging cargo at sunset, 
 	Light n.w. & fine cool
 weather ; 
-	*Light n.w. & very cool 
+	Light n.w. & very cool 
 morning ~ our steersman
 came down with an 
 
 Page 38: 
+
 	Margin: 
 Line 1: 1898 Augs
 
@@ -1108,6 +1118,7 @@ us along the East bank
 Alewy arrived from 
 
 Page 40: 
+
 	Margin:  
 Line 1: 1898 Augs
 
@@ -1138,6 +1149,7 @@ from Blanche, my
 late brother Alexander's 
 
 Page 41: 
+
 	Margin: 
 Line 6: Father Marie Joseph died 
 
@@ -1168,6 +1180,7 @@ that has ever remained
 so long in Baghdad
 
 Page 42: 
+
 	Margin: 
 Line 1: 1898 Augs
 Line 4: Bismark died on 30 July
@@ -1188,7 +1201,7 @@ ride in tomorrow early
 	The Comet kept working 
 and heaving over the shoal 
 at night; 
-	*Light n.w. & fine ~ 
+	Light n.w. & fine ~ 
 The Comet got over the Shoal
 this morning; the Khalifah
 is lightning herself on
@@ -1232,6 +1245,7 @@ the shoal & turned round
 broadside on and
 
 Page 44:
+
 	Margin: 
 Line 1: 1898 Augs
 
@@ -1614,7 +1628,7 @@ Page 56:
     Margin:
     Line 1: 1898
     Line 2: Augst 
-    Line 6: Commodore Ismail Beg died on 9th Instt
+    Line 6-16: Commodore Ismail Beg died on 9th Instt
     Line 19: 21
     Line 20: Tuesd
 
@@ -2212,6 +2226,8 @@ on the East bank,
 Page 75
             Margins:
 
+
+
             We anchored & sent to
 
 sound; Pilot returned to
@@ -2324,8 +2340,7 @@ him the 20 L £ for his
 
 Page 77
             Margins:
-           DivLine: 2 Frid
-           Line 14: 15, 16, and 17: The marriage of Louisa and Yousif Yaghchi is deferred to Sunday = تأخير زواج يوسف ياغچي و لويزه الى الاحد] 
+            Line 14, 15, 16, and 17: The marriage of Louisa and Yousif Yaghchi is deferred to Sunday = تأخير زواج يوسف ياغچي و لويزه الى الاحد] 
 
 			
 
@@ -2351,7 +2366,8 @@ telegram & remained in
 
 the room till day light
 
-*
+DivLine: 2 Frid
+
             Light N.W. air & fine ~
 
 Henry has stopped behind
@@ -2501,10 +2517,14 @@ also the corespondence
 
 
 Page 80
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Sept
-            Line 14: Arabic [The Archbishop Altmayer goes to Mardin to appoint (?) among other bishops a new Patriarch to replace the Patriarch Hanna Boonnyi = القاصد التماير يذهب الى ماردين لكي يرسم مع بقية المطارنه بطريركا عوضاً عن البطريرك حنا بني ] 
+
+            Line 14, 15, 16, 17: Arabic [The Archbishop Altmayer goes to Mardin to appoint (?) among other bishops a new Patriarch to replace the Patriarch Hanna Boonnyi = القاصد التماير يذهب الى ماردين لكي يرسم مع بقية المطارنه بطريركا عوضاً عن البطريرك حنا بني ] 
 
 
 
@@ -2559,8 +2579,8 @@ he will be back here
 
 
 Page 81
-           Margins:
-           DivLine: (illegible)
+
+            Margins:
 
 3’d
 
@@ -2582,7 +2602,8 @@ came home;
 
 weather;
 
-*
+DivLine: (illegible)
+
             Light N.W. & fine cool
 
 weather; at 7 am I came
@@ -2624,11 +2645,14 @@ emploi repondèz~
 
 
 Page 82
+
             Margins:
+
             Line 1: 1898
-            Line 2: Sept
-           DivLine: 4 Sund
-           Line 16: Louisa daughter of my she was born
+
+            Line 2; Sept
+
+            Line 16-26: Louisa daughter of my she was born
 
 
 
@@ -2654,7 +2678,8 @@ weather, I have the pain
 
 in my stomach since 5 days
 
-*
+DivLine: 4 Sund
+
             Light N.W. & fine cool
 
 morning; I did not go 
@@ -2687,9 +2712,11 @@ Bride groom & his brother
 
 
 
-Page 83 
+Page 83 - 0042r
+
             Margins: 
-            Line 1: Brother Henry was betrothed with Yousif Rufail Yaghchi on the 20 March 1876
+
+            Line 1-end: Brother Henry was betrothed with Yousif Rufail Yaghchi on the 20 March 1876
 
 
 
@@ -2748,8 +2775,11 @@ start on Wednesday
 
 
 Page 84
+
             Margins:           
+
             Line 1: 1898
+
             Line 2: Sept
 
 evening the 7th in Company
@@ -2807,9 +2837,10 @@ dated today at 10 am
 
 
 Page 85
+
             Margins:
-            DivLine: 5 Mond
-            Line 12: Arabic [A representation of the story of Jeanne D’Arc at the Latin school = تمثيل رواية جان دارك في مدرسة الاتين] 
+
+            Line 12, 13, 14: Arabic [A representation of the story of Jeanne D’Arc at the Latin school = تمثيل رواية جان دارك في مدرسة الاتين] 
 
 
 
@@ -2827,7 +2858,7 @@ I hope he will do it soon,
 
             Light N.W. & fine weather
 
-*
+DivLine: 5 Mond
 
             Light N.W. & fine ~ at 7 am 
 
@@ -2868,11 +2899,13 @@ on board, paid the
 
 
 Page 86
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Sept
-						DivLine: 6’ Tuesd Therm@ 5.79
-						
+
 officers wages etc. Went 
 
 home at 12 ~ at 3 P.M. 
@@ -2889,7 +2922,9 @@ we came home.
 
             Light N.W. & rather warm,
 
-            *Light N.W. air & fine ~
+DivLine: 6’ Tuesd Therm@ 5.79
+
+            Light N.W. air & fine ~
 
 at 6 ½ am called on Catherina
 
@@ -2928,9 +2963,11 @@ arrived at 2 ¾ P.M.
 
 
 Page 87
+
             Margins:
-            Line 24: The travel of Archbishop Altmayer to Mardin by the silk road with the Assyrian Bishop سفر القاصد التماير الى ماردين بطريق الحرير مع مطران السريان =ا] 
-						DivLine: 7 WednTherm 5.79
+
+            Line 24, 25, 26, 27: The travel of Archbishop Altmayer to Mardin by the silk road with the Assyrian Bishop سفر القاصد التماير الى ماردين بطريق الحرير مع مطران السريان =ا] 
+
 
 
 
@@ -2973,7 +3010,9 @@ evening ~
 
 cool night.
 
-	*Modte N.W. wind & fine
+DivLine: 7 WednTherm 5.79
+
+	Modte N.W. wind & fine
 
 weather; Henry came
 
@@ -2992,10 +3031,14 @@ Takhtarawan, also the
 
 
 Page 88
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Sept
-            Line 23: The new Mushir, he was a Wali and a Mushir in Yemen and he is Ahmed Faydhi Pasha = المشير الجديد و كان واليا و مشيرا في اليمن و هو احمد فيضي پاشا]
+
+            Line 23, 24, 25, 26 : The new Mushir, he was a Wali and a Mushir in Yemen and he is Ahmed Faydhi Pasha = المشير الجديد و كان واليا و مشيرا في اليمن و هو احمد فيضي پاشا]
 
 
 
@@ -3054,6 +3097,7 @@ down; He was the Waly
 
 
 Page 89
+
             Margins:
 
 
@@ -3111,6 +3155,7 @@ is no passport necessary
 
 
 Page 90: 
+
 	Margin: 
 Line 1: 1898 Sept
 DivLine 18: 8 Thurs
@@ -3140,13 +3185,14 @@ come onboard as he is
 going with us ~ 
 
 Page 91: 
+
 	Margin:
 Line 1: Draft 3.7
 Line 3: G. S. Piast 26,208 ¼
 Line 8: Okes 93,339
 Line 11: 240
 Line 13: Passengers 229 
-Line 14: arabic: [Doctor Ramsey officiates in Basreh in place of Consul Forbes who is in leave = الدكتور رمزي يقوم في البصرة مقام قنصلها فوربس المجاز]
+arabic: [Doctor Ramsey officiates in Basreh in place of Consul Forbes who is in leave = الدكتور رمزي يقوم في البصرة مقام قنصلها فوربس المجاز]
 
 Baghdad to Basrah
 	At 5.20 am we proceeded
@@ -3174,6 +3220,7 @@ servant free; also 2 in
 son of Elias Feraj & his wife
 
 Page 92: 
+
 	Margin: 
 Line 1: 1898 Septr
 DivLine 14: 9 Frid Ther @ 5.72
@@ -3205,8 +3252,9 @@ the Engine are visible,
 there is a sand bank 
 
 Page 93:
+
 	Margin: 
-	Line 1: arabic: [The anniversary of his marriage = ذكرى زواجه]
+arabic: [The anniversary of his marriage = ذكرى زواجه]
 
 forming just below the 
 Engine room high & dry
@@ -3235,6 +3283,7 @@ at 4,,15;
 at Um Sneyem~
 
 Page 94: 
+
 	Margin: 
 Line 1: 1898 Septr
 DivLine 6: 10 Sater Ther @ 5.74
@@ -3268,6 +3317,7 @@ were repairing the steering block
 which had broken; 
 
 Page 95: 
+
 	Margin: 
 DivLine 19: 11 Sund Ther @ 5.73
 
@@ -3299,10 +3349,11 @@ have off and at 12 proceeded
 fresh n.w. wind ~ 
 
 Page 96: 
+
 	Margin: 
 Line 1: 1898 Septr
-Line 2: arabic: [Daneg = دانك]
-Line 3: arabic: [ Ghadhban al-Boonyeh al-Mezban the Sheikh of Beni Laam plunders from Coot to Amara = شيخ بني لام غضبان البنية المزبان يسلب من الكوت الى العماره] 
+arabic: [Daneg = دانك]
+arabic: [ Ghadhban al-Boonyeh al-Mezban the Sheikh of Beni Laam plunders from Coot to Amara = شيخ بني لام غضبان البنية المزبان يسلب من الكوت الى العماره] 
 
 	At 1 1/2 P.M. we grounded
 hove off and at 2,,40 proceeded. 
@@ -3332,6 +3383,7 @@ plundering all the way
 from Coot to Amara, 
 
 Page 97:
+
 	Margin: 
 Line 1: Motserrif of Amara Mostapha Pasha dismissed on the 23d Augt
 
@@ -3364,6 +3416,7 @@ through the Shoal & the
 East bank ~ 
 
 Page 98: 
+
 	Margin: 
 Line 1: 1898 Septr 
 Line 3: 12 Mond Ther @ 5.40 Noon 88
@@ -3397,6 +3450,7 @@ Bags Onions)
 	At 1,,45 proceeded 
 
 Page 99: 
+
 	Margin: 
 DivLine 13: 13 Tuesd Ther @ 5.72
 
@@ -3412,7 +3466,7 @@ warmer, I had to sleep up
 on the house, Jeboory Asfar
 went to his house ~ 
 we coaled ship at night;
-	*Light n.w. & fine weather, 
+	Light n.w. & fine weather, 
 The Indian Marine Residency 
 Steamer of Bushire the Lawrence
 came up at 6 1/2 am from 
@@ -3428,9 +3482,10 @@ Khandallah are in quarantine
 	Yousif Marine &Rufail
 
 Page 100: 
+
 	Margin: 
 Line 1: 1898 Sept 
-Line 2: Arabic: [ Robbing the bugalows in the sea  =سلب البغال البحرية ] 
+Arabic: [ Robbing the bugalows in the sea  =سلب البغال البحرية ] 
 
 came to me on board they 
 enquired about Alexander
@@ -3457,6 +3512,7 @@ Piracy & robbery etc.
 taking place every year
 
 Page 101: 
+
 	Margin: 
 Line 11: Draft 3,,10
 Line 15: G. S. P. Local 6,528 ¾
@@ -3489,6 +3545,7 @@ rather warm at the beginning
 & cool afterward ; 
 
 Page 102: 
+
 	Margin: 
 Line 1: 1898 Septr 14 Wedn Ther @ 5.74
 
@@ -3522,6 +3579,7 @@ by sunset & rather warm,
 there are 4 or 5 Boats
 
 Page 103:
+
 	Margin: 
 DivLine 9: 15 Thursd Ther @ 5.68
 Line 15: Low state of river below Amara  
@@ -3556,6 +3614,7 @@ not listened to by the Turkish
 Government, the river is 
 
 Page 104: 
+
 	Margin: 
 Line 1: 1898 Sept
 
@@ -3587,10 +3646,10 @@ Light S. Ely breeze. but cool,
 a float & left at 11 ~ 
 	We heard at Amara that 
 	
-Page 105
+	Page 105
     Margin:
     Line 1: [The engineer of the Wilaya = مهندس الولاية]
-    Line 3: Difficulty in closing canals
+    Line 3-17: Difficulty in closing canals
     Line 19: [al-Btera = البتيرة]
 
 Missat Effendi the Turkish
@@ -3761,7 +3820,7 @@ Page 110:
     Margin:
     Line 1: 1898
     Line 2: Septr
-    Line 13:  [The tents of the Christians at Gherrareh and the names of their owners = خيام المسيحيين في كرارة و اسماء اصحابها]
+    Line 13, 14, 15:  [The tents of the Christians at Gherrareh and the names of their owners = خيام المسيحيين في كرارة و اسماء اصحابها]
     
 
 till 1,,50 when we passed
@@ -4526,9 +4585,10 @@ all; (one Deck free by
 Lynch Broths)
         At 5,,20 P.M. arrived
 at Amara, landed 25
-
 Page 135
+
 			Margins:
+
 			DivLine: 30 Frid therm@5.74
 
 
@@ -4584,8 +4644,11 @@ their wages for this month;
  
 
 Page 136
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
 
  
@@ -4641,9 +4704,10 @@ again taken ill with
  
 
 Page 137
+
             Margins:
-            DivLine: 1st  Satur therm@5.74 
-            Line 14: Arabic [The orchard of Agha (?) at Gherrarah and the tents there = بستان اغا (؟) في كرارة و خيام هناك] 
+
+            Line 14, 15, 16: Arabic [The orchard of Agha (?) at Gherrarah and the tents there = بستان اغا (؟) في كرارة و خيام هناك] 
 
 
 
@@ -4685,7 +4749,7 @@ her to do so ~
 
 fine clear weather & light N.W.
 
-            *
+            DivLine: 1st  Satur therm@5.74 
 
             Light N.W. & fine, Detained 
 
@@ -4702,11 +4766,16 @@ gave tickets to 11 ½ Coot passengers
  
 
 Page 138
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
-            Line 3: Also Mahomed Pasha al-Daghestany and Abduljebbar (Khayat) bought there and made use of it and other things = و مشترى محمد پاشا الداغستاني و عبد الجبار (خياط) بها و استغلالها و غير ذلك ] 
-            Line 10: Gutnyeh Property
+
+            Line 3-9: Also Mahomed Pasha al-Daghestany and Abduljebbar (Khayat) bought there and made use of it and other things = و مشترى محمد پاشا الداغستاني و عبد الجبار (خياط) بها و استغلالها و غير ذلك ] 
+
+            Line 10-20: Gutnyeh Property
 
  
 
@@ -4767,8 +4836,11 @@ from Telkef this year on
  
 
 Page 139
+
             Margins:
-            Line 21: The tents of the Christians at Gherrarah and the names of the owners, among them is our name = خيام المسيحيين في كراره  و اسماء اصحابها بينها اسمنا] 
+
+            Line 21, 22, 23, 24: The tents of the Christians at Gherrarah and the names of the owners, among them is our name = خيام المسيحيين في كراره  و اسماء اصحابها بينها اسمنا] 
+
 			DivLine: 2d  Sund Therm@5.68
 
 			
@@ -4828,10 +4900,14 @@ also Antone Marine
  
 
 Page 140
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
-            Line 21: Arabic [His servant and Khokhy his servant’s wife (he then became my servant for many years at al-Garraf)  = خادمه و زوجته خوخي (ثم كان خادمي سنين عديدة في الغراف)] 
+
+            Line 21, 22, 23, 24: Arabic [His servant and Khokhy his servant’s wife (he then became my servant for many years at al-Garraf)  = خادمه و زوجته خوخي (ثم كان خادمي سنين عديدة في الغراف)] 
 
             
 
@@ -4890,8 +4966,10 @@ arrived at 10 ½ ~
  
 
 Page 141
+
             Margins:
-            Line 9: He gets the keys (wrong word here, Yacoob Serkis meant to write “the letters”) of his son Iskander opened, he attributes opening them to Antone Julietti = مفاتيح ابنه اسكندر تصل اليه مفتوحة فيسندها فتحها الى انطوان جولييتي]  
+
+            Line 9, 10, 11,1 2, 13, 14: He gets the keys (wrong word here, Yacoob Serkis meant to write “the letters”) of his son Iskander opened, he attributes opening them to Antone Julietti = مفاتيح ابنه اسكندر تصل اليه مفتوحة فيسندها فتحها الى انطوان جولييتي]  
 
 
 
@@ -4950,8 +5028,11 @@ enquire from Antoin
  
 
 Page 142
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
 
  
@@ -5009,14 +5090,14 @@ in the Verandah
  
 
 Page 143
+
             Margins:
-	DivLine: 3 Mond
-	DivLine: 4 Tuesd Therm@74
-            
+
+            DivLine: 3 Mond
 
  
 
-            *Light air & fine ~ at
+            Light air & fine ~ at
 
 7 ½ am came on board
 
@@ -5042,7 +5123,8 @@ in the evening, ~
 
 first part of the night;
 
-            *
+            DivLine: 4 Tuesd Therm@74
+
             Light S. Ely breeze & little
 
 dampy; at 4 ½ am
@@ -5068,10 +5150,14 @@ married lately about
  
 
 Page 144
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
-            Line 3: Arabic [The marriage of Hannosh Andrea and Eliza Abood= زواج حنوش اندريا و اليزة عبود]
+
+            Line 3, 4 , 5 : Arabic [The marriage of Hannosh Andrea and Eliza Abood= زواج حنوش اندريا و اليزة عبود]
 
 
 
@@ -5128,7 +5214,9 @@ where I dined on the
  
 
 Page 145
+
             Margins:
+
 			DivLine: 5 Wedn Therm@5.78
 
 			
@@ -5186,8 +5274,11 @@ of the 19 Ulto; I suppose
  
 
 Page 146
+
             Margins:
+
             Line 1: 1898
+
             Line 2: Octor
 
  
@@ -5245,6 +5336,7 @@ Missionaire Couvent Carmes
  
 
 Page 147
+
             Margins:
 
  
@@ -5300,9 +5392,11 @@ other telegram to Alexander
  
 
 Page 148
+
             Margins:
-            DivLine: 6 Thurs.
+
             Line 1: 1898
+
             Line 2: Octor
 
 Draft / 3,,6
@@ -5327,7 +5421,8 @@ it shifted at midnight to
 
 N.W. ~
 
-            *
+            DivLine: 6 Thurs.
+
             Again the wind is S. Easter
 
             At 5 am. I came on 
@@ -5361,10 +5456,14 @@ of the river ~
  
 
 Page 149
+
             Margins:
-            Line 3: Okes / 82,574
-            Line 7: Passg 181 ½
-            Line 11: Jemil (cousin) Elias Serkis = جميل (ابن العم) الياس سركيس] 
+
+            Line 3-5: Okes / 82,574
+
+            Line 7-9: Passg 181 ½
+
+            Line 11, 12: Jemil (cousin) Elias Serkis = جميل (ابن العم) الياس سركيس] 
 
  
 
@@ -5427,6 +5526,7 @@ parts ~
 
 
 Page 150
+
 	Margin: 
 Line 1: 1898 Octer
 DivLine 6: 7 Sund
@@ -5457,13 +5557,14 @@ having left Baghdad
 a day before us ~ 
 
 Page 151: 
+
 	Margin: 
 DivLine 4: 8 Satur
 
 Very light air & clouds
 on the horyzon ~ We 
 remained at Coot for the night; 
-	*Light S. Ely breeze with 
+	Light S. Ely breeze with 
 some clouds on the horyzon, 
 	At 5,,30 Am. we left
 Coot the Mossul also following
@@ -5487,6 +5588,7 @@ at Ali Gherbi & went on at
 	Light S. Ely breeze & fine
 
 Page 152: 
+
 	Margin: 
 Line 1: 1898 Octer 9 Sund
 
@@ -5517,6 +5619,7 @@ to keep her close to the bank
 again anchored to wait 
 
 Page 153: 
+
 	Margin: 
 DivLine 18: 19 Mond
 
@@ -5545,6 +5648,7 @@ night from the heat &
 my thought about my 
 
 Page 154: 
+
 	Margin: 
 Line 1: 1898 Octo
 
@@ -5573,6 +5677,7 @@ dated the 4 Instt from
 Paris ~ I find no
 
 Page 155:
+
 	Margin: 
 Line 18: F.oc16 
 
@@ -5602,6 +5707,7 @@ a talk with him & explained
 he told that Père Pièrre
 
 Page 156: 
+
 	Margin: 
 Line 1: 1898 Octer 
 
@@ -5656,6 +5762,7 @@ for Pere Pièrre to be sent
 urging him to do all his
 
 Page 158: 
+
 	Margin: 
 Line 1: 1898 Octo
 Line 10: Draft 3,8 ~
@@ -5685,6 +5792,7 @@ Ship is drawing 3,,9 Inches
 going down ~ 
 
 Page 159: 
+
 	Margin: 
 Line 1: 11 Tuesd. Ther @ 5.74
 
@@ -5716,6 +5824,7 @@ and went on easy all
 the while ~ 
 
 Page 161:
+
 	Margin: 
 Line 1: 1898 Octor
 DivLine10: 12 Wednes Ther @ 5,65
@@ -5747,9 +5856,10 @@ at Ali Sherli & got 2 passenge
 detained at Seyd Abbass
 
 Page 161: 
+
 	Margin: 
 DivLine 10: 13 Thurs Ther @ 5.73
-Line 11: arabic: [Nefeshyeh = نفيشية] 
+arabic: [Nefeshyeh = نفيشية] 
 
 in trying to pass the shoal
 between two Boats aground
@@ -5779,6 +5889,7 @@ through;  at 9.5 she came
 down & went on ;
 
 Page 162: 
+
 	Margin: 
 Line 1: 1898 Octor
 
@@ -5810,10 +5921,11 @@ At 10,,45 got off & proceeded
 fine cool night ~ 
 
 Page 163: 
+
 	Margin: 
 Line 1: 14 Frid Ther @ 6.60
-Line 2: arabic: [His arrival in Baghdad was on the 14th of October 1897 = كان وصوله الى بغداد في ١٤  تشرين الاول ١٨٩٧]
-Line 3: arabic: [His meeting with the Kaimakam of Al-Ramadi Haj Talib Effendi then the Kaimakam of Al- Swereh = ملاقاته القائم مقام الرمادي الحاج طالب افندي ثم قائم مقام الصويرة] 
+arabic: [His arrival in Baghdad was on the 14th of October 1897 = كان وصوله الى بغداد في ١٤  تشرين الاول ١٨٩٧]
+arabic: [His meeting with the Kaimakam of Al-Ramadi Haj Talib Effendi then the Kaimakam of Al- Swereh = ملاقاته القائم مقام الرمادي الحاج طالب افندي ثم قائم مقام الصويرة] 
 
 	Light n.w. breeze & cool
 weather ~ 
@@ -5845,6 +5957,7 @@ not seen him since that
 time he has been shifted
 
 Page 164:
+
 	Margin: 
 Line 1: 1898 Octo
 
@@ -5876,7 +5989,7 @@ opposite side 18 Tents
 Page 165: 
 Margin:
 Line 2: [The tents of the Christians = خيام المسيحيين] 
-Line 4: [Doctor Sakhur (he is alive in Beirut and his (?) is in Beirut in autumn 1938 and he is advanced in age ) = الدكتور زخور ( حي ببيروت و (؟) في بيروت في خريف ١٩٣٨ و هو معمر)      
+Line 4, 5, 6, 7 and 8: [Doctor Sakhur (he is alive in Beirut and his (?) is in Beirut in autumn 1938 and he is advanced in age ) = الدكتور زخور ( حي ببيروت و (؟) في بيروت في خريف ١٩٣٨ و هو معمر)      
 
 & those above the bridge
 on this about 25 Tents
@@ -6787,7 +6900,947 @@ here a letter left by Henry
 arrived last Thursday
 the 20 Inst; he complains
 
+Page 135
+
+			Margins:
+
+			DivLine: 30 Frid therm@5.74
+
+
+
+passengers ~ we took no
+
+coal but shipped 879 Tins
+
+of Glue & 6 Bags of Dye;
+
+weather very calm with a 
+
+light south westerly  breeze,
+
+& clouds clearing up ~
+
+            At 7 P.M. we left Amara,
+
+fool moon & fine weather;
+
+            *Light S Ely & hazy atmosphere
+
+            At 5,,5 AM. landed 4
+
+passengers at Ali Gherbi
+
+and took one & went on
+
+at 5,,15; weather unsettled 
+
+& disagreable; plenty of
+
+flies & troubled sky ~
+
+	Gave tickets to 34 Amara
+
+passengers;
+
+            At 8 grounded at Seyd Abbass
+
+took an anchor ahead &
+
+hov over ~ At 9,,30 got 
+
+off & proceeded;
+
+            I paid the Ships’ company
+
+their wages for this month;
+
+            Very sultry and hazy warm
+
+ 
+
+Page 136
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+ 
+
+weather
+
+            At 5,,30 grounded below
+
+the village of Coot, took
+
+an anchor ahead & hove
+
+her into deep water; at
+
+6,,15 one of the steering braket
+
+was carried off as we were
+
+getting off the shoal, we
+
+stopped to repair it ~
+
+            At 7,,15 the SS. Khalifah
+
+arrived at Coot.
+
+            At 7.30 we finished &
+
+proceeded to Coot where
+
+we arrived at 7,,40 ~
+
+landed 4 passengers &
+
+begun to take 10 Tons of
+
+Coal; ~ Capt Hanslow
+
+& the rest of the officers & Engineers
+
+came on board except 
+
+Henry did not come,
+
+he sent me a letter in
+
+which he says that his
+
+wife Menusha had 
+
+again taken ill with
+
+ 
+
+Page 137
+
+            Margins:
+
+            Line 14, 15, 16: Arabic [The orchard of Agha (?) at Gherrarah and the tents there = بستان اغا (؟) في كرارة و خيام هناك] 
+
+
+
+vomiting bile & she was
+
+better but weak, he
+
+says that no telegrams
+
+had arrived from my
+
+son Alexander in answer 
+
+to mine of the 19th Instt;
+
+but the letters which are
+
+left with Johny, the
+
+Khalifah has only 64000
+
+Okes & 204 passengers,
+
+Henry says that Alice with 
+
+her mother my sister Emilia 
+
+have gone out to encamp at
+
+Gherrah, outside Michail
+
+Minas’s garden, as Alice is 
+
+very weak & the Doctor advised
+
+her to do so ~
+
+            At 9.30 P.M. we left Coot 
+
+fine clear weather & light N.W.
+
+            DivLine: 1st  Satur therm@5.74 
+
+            Light N.W. & fine, Detained 
+
+at Mehd from 3 ½ till 4 
+
+am ~
+
+            At 5,,50 passed Memlah
+
+gave tickets to 11 ½ Coot passengers
+
+            At 7.30 grounded at
+
+ 
+
+Page 138
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+            Line 3-9: Also Mahomed Pasha al-Daghestany and Abduljebbar (Khayat) bought there and made use of it and other things = و مشترى محمد پاشا الداغستاني و عبد الجبار (خياط) بها و استغلالها و غير ذلك ] 
+
+            Line 10-20: Gutnyeh Property
+
+ 
+
+Sheresh, took an anchor out
+
+to the east shore & hov off, sent
+
+to sound, & marked the Channel
+
+dropped down & steamed through
+
+it, went on at 8,,40 ~
+
+            At 2,,55 P.M. passed 
+
+Azizieh, the village is falling
+
+down, the houses are getting
+
+eaten away by the river
+
+            Detained at Rmelat in shoal
+
+water from 4,,45 till 5 P.M. 
+
+            The reach of Gutnyeh
+
+which was bought from
+
+the Turkish Governt. by Mohamed
+
+Pasha Daghestany (General
+
+of Cavallery here) and the 
+
+lawyer Abduljebbar, is now
+
+florishing, they have let
+
+the Tamarisk jungle grown
+
+thick, they have built a 
+
+house on the bank at the 
+
+lower end of the reach as
+
+a Granery store house, and 
+
+have lately taken out about 
+
+10 Tilkefli families destitute
+
+people who had all come
+
+from Telkef this year on
+
+ 
+
+Page 139
+
+            Margins:
+
+            Line 21, 22, 23, 24: The tents of the Christians at Gherrarah and the names of the owners, among them is our name = خيام المسيحيين في كراره  و اسماء اصحابها بينها اسمنا] 
+
+			DivLine: 2d  Sund Therm@5.68
+
+			
+
+account of the scarcity there
+
+of water & failure of cultivation
+
+            At 6.30 P.M. passed Baghdadieh
+
+Fort, moon just getting 
+
+up, very calm weather,
+
+but cool & light N.W. ~
+
+            
+
+	*Very light N.W. breeze &
+
+fine ~ At 3,,10 AM. passed 
+
+Ctesiphon;
+
+            At 4,,10 touched the Shoal
+
+at Gusseiba, worked her back,
+
+with the Engine, she stuck again,
+
+while taking an anchor out
+
+ahead, she got off ~ At
+
+5,,40 proceeded ~
+
+            At 7 passed Diala, detained 
+
+10 minutes in shoal water
+
+just in rounding the Diala
+
+river ~
+
+            At 8,,15 I landed at the 
+
+	Tents just above the Bridge
+
+where I met Polus Serkis &
+
+his wife & Mily his brother
+
+Naoom’s wife & her son Yacoob
+
+also Antone Marine
+
+ 
+
+Page 140
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+            Line 21, 22, 23, 24: Arabic [His servant and Khokhy his servant’s wife (he then became my servant for many years at al-Garraf)  = خادمه و زوجته خوخي (ثم كان خادمي سنين عديدة في الغراف)] 
+
+            
+
+his wife & children these latter
+
+are in the Garden of Gherrarah
+
+in the home of Nawab Ahmed
+
+Agha with Jeboory Asfar’s
+
+wife, Antone tells me 
+
+that no telegram has yet
+
+arrived from Alexander;
+
+            I walked up to the Tents of 
+
+Alice & Sister Emilia above 
+
+the Garden of Gherrara about
+
+600 yards they are by themselves
+
+only there with their servants
+
+and 2 watchmen Arabs;
+
+            I sat about ½ hour &
+
+left them & walked in to
+
+town at halfway I met
+
+some Sakka donkeys
+
+returning I rode one for 5
+
+piaster to inside the Gate, 
+
+arrived home at 9 ¾ ~
+
+I foud our servant Meekha
+
+& his wife Khokhy only
+
+here she is in bed having
+
+delivered a child 8 days ago
+
+in my house ~ The Mejidieh
+
+arrived at 10 ½ ~
+
+ 
+
+Page 141
+
+            Margins:
+
+            Line 9, 10, 11,1 2, 13, 14: He gets the keys (wrong word here, Yacoob Serkis meant to write “the letters”) of his son Iskander opened, he attributes opening them to Antone Julietti = مفاتيح ابنه اسكندر تصل اليه مفتوحة فيسندها فتحها الى انطوان جولييتي]  
+
+
+
+	I found two letters here
+
+from Alexander one of
+
+last week (arrived on 22 Sept
+
+and the other of this week)
+
+(arrived on the 29) but both
+
+letters were brought from
+
+the Post Office, Cut open,
+
+with a Knife from the edges.
+
+My servant says he received 
+
+the latter one opened, and
+
+the former one of last week
+
+also was given to Johny
+
+open; every one tells me
+
+that the Suspicion must
+
+fall on Antone Julietti who
+
+msut be the author, having
+
+been Alexander’s friend
+
+and wishes to know all about
+
+his doings, & as his father
+
+is the Inspector of Post and 
+
+Telegraph here, the Turkish
+
+employèes are, as is natural
+
+with to favor anything
+
+he wishes to do for the sake 
+
+of his father; I sent to 
+
+enquire from Antoin
+
+ 
+
+Page 142
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+ 
+
+Julietti he came at once to
+
+me expressing his utter 
+
+ignorance of the affair,
+
+I told him that I shall
+
+have to complain of this
+
+matter to my Consul against
+
+whoever has done it ~
+
+            I called to see Menusha,
+
+I found her well only little
+
+weak from vomiting which
+
+she had few days ago;
+
+            I sent a telegram to Henry
+
+this afternoon to Basreh
+
+            Svoboda Basreh
+
+            Wife perfectly well little
+
+weak.    Svoboda,
+
+            I called on the family of 
+
+Pahlawan opposite us;
+
+breakfasted at home; I
+
+called on Sister Eliza at 2
+
+P.M. & then on Sister Medula
+
+I came home ~
+
+            Light N.W. & fine, I
+
+dined & slept down below
+
+in the Verandah
+
+ 
+
+Page 143
+
+            Margins:
+
+            DivLine: 3 Mond
+
+ 
+
+            Light air & fine ~ at
+
+7 ½ am came on board
+
+the SS. Mossul is inside
+
+discharging cargo;
+
+            I went to the office for some
+
+gold pounds & came home
+
+at 11 ~ I had a cold water
+
+bath; ~ at 4 P.M. called 
+
+on Sister Medula & then came 
+
+home; Johny & Artin called
+
+in the evening, ~
+
+            Light air & warm in the 
+
+first part of the night;
+
+            DivLine: 4 Tuesd Therm@74
+
+            Light S. Ely breeze & little
+
+dampy; at 4 ½ am
+
+I came on board the Mejidieh
+
+she went inside to discharge
+
+& the Mossul hauled 
+
+out & at 10 I went onshore
+
+called on Menusha & then,
+
+with Catterina Yaghchi we
+
+called on Hannosh son of
+
+Naoom Andrea who got
+
+married lately about
+
+ 
+
+Page 144
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+            Line 3, 4 , 5 : Arabic [The marriage of Hannosh Andrea and Eliza Abood= زواج حنوش اندريا و اليزة عبود]
+
+
+
+a month ago with Eliza
+
+daughter of Fathalla
+
+Abood & widow of the 
+
+late Johny Toma Loca
+
+she is much older than
+
+Hamosh about 10 years,
+
+            I came home & breakfasted
+
+Sister Medula called on 
+
+me for ½ hour;
+
+            At 3 P.M. I came on board 
+
+we are shipping a good 
+
+deal of Local cargo, as the
+
+Khalifah had refused taking
+
+any ~ We took up to No.
+
+35 the local cargo the freight
+
+has been risen from 9
+
+Paras to 10 for the present 
+
+state of the river ~
+
+            Weather keeps bad with 
+
+a warm & light S.Ely breeze
+
+& some clouds on the
+
+N.West;
+
+            At 5 P.M. I went home &
+
+then went over to Sister Eliza
+
+where I dined on the 
+
+ 
+
+Page 145
+
+            Margins:
+
+			DivLine: 5 Wedn Therm@5.78
+
+			
+
+top of the house, they are
+
+sleeping up still & so all
+
+the people too ~ at 9
+
+I came home ~
+
+            *Light S. Ely breeze &
+
+warm dampy weather, 
+
+	At 7 am called on Menusha
+
+& came on board; ~
+
+The SS Mossul & Barge left
+
+this morning for Basreh;
+
+            We are shipping wool &
+
+other cargo ~
+
+            At 10 ½ I went home to 
+
+breakfast,
+
+            At 11 I received this telegram
+
+from Alexander from
+
+Paris dated the 4th (yesterday)
+
+            Svoboda          Baghdad
+
+            Incapable voyagèr, Souffrant
+
+Cotè Hopital necessaire
+
+pryè mère venir Paris
+
+pourquoi impetiseux,
+
+repondèz 124 Rennes,
+
+            This is the answer of mine
+
+of the 19 Ulto; I suppose
+
+ 
+
+Page 146
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+ 
+
+            I got so sorry & disgusted 
+
+of these telegrams and
+
+always he is trying to
+
+stop his departure and
+
+make some excuses, I 
+
+could not eat my breakfast
+
+at all; ~ I left & went to 
+
+Sister Medula to confer with
+
+her but I saw there Father
+
+Emmanuel the Carmelite
+
+& we came to the conclusion
+
+that as Père Pièrre must 
+
+be now gone to Paris about
+
+today or tomorrow before
+
+starting for Baghdad,
+
+it would be a good change
+
+to wire to him to go & see
+
+Alexander & try to bring
+
+him with him; so I went 
+
+with him to the Church
+
+& made out this telegram
+
+            Père Pièrre 
+
+Missionaire Couvent Carmes
+
+            Pompe Passy
+
+                        Paris
+
+ 
+
+Page 147
+
+            Margins:
+
+ 
+
+            Prière Voir Alexandre
+
+124 Rue Rennes rassurez
+
+Sur Santé, persuadèz
+
+Voyager ensemble
+
+absolument, disposè
+
+oublièr, repondèz
+
+            Svoboda
+
+            I also made out one
+
+for Alexander, thus
+
+            Svoboda
+
+            124 Rue Rennes
+
+            Paris
+
+            Accompagnèz Pêre Pièrre
+
+actuellement Paris lui
+
+telegraphiam sujet,
+
+Mère Basreh ~ 
+
+            Svoboda
+
+            I sent them at 1 P.M. at once
+
+and paid 23 ½ frcs;
+
+            We finished at 3 P.M. 
+
+I went on shore to my
+
+house; Johny came to me
+
+I was going to make an 
+
+other telegram to Alexander
+
+ 
+
+Page 148
+
+            Margins:
+
+            Line 1: 1898
+
+            Line 2: Octor
+
+Draft / 3,,6
+
+G.S.Piast / 19,004 ½  
+
+
+
+but I thought it will be
+
+of no use, & better wait
+
+until I get Père Pièrre’s answer
+
+& see what my wife will
+
+say at Basreh; ~
+
+            S. Ely wind all the night
+
+it shifted at midnight to
+
+N.W. ~
+
+            DivLine: 6 Thurs.
+
+            Again the wind is S. Easter
+
+            At 5 am. I came on 
+
+board, I could not sleep
+
+well, always thinking about
+
+Alexander’s doings ~
+
+The SS Thrat arrived yesterday at 10 ½ am
+
+            Baghdad to Basreh
+
+            At 5,,55 AM we got under
+
+way & proceeded; Light
+
+S Ely breeze; ship drawing
+
+3 feet 6 Inches;
+
+            Lots of Tents are encamped
+
+at Gherrarah on both Sides
+
+of the river ~
+
+            At 8.15 passed Gherrarah,
+
+ 
+
+Page 149
+
+            Margins:
+
+            Line 3-5: Okes / 82,574
+
+            Line 7-9: Passg 181 ½
+
+            Line 11, 12: Jemil (cousin) Elias Serkis = جميل (ابن العم) الياس سركيس] 
+
+ 
+
+gave tickets to the Passengers
+
+we have altogether 141 (6
+
+in 1stclass they are 2 women
+
+family of Cassim Khdery at
+
+Basreh, 3 Persian women
+
+of Kadumein and Jemil
+
+the son of Elias Serkis all
+
+for Basreh, there are the wife
+
+& children & servant of Hannosh
+
+Hanna the Clerk of Lynch
+
+Brothers free in 2d Class)
+
+also 3 Tilkefli women free ~
+
+            At 9,,15 anchored at the Island
+
+of Zumbaranyeh & sounded
+
+            At 9,,50 went on after
+
+marking the Channel ~
+
+            At 10,,30 passed 
+
+Ctesiphon; ~
+
+            Weather became very hazy
+
+and dusty with warm S.Ely
+
+light wind ;
+
+            At 4,45 P.M. passed
+
+Baghdadieh Fort ~
+
+            At 5,,50 anchored at 
+
+Rmelat & sent to sound,
+
+clouds on the west & north
+
+parts ~ 
+
+            At 6,,10 we weighed and 
+
+
 Page 210: 
+
 	Margin: 
 Line 1: 1898 Novr
 DivLine 5: 7 Mond
@@ -6819,9 +7872,10 @@ the 31st Octor; ~
 	Weather became fine with
 
 Page 211: 
+
 	Margin: 
 DivLine 2: 8 Tuesd
-Line 1: arabic: [Father Louis Sayegh = الاب لويس صائغ] 
+arabic: [Father Louis Sayegh = الاب لويس صائغ] 
 
 a Light n.w. breeze; 
 	*Light N.W. & fine weather
@@ -6849,6 +7903,7 @@ we received the mail at
 4 P.M.; 
 
 Page 212: 
+
 	Margin: 
 Line 1: 1898 noon
 DivLine 12: 9 Wedn
@@ -6881,7 +7936,7 @@ we got up to near K. Saleh
 	Finished with the passengers
 tickets; 
 
-Page 213: 
+Page  213: 
 	Margin: 
 Line 1: Okes 131,559
 Line 6: Passgr 238
@@ -6914,6 +7969,7 @@ on board with Abdul Kadur’s
 mother free also) ~ 
 
 Page 214:
+
 	Margin: 
 Line 1: 1898 Novr
 DivLine 4: 10 Thursd The 6.54
@@ -6945,6 +8001,7 @@ took 5 Tons of coal,
 to go back with us ,
 
 Page 215:
+
 	Margin: 
 DivLine 5: 11 Frid The @ 6.55
 
@@ -6977,10 +8034,11 @@ I saw Jeboory Asfar's
 wife & her two children
 
 Page 216: 
+
 	Margin: 
 Line 1: 1898 Novr
 DivLine 12: 12 Satur Ther @ 6.51
-Line 13: arabic: [His nephew Edward Blockey = ابن اخته ادور بلوكي] 
+arabic: [His nephew Edward Blockey = ابن اخته ادور بلوكي] 
 
 going down in her ; 
 	Toward sunset the clouds begun 
@@ -7010,8 +8068,9 @@ Bridge, where the steamer
 went alongside & landed 
 
 Page 217: 
+
 	Margin : 
-Line 1: arabic: [Some tents of the Christians remain out at Gherrarah, of these are our tents – signed: Yacoob Serkis = بقاء خيام بعض المسيحيين في كرارة منها خيامنا – يعقوب سركيس] 
+arabic: [Some tents of the Christians remain out at Gherrarah, of these are our tents – signed: Yacoob Serkis = بقاء خيام بعض المسيحيين في كرارة منها خيامنا – يعقوب سركيس] 
 
 a mare we have from Basreh
 	We walked to town; a;;
@@ -7043,6 +8102,7 @@ he gets better he will
 leave with Père Pièrre
 
 Page 218: 
+
 	Margin: 
 Line 1: 1898 Novr
 DivLine 19: 13 Sund Ther @ 6.52 
@@ -7074,6 +8134,7 @@ and at 7 1/2 it began to
 rain steadily and became 
 
 Page 219: 
+
 	Margin: 
 Line 7: 
 
@@ -7106,6 +8167,7 @@ marriage shall take
 place next Sunday
 
 Page 220: 
+
 	Margin: 
 Line 1: 1898 Nov 
 
@@ -7163,6 +8225,7 @@ him if he wants to wire
 to Alexander that he can
 
 Page 222: 
+
 	Margin: 
 Line 1: 1898 Novr
 DivLine 8: 14 Mond Therm 6.51
@@ -7222,6 +8285,7 @@ since Père Pièrre is Absent
 "15 mots F 8,,65 Svoboda
 
 Page 224: 
+
 	Margin:
 Line 1: 1898 Novr
 
@@ -7252,6 +8316,7 @@ evening for an hour
 weather ~ 
 
 Page 225:
+
 	Margin:
 	DivLine: 15 Tuesd Th @ 6,,50 
 	
@@ -7281,6 +8346,7 @@ decisive answer or say
 when he is leaving;~ 
 
 Page 226
+
 	Margin:
 	Line 1: 1898
 	Line 2: Novr
@@ -7312,8 +8378,9 @@ cold weather;~
 	I sent this morning
 	
 Page 227:
+
 	Margin:
-	Line 1: Delegate Altmayer & Bishop Aghnatius arrived from Mossul
+	Vertical lines: Delegate Altmayer & Bishop Aghnatius arrived from Mossul
 	
 	one Tray with 9 Loaves of 
 Sugar to Menusha &
@@ -7343,6 +8410,7 @@ Fahama (Kadem Pasha's
 property) I & Artin and 
 
 Page 228:
+
 	Margin:
 	Line 1: 1898 
 	Line 2: Novr 
@@ -7400,6 +8468,7 @@ says
 Ibrahim Gejou from 
 
 Page 230:
+
 	Margin:
 	Line 1: 1898
 	Line 2: Novr
@@ -7453,14 +8522,15 @@ not working to Basreh,
 me to see the telegrams 	
 
 Page 232: 
+
 	Margin:
 	Line 1: 1898
 	Line 2: Novr
 	DivLine: 18 Frid
-	Line 8: Draft 3,,5 
-	Line 11: G. S. Piast 21110 3/4 
-	Line 17: Okes 75,766
-	Line 20: Passg 204 1/2 
+	Line 8-10: Draft 3,,5 
+	Line 11-14: G. S. Piast 21110 3/4 
+	Line 17-19: Okes 75,766
+	Line 20-23: Passg 204 1/2 
 
 Weather kept cloudy at 
 night~
@@ -7517,6 +8587,7 @@ I could not get passed we
 anchored for the night;
 
 Page 234: 
+
 	Margin:
 	Line 1: 1898 
 	Line 2: Novr
@@ -7579,11 +8650,13 @@ round; we knocked off and
 remained for the night
 
 Page 236: 
+
 	Margin:
 	Line 1: 1898
 	Line 2: Novr
 	DivLine: 20 Sund Th @ 6,,54 
-	Line 8: Louisa my niece was married with Yousif Yaghchi (see 26th)
+	Line 8-25: Louisa my niece was married with
+	Yousif Yaghchi (see 26th)
 	
 	Light S. Erly & little cloudy
 	At 6,,30 AM. left Umel Ajaj
@@ -7612,6 +8685,7 @@ begin to gather up~
 	At 6 P.M. landed 2
 	
 Page 237:
+
 	Margin:
 	DivLine: 21 Mond Th @ 6,,60
 	
@@ -7643,6 +8717,7 @@ weather getting fine &
 clouds disappearing 
 
 Page 238:
+
 	Margin:
 	Line 1: 1898
 	Line 2: Nov
@@ -7704,6 +8779,7 @@ Rezooki Angoorly also came
 afterward; we are going 
 	
 Page 240:
+
 	Margins:
 	Line 3: 1898 Nov.
 
@@ -7733,6 +8809,7 @@ fine, very bright N.W. air
 and not cold at all,
 
 Page 241:
+
 	Margins:
 	DivLine: 23 Wedn. Ther @ 6.63
 	Line 33: Draft / 4,,0
@@ -7769,6 +8846,7 @@ Amara landed 24 passengers
 	Mr. Guilietti is here
 
 Page 242:
+
 	Margins:
 	Line 68: 1898 Nov
 	DivLine: 24 Thursd Therm @ 6. 55
@@ -7800,6 +8878,7 @@ We took 39 1/2 passengers from
 Amara, the
 
 Page 243:
+
 	Margins:
 	DivLine: 25 Frid Therm. @ 6.49
 
@@ -7861,6 +8940,7 @@ At 6,,30 passed through the
 Bridge of Gherrara Cut
 
 Page 245
+
             Margins:
             Line 7:عودة ريشارز من  اوربة
             Line 23: زواج  يوسف ياغڄي و لويزة
@@ -8281,13 +9361,12 @@ as Jeboory had told them,
 Nessoory Andrea also
 came with me & he slept
 there;
-            *Light N.W. & fine cold
+            Light N.W. & fine cold
 morning; I had tea &
 breakfasted with them
 Yousif Marine also came
 down; At 10 ½ I came
 on board & called on
-
 Page 256 – Note: this page exists in the previous document Diary_48_Pages_243_257
 	Margins:
 	Line 1: 1898
@@ -8640,7 +9719,7 @@ him to Church; Rosa
 
 Page 267
 	Margins:
-	Line 9: Arabic [Menusha, his sister in law and wife of his brother Henry, complains from urinary sand= منوشة زوجة اخيه هانري تشكو الرمل البولي]  
+	Line 9, 10, 11, 12: Arabic [Menusha, his sister in law and wife of his brother Henry, complains from urinary sand= منوشة زوجة اخيه هانري تشكو الرمل البولي]  
 
 his daughter about 18 years 
 old had the small Pox
@@ -8669,10 +9748,11 @@ the 17 Novr; so I sent
 the following telegram
 
 Page 268
+
 	Margins:
 	Line 1: 1898
 	Line 2: Decr
-	Line 10: Arabic [Eliza and Emilia prepare the trousseau of Regina for her marriage with Duncan the clerk of the Comet = اليزه و اميليا تهيأن جهاز ريجينة لزواجها مع دنكن كاتب كوميت ]
+	Line 10, 11, 12, 13, 14: Arabic [Eliza and Emilia prepare the trousseau of Regina for her marriage with Duncan the clerk of the Comet = اليزه و اميليا تهيأن جهاز ريجينة لزواجها مع دنكن كاتب كوميت ]
 
 at noon today to him
 	Gejou
@@ -8766,7 +9846,7 @@ of marriage and
 
 Page 271
 	Margins:
-	Line 12: Arabic [The gifts and they are fifty in number = الهدايا و عددها خمسون]
+	Line 12, 13: Arabic [The gifts and they are fifty in number = الهدايا و عددها خمسون]
 
 both husband & wife
 had to sign them, the 
@@ -8791,11 +9871,11 @@ Medula & many others,
 office; and I then
 sent the following
 telegram to my wife
-
 Page 272:
+	
 	Margin: 
 Line 1: 1898 Decr
-Line 2: Arabic: [The description of the wedding party = وصف حفلة العرس]
+Arabic: [The description of the wedding party = وصف حفلة العرس]
 
 Eliza in Basreh
 	Sayegh
@@ -8810,7 +9890,7 @@ the people there making
 merry, the Jewish music
 or Brass band & the
 Tabul playing, they
-danced & did all sorts
+* danced & did all sorts
 of amusements; but
 the people were sorry 
 to see me in this state 
@@ -8850,9 +9930,10 @@ for an hour & returned at 7
 S. Ely wind & cloudy weather
 
 Page 274: 
+
 	Margin: 
 Line 1: 1898 Decr 13 Tuesd.
-Line 2: Arabic: [His son Iskender = ابنه اسكندر]
+Arabic: [His son Iskender = ابنه اسكندر]
 
 
 	 Strong S. Ely wind & cloudy
@@ -8883,8 +9964,9 @@ him under surveillance
 to Marseilles & get him
 
 Page 275: 
+	
 	Margin: 
-Line 1: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
 
 embarked in one of the Anglo
 Arabian & Persian 	 S N. Copy
@@ -8913,9 +9995,10 @@ Bank & obtained a cheque
 payable to the Austro Hungarian
 
 Page 276: 
+
 	Margin: 
 Line 1: 1898 Decr
-Line 2: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
 
 
 Consul General for 300 Frcs
@@ -8944,6 +10027,7 @@ did not start &Isak
 gave me a letter to read
 
 Page 277: 
+
 	Margin:
 DivLine: 17: 14 Wedn.
 
@@ -8974,9 +10058,10 @@ to the Austro Hungarian
 Consul General of Paris
 
 Page 278: 
+
 	Margin: 
 Line 1: 1898 Decr
-Line 2: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
 
 
 in the way of a Protocol 
@@ -9005,8 +10090,9 @@ to Cardinal Richarz
 in Paris to assist &
 
 Page 279:
+
 	Margin: 
-Line 1: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
 
 use his influence to get my 
 son liberated from this
@@ -9036,9 +10122,11 @@ Ibrahim Gejou and one
 to 	 Rezooki 	 Korkis, Copies
 
 Page 280: 
+
 	Margin: 
 Line 1: 1898 Decr
-Line 2: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
+
 DivLine 22: 15 Tursd 	Therm @ 6.46 
 
 of which I have kept
@@ -9069,6 +10157,7 @@ The 	Mossul 	 & Barge went
 inside to discharge &
 
 Page 281: 
+
 	Margin: 
 
 we are loading over them
@@ -9099,9 +10188,10 @@ Emmanuel called on
 me, with a letter from
 
 Page 282:
+
 	Margin: 
 Line 1: 1898 Decr
-Line 2: arabic: His son Iskender = ابنه اسكندر]
+arabic: His son Iskender = ابنه اسكندر]
 
 Père Pièrre dated the 21st
 Novr from Montpellièr
@@ -9128,8 +10218,9 @@ now; But Pièrre says
 in his letter to the fathers
 
 Page 283: 
+
 	Margin: 
-Line 1: arabic: [His son Iskender = ابنه اسكندر]
+arabic: [His son Iskender = ابنه اسكندر]
 
 that he was surprised
 when he received a letter 
@@ -9156,6 +10247,7 @@ with him proved fruitless,
 following telegram to him
 
 Page 284:
+
 	Margin: 
 Line 1: 1898 Decr
 
@@ -9180,6 +10272,7 @@ tomorrow morning; &
 weather ~ 
 
 Page 285: 
+
 	Margin: 
 Line 1: 16 Frid
 DivLine 4: [arabic] [Mirza Ali Naki Khan, the Persian Consul in Baghdad = ميرزا علي تقي خان القنصل الايراني في بغداد] 
@@ -9250,7 +10343,7 @@ at the weel~
 
 Page 287:
 	Margin:
-	Line 2: [al-Swera, presently named (at that time) al-Hamidiya = الصويرة المسماة الان (اذ ذاك ) الحميدية] 
+	Line 2, 3, 4, 5: [al-Swera, presently named (at that time) al-Hamidiya = الصويرة المسماة الان (اذ ذاك ) الحميدية] 
 	DivLine: 18 Sund The @ 6,,30
 
 H Talub Effendi the Kamakam
@@ -9317,7 +10410,7 @@ on the 12th~ Mr. & Mrs. Heyns
 
 Page 289:
 	Margin:
-	Line 1: [The archeologist Heyns and others = هينس الاثري و غيره] 
+	Line 1, 2 : [The archeologist Heyns and others = هينس الاثري و غيره] 
 
 the American excavator
 at Nuffar & two other
@@ -9417,7 +10510,7 @@ Margin:
 	Line 1: 1898
 	Line 2: Decr
 	DivLine: 21 Wedn
-Line 12: [His son Iskender = ابنه اسكندر]
+Line 12 –: [His son Iskender = ابنه اسكندر]
 
 	*Light S. Erly breeze & cloudy 
 weather; After tea Yousif
@@ -9445,7 +10538,7 @@ the captain of any steamer
 
 Page 293:
 	Margin:
-	Line 17: Raining all day 
+	Line 17-26: Raining all day 
 
 he promised to do it today
 & send letters my both ways,
@@ -9504,15 +10597,16 @@ my wife & I did give it,
 cloudy;~
 
 Page 295:
+	
 	Margin: 
-	Line 2: Okes / 144,369 
-	Line 3: Passeg / 179 ½ 
-	Line 6: [illegible]
+	Line 2-5: Okes / 144,369
+Passeg / 179 ½ 
+	Line 6-8 [illegible]
 	DivLine: 22d  Thursd. 
 	Line 14: [ The phsician Ramsay = الطبيب رمزى] 
-	Line 16: [Cooper at the Tombac Company = كوپر في شركة التنباك]  
-	Line 19: [Candler an English traveler = كندلر سائح انكليزي]
-	Line 22: Arabic [Diamond an American wool mechant = ديامونت تاجر صوف امريكي]
+	Line 16, 17: [Cooper at the Tombac Company = كوپر في شركة التنباك]  
+	Line 19, 20: [Candler an English traveler = كندلر سائح انكليزي]
+	Line 22, 23: Arabic [Diamond an American wool mechant = ديامونت تاجر صوف امريكي]
 
 Text:
 	Line 1: Basreh to Baghdad
@@ -9546,7 +10640,7 @@ Page 296:
 	Margin:	
 	Line 1: 1898
 	Line 2: Decr
-	Line 8: [The return of his wife rom Basreh =عودة زوجته من البصرة ]
+	Line 8, 9: [The return of his wife rom Basreh =عودة زوجته من البصرة ]
 	Line 9: 
 
 him a Return Ticket, and
@@ -9639,7 +10733,7 @@ money to pay his passage
 
 Page 299: 
 	Margin:	
-	Line 13: [The travel of father Butros from Europe = سفر الاب بطرس من اوربة] 
+	Line 13, 14, 15: [The travel of father Butros from Europe = سفر الاب بطرس من اوربة] 
 
  I received a letter from 
 Henry, he says that they 
@@ -9669,6 +10763,7 @@ S. Erly breeze & fine weather with few
 clouds, the river must 
 
 Page 300:
+
 	Margins:
 	Line 3: 1898 Decr
 	Line 4: 25 Sound.
@@ -9730,6 +10825,7 @@ the Carmelite father sent
 for me to say that a
 
 Page 302:
+
 	Margins:
 	Line 65: 1898 Decr
 
@@ -9759,6 +10855,7 @@ P. Pi√®rre dated the 29
 Ulto from Montpellier,
 
 Page 303:
+
 	Margins:
 	Line 92: [His son Iskender]
 
@@ -9969,7 +11066,6 @@ Gave tickets to the passengers
 we have no one in 1st
 Class Cabins~
             At 11,,25 passed the
-            
 Page 310
         Margins:
             Line 1: 1898 Decr
@@ -10224,7 +11320,6 @@ proceeded;
 tickets;~ We took 2 from Gorna
             We have in all 136 ½
 with the 2 from Gorna
-
 Page 318
 	Margins:
 	Line 1: 1899
@@ -10292,7 +11387,7 @@ Page 320
 	Margins:
 	Line 1: 1899
 	Line 2: Jany
-	Line 13: Arabic [Wratislan, the new Consul at Basreh = وراتسلن القنصل الجديد في البصرو] 
+	Line 13, 14, 15: Arabic [Wratislan, the new Consul at Basreh = وراتسلن القنصل الجديد في البصرو] 
 
 wind is strong from S.Et;
 	Gave tickets to 17 Coot
@@ -10323,7 +11418,7 @@ Wratislaw has been for
 
 Page 321
 	Margins:
-	Line 1: Arabic [The Consul speaks many languages=  القنصل يتكلم عدة لغات] 
+	Line 1, 2: Arabic [The Consul speaks many languages=  القنصل يتكلم عدة لغات] 
 	Line 2: Arabic
 	DivLine: 8 Sund
 
@@ -10582,8 +11677,8 @@ fasting month for the
 Page 329
 	Margins:
 	Line 1: Passgr 137,,; Okes 113,423; G S.Piast 18,795 ¾; Draft 3,,9
-	Line 19: [A Swiss silk merchant = تاجر حرير سوسري] 
-	Line 20: [Jemil Beg the Motserrif of Hassa and the son of Said Pasha = جميل بك ابن سعيد پاشا متصرف الاحساء] 
+	Line 19, 20: [A Swiss silk merchant = تاجر حرير سوسري] 
+	Line 20, 21, 22: [Jemil Beg the Motserrif of Hassa and the son of Said Pasha = جميل بك ابن سعيد پاشا متصرف الاحساء] 
 	Line 23: Arabic
 	Line 24: Arabic
 	Line 25: Arabic
@@ -10683,6 +11778,7 @@ night, with slight rain
 occasionally~
 
 Page 332:
+
 	Margin:
 Line 1: 1899 Jany 15 Sund 
 Line 5: Therm @ 6.40
@@ -10715,6 +11811,7 @@ landed 35 passengers and 83
 Packages; ~ 
 
 Page 333: 
+
 	Margin: 
 DivLine 13: 16 Mond
 
@@ -10749,6 +11846,7 @@ off & proceeded ~ S. Ely breeze
 Jews at Azair (2 with Return
 
 Page 334: 
+
 	Margin: 
 Line 1: 1899 Jany
 DivLine 11: 17 Tuesd
@@ -10780,6 +11878,7 @@ quarantine ~ The S.S.
 "Scarsdale" which came
 
 Page 335: 
+
 	Margin:
 DivLine 27: 18 Wedn
 
@@ -10813,6 +11912,7 @@ the pain & weakness ~
 rain still continues ~ 
 
 Page 336:
+
 	Margin:
 Line 1: 1899 Jany
 
@@ -10845,6 +11945,7 @@ We kept loading Cargo
 all the day ~ 
 
 Page 337 
+
 	Margin:
 Line 3: Draft 4,,8
 Line 9: G.S. P. Local 15,118,,
@@ -10879,10 +11980,11 @@ Gorna ~
 Return Passengers from Azair
 
 Page 338: 
+
 	Margin: 
 Line 1: 1899 Jany
-Line 2: arabic: [Assad Khan Nedam ul Oolema and others belong to Agha Khan in Bombay =   اسعد خان تظام العلماء و غيرهم منتمون الى اغاخان في بومبي
-Line 3: arabic : [Sheikh Zein ood Din from Mohamerah = الشيخ زين الدين من اهل المحمرة] 
+arabic: [Assad Khan Nedam ul Oolema and others belong to Agha Khan in Bombay =   اسعد خان تظام العلماء و غيرهم منتمون الى اغاخان في بومبي
+arabic : [Sheikh Zein ood Din from Mohamerah = الشيخ زين الدين من اهل المحمرة] 
 
 and went on at 10,,40 ~
 Finished with the passengers
@@ -10910,6 +12012,7 @@ Took 6 Tons of Coal
 	At 11,,30 left Amara
 
 Page 339:
+
 	Margin:
 Line 1: 20 Frid
 
@@ -10975,6 +12078,7 @@ Azizieh ~ Very fine and
 cold weather ~ 
 
 Page 341:
+
 	Margin:
 DivLine 4: 22 Sund Therm @ 6.36
 
@@ -11007,11 +12111,11 @@ are only here;
 is also unwell & very weak
 
 Page 342:
+
 	Margin:
 Line 1: 1899 Jany
 DivLine 7: 23 Mond Therm 6.38
-Line 8: arabic: [His son Iskender = ابنه اسكندر]
-
+arabic: [His son Iskender = ابنه اسكندر]
 from affliction & sorrow;
 	 There is a [illegible] dancing party;
 given tonight by Asfar's
@@ -11039,6 +12143,7 @@ Alexander 350 frcs more
 to Constantinople the etc
 
 Page 343: 
+
 	Margin:
 DivLine 17: 24 Tuesd Therm 6.34
 
@@ -11070,11 +12175,12 @@ sister Medula called
 on us; I took a warm bath
 
 Page 344: 
+
 	Margin:
-Line 1: 1899 Jany
+Line1: 1899 Jany
 DivLine 5: 25 Wedn
-Line 6: arabic: [The death of the priest Yousif Segman in Beirut = وفاة القس يوسف سكمن في بيروت]
-Line 7: arabic: [Yousif and Nejib Chiha in Beirut = يوسف و نجيب شيحا في استانبول]
+arabic: [The death of the priest Yousif Segman in Beirut = وفاة القس يوسف سكمن في بيروت] 
+arabic: [Yousif and Nejib Chiha in Beirut = يوسف و نجيب شيحا في استانبول]
 
 I feel still very nervous &
 weak, I am sleeping
@@ -11465,10 +12571,10 @@ feeling very weak & out of
 
 Page 357: 
 	Margin: 
-	Line 8: Draft / 4,,8
-	Line 12: G. S. Piast Local / 8,2619
-	Line 20:Okes/ 233,982,
-	Line 24: Passeng / 114 ½ 
+	Line 8-10: Draft / 4,,8
+	Line 12-18: G. S. Piast Local / 8,2619
+	Line 20-23:Okes/ 233,982,
+	Line 24-26: Passeng / 114 ½ 
 
 humour, not having slept last 
 night;~ Yacoob Eassayi
@@ -11566,6 +12672,7 @@ I slept last night well, from
 	Gave tickets to 33 Amara 
 
 Page 359:
+
 	Margins:
 	DivLine: 2 Thurs.	
 		
@@ -11600,6 +12707,7 @@ is till 4 AM his morning
 	Gave tickets to 33 [illegible]
 
 Page 360:
+
 	Margins:
 	Line 37: 1899 Feby
 	DivLine: 3 Frid Therm. @ 6.44
@@ -11664,6 +12772,7 @@ it is cold, but I have lost my
 sleep 	& could not dose of
 
 Page 362:
+
 	Margins:
 	Line 101: 1899 Feby
 	DivLine: 4 Satur, Therm. @ 6.46
@@ -12151,7 +13260,7 @@ arrived 3 days ago, and
 
 Page 377
 	Margins:
-	Line 1: Arabic [Father Butros and Father Jean (then Monseigneur Martin ) = الاب بطرس و الاب جان ( ثم المنسيور مارتن)] 
+	Line 1, 2, 3, 4: Arabic [Father Butros and Father Jean (then Monseigneur Martin ) = الاب بطرس و الاب جان ( ثم المنسيور مارتن)] 
 	DivLine: 14 Tuesd.
 
 Père Pièrre & P. Jean are
@@ -12186,8 +13295,8 @@ Page 378
 	Line 1: 1899
 	Line 2: Feby
 	Line 7: Arabic [His son Iskender = ابنه اسكندر] 
-	Line 16: [His subscription in the newspaper L’Eclair = L’Eclair  اشتراكه في جريدة] 
-	Line 22: Arabic [The arrival of 2 bicycles = ٢ وصول بايسكل عدد] 
+	Line 16, 17: [His subscription in the newspaper L’Eclair = L’Eclair  اشتراكه في جريدة] 
+	Line 22, 23: Arabic [The arrival of 2 bicycles = ٢ وصول بايسكل عدد] 
 
 at all about Alexander’s 
 story, he saw no one to 
@@ -12247,6 +13356,7 @@ that I intend to resign as
 my health does not
 
 Page 380:
+
 	Margin: 
 Line 1: 1899 Febry
 DivLine 14:15 Wedn
@@ -12277,11 +13387,12 @@ my tooth ache troubled
 me much ~
 
 Page 381:
+
 	Margin:
 Line 2: G. S. P. Local 4,398 1/4
 Line 9: Okes 235,664,
 Line 13: Passengers 82 1/2
-Line 14: arabic: [Dr. Sturrock and others = الدكتور سترك و غيره] 
+arabic: [Dr. Sturrock and others = الدكتور سترك و غيره] 
 
 	At 8,,15 passed Gorna
 Finished with the passengers
@@ -12310,6 +13421,7 @@ water & went on at 7 P.M.
 Fine weather & moonlight
 
 Page 382: 
+
 	Margin: 
 Line 1: 1899 Feby
 DivLine 5: 16 Thursd
@@ -12400,6 +13512,7 @@ the french Republic Mr.
 Felix Faure died suddenly
 
 Page 385:
+
 	Margin:
 
 from appoplexy,
@@ -12432,6 +13545,7 @@ wrote to him from Zurich
 in Switzerland to Marseilles
 
 Page 386: 
+
 	Margin:
 Line 1: 1899 Feby
 DivLine 16: 19 Sund.
@@ -12464,6 +13578,7 @@ Knees, & has been recommended
 a hot bath in a public
 
 Page 387: 
+
 	Margin:
 Line 1: arabic: [The Archbishop Altmayer was advised to bathe in the public baths, the Shorjah Bath = اوصي القاصد التماير ان يستحم في الحمامات العامات حمام الشورجه] 
 Line 2: arabic: [His son Iskender = ابنه اسكندر]
@@ -12503,7 +13618,7 @@ Page 388:
 	Line 1: 1899
 	Line 2: Feby
 	DivLine: 21’ Tuesd. 
-	Line 15: [Mass celebrated for the soul of Felix Faure, representatives of countries attend = قداس عن روح فلكس فور يحضره ممثلو الدول]
+	Line 15, 16, 17, 18: [Mass celebrated for the soul of Felix Faure, representatives of countries attend = قداس عن روح فلكس فور يحضره ممثلو الدول]
 
 Weather cloudy~
 S. Erly wind & dark;
@@ -12534,9 +13649,9 @@ Dr. Hesse; Mr. Hürner
 
 Page 389
 	Margin:
-	Line 1: [Hürner, the American Consul and his interpreter Habib Chiha = هرنر قنصل امريكة و ترجمانه حبيب شيحا] 
-	Line 5: [The Vice-Consul Rouet = روى فيس قنصل]
-	Line 9: [ The Chaldean Bishop Gabriel = مطران الكلدان كابرئيل]
+	Line 1, 2, 3: [Hürner, the American Consul and his interpreter Habib Chiha = هرنر قنصل امريكة و ترجمانه حبيب شيحا] 
+	Line 5, 6: [The Vice-Consul Rouet = روى فيس قنصل]
+	Line 9, 10: [ The Chaldean Bishop Gabriel = مطران الكلدان كابرئيل]
 	DivLine: 22’ Wedn Th 6,,38
 
 the American consular
@@ -12571,7 +13686,7 @@ Page 390:
 	Margin:
 	Line 1: 1899
 	Line 2: Feby
-	Line 4: [Atta Allah Pasha and the kind of illness that he has = عطا الله پاشا و نوع مرضه ]
+	Line 4, 5, 6, 7: [Atta Allah Pasha and the kind of illness that he has = عطا الله پاشا و نوع مرضه ]
 	DivLine: 23 Thursd. Th @ 6,,38
 
 we are alongside the bank
@@ -12667,8 +13782,8 @@ At 10,,30 passed the SS.
 
 Page 393:
 	Margin:
-	Line 10: [Banyar, the mechanic of the Comet = بانيار ميكانيكي كوميت] 
-	Line 16: [The travel of Yousif Metchich to Basreh = سفر يوسف مڄيڄ الى البصرة] 
+	Line 10, 11: [Banyar, the mechanic of the Comet = بانيار ميكانيكي كوميت] 
+	Line 16, 17: [The travel of Yousif Metchich to Basreh = سفر يوسف مڄيڄ الى البصرة] 
 
 	Khalifah going up at
 Bostan;~ Fresh S. Erly
@@ -12740,7 +13855,7 @@ at Amara landed 11 passengers
 Tons Coal~
 	At 9,,30 left Amara,  
 fine moonlight & clear night,
-	*& At 0,,30 am we dropped
+	& At 0,,30 am we dropped
 anchor above Kalat  Saleh,
 	At 5,,30 proceeded, 
 S. Erly breeze & clouds on
@@ -12791,9 +13906,10 @@ against the idea of Eliza's
 going to Paris to
 
 Page 397
+
 	Margins:
 	Line 35: Tookyeh delivered of 
-	Line 36: a  son on 22d.
+	a  son on 22d.
 	DivLine: 27 Mond
 
 bring him, &  Rufail
@@ -12823,9 +13939,10 @@ midnight the 22d. Instt,
 to me & we entered to Basreh
 
 Page 398
+
 	Margins:
 	Line 67: 1899 Feby
-	Line 9: Arabic: [His son Iskender and his tricks]
+	Line 9,10 Arabic: [His son Iskender and his tricks]
 
 	We called on Angoorlies,
 I saw Tookyeh she is in
@@ -12855,8 +13972,9 @@ we dined, P Jéan who
 came out with P. Pièrre
 
 Page 399
+
 	Margins:
-	Line 13: Arabic [The son and son-in-law of the Shah’s uncle]
+	Line 13, 14: Arabic [The son and son-in-law of the Shah’s uncle]
 	DivLine: 28 Tuesd
 
 there living, they will

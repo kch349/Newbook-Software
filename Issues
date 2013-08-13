@@ -1,18 +1,45 @@
 ToDo List:
-  * asterisk with wrong unicode? -- example on page 66
-  * last few pages not printing
+  * Keep a hash of ids to robustly check for duplicates (add "i" on duplicates)
+  * Warning for duplicate pages ^and ids
+  * create TEI header method adding nodes
   * incrementing div1s "n" attribute
-  * line issue with double spaces print or not
-  * Maybe include percentages of each type of error in the error messages
+  * Program crashes for unknown reason with error message that is commented out
   * Initial, Middle, Final
-  * TEI header included into the autotagger code
-  * add first div2
-  * Linecount should start at 1 not 0
-  * page 371 empty p node?
+  * Include an error message about having too few or too many stars on a page, or in the file. 
+    Maybe do that for div1s too.
+  * Add warning if double spacing is found in the body.	
+  * Div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
+  * Comment out debugging printing to stderr
+
+Questions:
+ *   Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
+     autotagger creates a well-formed XML file, but one with encoding set at '?' in the XML Declaration.
+     But with encoding of 'utf-8', tab and newline characters are actually printed as '\t' and '\n',
+     making the file all one line that isn't well-formed according to Exchanger XML. 
+ * Should multiple lines at the beginning of a page be stripped? Or just at the end after the text and before the next page?
 
 Fixed:
   * catching Line #: in body that isn't an error
+  * asterisk skipping problem. Wasn't unicode, was the try clause. Also errors in transcription file
+  * add first div2
+  * last 8 pages not printing
+  * Last half of pg. 399 - end is repeated in output.
+  * make a create_div1 method to clean up code, like the create_div2 method
+  * Linecount should start at 1 not 0
+  * One more div2 not being filled correctly
+  * last page not printing
+  * line issue with double spaces print or not
+  * TEI header included into the autotagger code
+  * page 371 empty p node?
+   * At some point diary entries are not getting correct content.
+      -----At what point does the diary content become incorrect?
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:
     ** first option here is 'multilinugal=yes/no'
+  * Maybe include percentages of each type of error in the error messages
+  * Regression test
+  * Code Reorganization:
+    **Reorganize as python module
+    **Option for verbose developper output
+    **Lessen the number of times the program loops through the file
