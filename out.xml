@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE TEI
-  SYSTEM 'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/teilite.dtd'>
+  SYSTEM 'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_lite.dtd'>
 <TEI>
 	<teiHeader>
 		<!--put real TEI header here-->
