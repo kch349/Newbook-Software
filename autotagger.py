@@ -137,7 +137,7 @@ class TranscriptionFile:
         # if n is already defined, we've found a new page, so
         #    process the old one
         if n > -1:
-          print(m1.group(1) + " found page", file=sys.stderr)
+          # print(m1.group(1) + " found page", file=sys.stderr)
           self.pages.append(TranscriptionPage(str(n),p))
           p = []
           lines.pop(0)
@@ -178,7 +178,7 @@ class TranscriptionPage:
     # sys.stderr.write("process transcription page ... ")
     self.num = num
     self.parse_lines(lines)
-    print(self.num + " page created", file=sys.stderr)
+    # print(self.num + " page created", file=sys.stderr)
 
     # check
 
@@ -320,6 +320,7 @@ def create_dom_nodes(tf):
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
   
+  div1_count = 0
   div2_printed_count = 0
   div_count = 0
   marginline_count = 0
@@ -362,7 +363,6 @@ def create_dom_nodes(tf):
 
     # now looping through page body to find div1s, which we may want to figure out how to 
     # do in the organize_nodes method later so as not to loop through the file as much.                
-    div1_count = 0
     previous_text = False
     current_head = None
     text_found = False
@@ -380,10 +380,11 @@ def create_dom_nodes(tf):
       #if it is the first line in the file, just create a generic and arbitrary div1
       #to hold diary entries until the first real div1 trip heading is found.  
       if len(div1s) == 0:
-        current_head, div1 = create_div1(str(div_count))
+        current_head, div1 = create_div1(str(div1_count))
         div1s.append(div1)
         text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
         current_head.appendChild(text)
+        div1_count += 1
         
       if m and text_found:
         if not previous_text:  
@@ -491,22 +492,6 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
       #attribute issue
       m = STAR_RE.match(l) 
       if m: 
-        #print("asterisk, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
-        #try: 
-         # if linecount < int(current_lineheader[2]):
-          #  continue
-        #except: 
-    	 #   """problem in screening each line for margin headers"""
-
-        #if div2 is empty (no content), strip it. 
-        
-        
-        #tries to delete the extra medial/final node created if it isn't necessary, as is true if the 
-        #new diary entry occurs at the beginning of a new journey.
-       # if new_trip:
-    	   # print("deleted extra final node, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
-    	  #  div2s.pop(0)  
-        
         #appends children to div2 and that div2 to div1, then moves to the next div2
         div2s[0].childNodes.extend(current_prose)
         div1s[0].appendChild(div2s[0])
@@ -516,15 +501,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         current_prose = create_p(current_prose,[re.sub('\s+\*','',l),linecount],fresh=True)
         if len(div2s) > 1:
           headCheck = div2s[0].getElementsByTagName('head')
-          #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
-          #for h in headCheck:
-           # print(h.toxml(None), file=sys.stderr)
           div2s.pop(0)
-          #print("moved to next div2, page " + str(page.num) + "line " + str(linecount), file=sys.stderr)
-        
-        #if len(div2headers) > 0:
-          #current_div2 = div2s[0]
-        #put in stuff for trip headings
       else:
         m = PARA_RE.match(l)
         if m:
@@ -568,48 +545,12 @@ if __name__ in "__main__":
   tf = TranscriptionFile(infilelines)
 
   print("found "+str(len(tf.pages))+" transcription pages", file=sys.stderr)
-  #for p in tf.pages:
-  #   print(p.num,p.head,[l for l in p.body], file=sys.stderr)
-  # print("---------", file=sys.stderr)
- 
-  #to_xml_dom(tf)
-  #div1s, div2s, marginheaders = create_dom_nodes(tf)
-
-  ## okay, this is too verbose for now :)
-  #for d in div1s:
-   # print(d.toxml(),file=sys.stderr)
-    #print("\n\n",file=sys.stderr)
-   
-  #for d in div2s:
-    #print(d.toxml(),file=sys.stderr)
-    #print("\n\n",file=sys.stderr)
-  # 
-  # for d in marginheaders:
-  #   print(d[0].toxml(),file=sys.stderr)
-  #   print("\n\n",file=sys.stderr)
   
   if errors_found:
     print("Errors found. Please check error log and try again later.")
   else:	
     #to_xml_dom(tf)
     div1s, div2s, marginheaders = create_dom_nodes(tf)
-
-    ## okay, this is too verbose for now :)
-    #for d in div1s:
-      #print(d.toxml(),file=sys.stderr)
-      #print("\n\n",file=sys.stderr)
-    # 
-    # for d in div2s:
-    #   print(d.toxml(),file=sys.stderr)
-    #   print("\n\n",file=sys.stderr)
-    # 
-    # for d in marginheaders:
-    #   print(d[0].toxml(),file=sys.stderr)
-    #   print("\n\n",file=sys.stderr)
   
     organize_nodes(tf, div1s, div2s, marginheaders)
-    print(newdoc.toprettyxml('\t', '\n', "utf-8"))
-    #for d in div2s:
-     # print(d.toxml(),file=sys.stderr)
-      #print("\n\n",file=sys.stderr)
-
+    print(newdoc.toprettyxml('\t', '\n', None))
