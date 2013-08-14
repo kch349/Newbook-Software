@@ -36,16 +36,69 @@ PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 
 
 impl = getDOMImplementation()
-#doctype = <!DOCTYPE TEI PUBLIC "-//OTAP//DTD TEI Transitional//EN" "http://www.tei-c.org/release/xml/tei/custom/schema/dtd/teilite.dtd">
 
-doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/teilite.dtd')
+doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd')
 
 # def createDocument(self, namespaceURI, qualifiedName, doctype):
 newdoc = impl.createDocument(None, "TEI", doctype)
 document = newdoc.documentElement
 newdoc.appendChild(document)
 header = newdoc.createElement('teiHeader')
-header.appendChild(newdoc.createComment('put real TEI header here'))
+header.appendChild(newdoc.createComment("""		<!-- [ TEI Header information ] -->
+ <fileDesc>
+  <titleStmt>
+   <title>Diary 47</title>
+   <author>Joseph Mathia Svoboda</author>
+
+   <respStmt>
+    <resp>OTAP</resp>
+    <name>Walter Andrews</name>
+   </respStmt>
+   <respStmt>
+    <resp>OTAP</resp>
+    <name>Walter Andrews</name>
+
+   </respStmt>
+  </titleStmt>
+  <publicationStmt>
+   <distributor>OTAP</distributor>
+   <address>
+    <addrLine></addrLine>
+   </address>
+   <idno type="OTAP">1897-1898</idno>
+
+   <availability>
+    <p>Copyright 2012 OTAP. All Rights Reserved.</p>
+   </availability>
+   <date when="2007">2011</date>
+  </publicationStmt>
+  <sourceDesc>
+   <bibl>Joseph Mathia Svoboda</bibl>
+
+  </sourceDesc>
+ </fileDesc>
+ <encodingDesc>
+  <projectDesc>
+   <p>OTAP</p>
+  </projectDesc>
+<!--
+  <editorialDecl>
+   <correction>
+    <p>NO CORRECTIONS.</p>
+   </correction>
+   <normalization>
+    <p>Original spelling and typography is retained.</p>
+   </normalization>
+  </editorialDecl>
+-->
+ </encodingDesc>
+ <revisionDesc>
+
+  <list>
+   <item>
+    <date when="2012-30-08">30 August 12</date> Last checked</item>
+  </list>
+ </revisionDesc>"""))
 document.appendChild(header)
 text = newdoc.createElement('text')
 document.appendChild(text)
@@ -555,7 +608,7 @@ if __name__ in "__main__":
     #   print("\n\n",file=sys.stderr)
   
     organize_nodes(tf, div1s, div2s, marginheaders)
-    print(newdoc.toprettyxml('\t', '\n', None))
+    print(newdoc.toprettyxml('\t', '\n', "utf-8"))
     #for d in div2s:
      # print(d.toxml(),file=sys.stderr)
       #print("\n\n",file=sys.stderr)

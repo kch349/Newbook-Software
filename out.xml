@@ -1,10 +1,53 @@
 <?xml version="1.0" ?>
 <!DOCTYPE TEI
-  SYSTEM 'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_lite.dtd'>
+  SYSTEM 'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd'>
 <TEI>
 	<teiHeader>
-		<!--put real TEI header here-->
-	</teiHeader>
+<fileDesc>
+<titleStmt>
+<title>Diary 48</title>
+<author>Joseph Mathia Svoboda</author>
+<respStmt>
+<resp>OTAP</resp>
+<name>Walter Andrews</name>
+</respStmt>
+<respStmt>
+<resp>OTAP</resp>
+<name>Walter Andrews</name>
+</respStmt>
+</titleStmt>
+<publicationStmt>
+<distributor>OTAP</distributor>
+<address>
+<addrLine/>
+</address>
+<idno type="OTAP">1898-1899</idno>
+<availability>
+<p>Copyright 2012 OTAP. All Rights Reserved.</p>
+</availability>
+<date when="2007">2011</date>
+</publicationStmt>
+<sourceDesc>
+<bibl>Joseph Mathia Svoboda</bibl>
+</sourceDesc>
+</fileDesc>
+<encodingDesc>
+<projectDesc>
+<p>OTAP</p>
+</projectDesc>
+<!--
+<editorialDecl> <correction> <p>NO CORRECTIONS.</p> </correction> <normalization> <p>Original spelling and typography is retained.</p> </normalization> </editorialDecl>
+-->
+</encodingDesc>
+<revisionDesc>
+<list>
+<item>
+<date when="2012-30-08">30 August 12</date>
+Last checked
+</item>
+</list>
+</revisionDesc>
+</teiHeader>
 	<text>
 		<body>
 			<div1 n="0" type="journey">
@@ -21551,7 +21594,7 @@
 				</div2>
 				<div2 n="97" part="N" type="diaryentry">
 					<head type="diaryentry">7th Tuesd.</head>
-					<head type="marginnote" xml:id="p256-1">1898</head>
+					<head type="marginnote" xml:id="p256-1i">1898</head>
 					<head type="marginnote" xml:id="p256-2">Decr</head>
 					<head type="marginnote" xml:id="p267-3">Arabic [The arrival of Yacoob Essayi and his wife from </head>
 					<head type="marginnote" xml:id="p267-4">Arabic</head>
