@@ -1,7 +1,6 @@
 ToDo List:
   * Keep a hash of ids to robustly check for duplicates (add "i" on duplicates)
   * Warning for duplicate pages ^and ids
-  * create TEI header method adding nodes
   * Program crashes for unknown reason with error message that is commented out
   * Initial, Middle, Final
   * Include an error message about having too few or too many stars on a page, or in the file. 
@@ -33,6 +32,7 @@ Fixed:
   * page 371 empty p node?
    * At some point diary entries are not getting correct content.
       -----At what point does the diary content become incorrect?
+  * create TEI header method adding nodes
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:
