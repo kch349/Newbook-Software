@@ -34,6 +34,83 @@ MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 
+def create_respSt():
+  resp_statement = newdoc.createElement('respStmt')	
+  resp = newdoc.createElement('resp')
+  resp_statement.appendChild(resp)
+  resp.appendChild(newdoc.createTextNode('OTAP'))
+  name = newdoc.createElement('name')
+  name.appendChild(newdoc.createTextNode('Walter Andrews'))
+  return resp_statement
+   
+def create_teiHeader():
+  header = newdoc.createElement('teiHeader')
+  fileDesc = newdoc.createElement('fileDesc')
+  header.appendChild(fileDesc)
+  title_statement = newdoc.createElement('titleStmt')
+  fileDesc.appendChild(title_statement)
+  
+  title = newdoc.createElement('title')
+  title_statement.appendChild(title)
+  title.appendChild(newdoc.createTextNode('Diary 48'))
+  
+  author =  newdoc.createElement('author')
+  title_statement.appendChild(author)
+  author.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
+  
+  for i in range (0, 1):
+    title_statement.appendChild(create_respSt())
+  
+  pubSt = newdoc.createElement('publicationStmt')
+  fileDesc.appendChild(pubSt)
+  distributor = newdoc.createElement('distributor')
+  pubSt.appendChild(distributor)
+  distributor.appendChild(newdoc.createTextNode('OTAP'))
+  
+  address = newdoc.createElement('address')
+  pubSt.appendChild(address)
+  addrLine = newdoc.createElement('addrLine')
+  address.appendChild(addrLine)
+  
+  idno = newdoc.createElement('idno')
+  idno.setAttribute('type', 'OTAP')
+  idno.appendChild(newdoc.createTextNode('1898-1899'))
+  
+  availability = newdoc.createElement('availability')
+  pubSt.appendChild(availability)
+  p = newdoc.createElement('p')
+  availability.appendChild(p)
+  p.appendChild(newdoc.createTextNode('Copyright 2012 OTAP. All Rights Reserved.'))
+  
+  date = newdoc.createElement('date')
+  pubSt.appendChild(date)
+  date.setAttribute('when', '2007')
+  date.appendChild(newdoc.createTextNode('2011'))
+  
+  sourceDesc = newdoc.createElement('sourceDesc')
+  fileDesc.appendChild(sourceDesc)
+  bibl = newdoc.createElement('bibl')
+  bibl.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
+  
+  encodingDesc = newdoc.createElement('encodingDesc')
+  fileDesc.appendChild(encodingDesc)
+  
+  revisionDesc = newdoc.createElement('revisionDesc')
+  encodingDesc.appendChild(revisionDesc)
+  
+  listNode = newdoc.createElement('list')
+  revisionDesc.appendChild(listNode)
+  
+  item = newdoc.createElement('item')
+  listNode.appendChild(item)
+  
+  date = newdoc.createElement('date')
+  item.appendChild(date)
+  date.setAttribute('when', '2012-30-08')
+  date.appendChild(newdoc.createTextNode('30 August 12'))
+  item.appendChild(newdoc.createTextNode('Last checked'))
+  return header
+  
 
 impl = getDOMImplementation()
 
@@ -43,63 +120,9 @@ doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/t
 newdoc = impl.createDocument(None, "TEI", doctype)
 document = newdoc.documentElement
 newdoc.appendChild(document)
-header = newdoc.createElement('teiHeader')
-header.appendChild(newdoc.createComment("""		<!-- [ TEI Header information ] -->
- <fileDesc>
-  <titleStmt>
-   <title>Diary 47</title>
-   <author>Joseph Mathia Svoboda</author>
+teiHeader = create_teiHeader()
+document.appendChild(teiHeader)
 
-   <respStmt>
-    <resp>OTAP</resp>
-    <name>Walter Andrews</name>
-   </respStmt>
-   <respStmt>
-    <resp>OTAP</resp>
-    <name>Walter Andrews</name>
-
-   </respStmt>
-  </titleStmt>
-  <publicationStmt>
-   <distributor>OTAP</distributor>
-   <address>
-    <addrLine></addrLine>
-   </address>
-   <idno type="OTAP">1897-1898</idno>
-
-   <availability>
-    <p>Copyright 2012 OTAP. All Rights Reserved.</p>
-   </availability>
-   <date when="2007">2011</date>
-  </publicationStmt>
-  <sourceDesc>
-   <bibl>Joseph Mathia Svoboda</bibl>
-
-  </sourceDesc>
- </fileDesc>
- <encodingDesc>
-  <projectDesc>
-   <p>OTAP</p>
-  </projectDesc>
-<!--
-  <editorialDecl>
-   <correction>
-    <p>NO CORRECTIONS.</p>
-   </correction>
-   <normalization>
-    <p>Original spelling and typography is retained.</p>
-   </normalization>
-  </editorialDecl>
--->
- </encodingDesc>
- <revisionDesc>
-
-  <list>
-   <item>
-    <date when="2012-30-08">30 August 12</date> Last checked</item>
-  </list>
- </revisionDesc>"""))
-document.appendChild(header)
 text = newdoc.createElement('text')
 document.appendChild(text)
 
@@ -273,7 +296,7 @@ def print_errors(page_num, line_num, line, error_code):
          file=sys.stderr)	
   elif error_code == 5:
     print("This line must be formatted \"Page #\". No additional formatting is allowed.\n", file=sys.stderr)  
-		 
+
 
 def create_div1(n): 
   div1 = newdoc.createElement('div1')
@@ -320,6 +343,11 @@ def create_dom_nodes(tf):
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
   
+  
+  
+
+
+
   div1_count = 0
   div2_printed_count = 0
   div_count = 0
