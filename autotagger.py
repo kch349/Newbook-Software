@@ -343,15 +343,10 @@ def create_dom_nodes(tf):
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
   
-  
-  
-
-
-
-  div1_count = 0
-  div2_printed_count = 0
-  div_count = 0
-  marginline_count = 0
+  div1_count = 1
+  div2_printed_count = 1
+  div2_count = 1
+  marginline_count = 1
   for page in tf.pages:	
     for l in page.head:
        # DivLine: "..." are 'diaryentry' headers
@@ -364,17 +359,17 @@ def create_dom_nodes(tf):
       #Part N means the node isn't fragmented at all.
       if len(div2s)==0:
         ## create first div2
-        div2s.append(create_div2(str(div_count),part,"First diary entry, no title given in text."))
-        div_count += 1
+        div2s.append(create_div2(str(div2_count),part,"First diary entry, no title given in text."))
+        div2_count += 1
 
       m = DIVLINE_RE.match(l)
       if m:
         # matched a Divline, create a new div2
         part="N" # what's part="N"? I though these values were "I" and "F"
-        div2s.append(create_div2(str(div_count),part,m.group(1)))
+        div2s.append(create_div2(str(div2_count),part,m.group(1)))
         #print("d " + str(page.num) + " " + m.group(1), file=sys.stderr)
         div2_printed_count += 1
-        div_count += 1
+        div2_count += 1
         		
       else:
         m = MARGINLINE_RE.match(l)
@@ -421,14 +416,15 @@ def create_dom_nodes(tf):
           div1_count += 1
           
           #creates a cloned div2 with all its nodes to serve as the medial or final part
-          #then labeled as the next number in the div_count
+          #then labeled as the next number in the div2_count
           if len(div2s) >= 2:
-            next_div2 = div2s[div_count - 1].cloneNode(True)
+            next_div2 = div2s[div2_count - 2].cloneNode(True)
             #print("d " + str(page.num) + " split", file=sys.stderr)
-            next_div2.setAttribute('n', str(div_count))
-            #next_div2.setAttribute('part', 'M')
+            next_div2.setAttribute('n', str(div2_count))
+            #next_div2.setAttribute('part', 'F')
+           # div2s[div2_count - 2].setAttribute('part', 'I')
             div2s.append(next_div2)
-            div_count += 1
+            div2_count += 1
             
         #if it actually is a trip heading, print the text as the header (and added in the
         #line number here just in case, since I don't know if that is important or not
