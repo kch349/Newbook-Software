@@ -40,6 +40,7 @@ def create_respSt():
   resp_statement.appendChild(resp)
   resp.appendChild(newdoc.createTextNode('OTAP'))
   name = newdoc.createElement('name')
+  resp_statement.appendChild(name)
   name.appendChild(newdoc.createTextNode('Walter Andrews'))
   return resp_statement
    
@@ -58,7 +59,7 @@ def create_teiHeader():
   title_statement.appendChild(author)
   author.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
   
-  for i in range (0, 1):
+  for i in range (0, 2):
     title_statement.appendChild(create_respSt())
   
   pubSt = newdoc.createElement('publicationStmt')
@@ -73,6 +74,7 @@ def create_teiHeader():
   address.appendChild(addrLine)
   
   idno = newdoc.createElement('idno')
+  pubSt.appendChild(idno)
   idno.setAttribute('type', 'OTAP')
   idno.appendChild(newdoc.createTextNode('1898-1899'))
   
@@ -90,13 +92,19 @@ def create_teiHeader():
   sourceDesc = newdoc.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
   bibl = newdoc.createElement('bibl')
+  sourceDesc.appendChild(bibl)
   bibl.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
   
   encodingDesc = newdoc.createElement('encodingDesc')
-  fileDesc.appendChild(encodingDesc)
+  header.appendChild(encodingDesc)
+  projectDesc = newdoc.createElement('projectDesc')
+  encodingDesc.appendChild(projectDesc)
+  p2 = newdoc.createElement('p')
+  projectDesc.appendChild(p2)
+  p2.appendChild(newdoc.createTextNode('OTAP'))
   
   revisionDesc = newdoc.createElement('revisionDesc')
-  encodingDesc.appendChild(revisionDesc)
+  header.appendChild(revisionDesc)
   
   listNode = newdoc.createElement('list')
   revisionDesc.appendChild(listNode)
@@ -342,6 +350,8 @@ def create_dom_nodes(tf):
   div1s = [] # contains all trip div headers
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
+  margins_dict = {}
+  margins = []
   
   div1_count = 1
   div2_printed_count = 1
@@ -374,15 +384,21 @@ def create_dom_nodes(tf):
       else:
         m = MARGINLINE_RE.match(l)
         if m:
-            head = newdoc.createElement('head')
-            marginheaders.append([head, page.num, m.group(1)])
-            head.setAttribute('type','marginnote')
-
-            xml_id = newdoc.createAttribute("xml:id")
-            xml_id.nodeValue = "p" + page.num + '-' + m.group(1)
-            head.setAttributeNode(xml_id)
-            text = newdoc.createTextNode(m.group(2))
-            head.appendChild(text)
+          head = newdoc.createElement('head')
+          marginheaders.append([head, page.num, m.group(1)])
+          head.setAttribute('type','marginnote')
+          id_value = "p" + page.num + '-' + m.group(1)
+          try:
+            exists = margins_dict[id_value]
+            if exists == 1:
+              print("Warning: Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+              id_value = id_value + "i"
+          except:
+            pass
+          head.setAttribute('xml:id', id_value)
+          margins_dict[id_value] = 1
+          text = newdoc.createTextNode(m.group(2))
+          head.appendChild(text)
 
     # now looping through page body to find div1s, which we may want to figure out how to 
     # do in the organize_nodes method later so as not to loop through the file as much.                
@@ -435,20 +451,18 @@ def create_dom_nodes(tf):
       else:
         #text line for trip header isn't matched, variables set accordingly.
         previous_text = False
-        div1text_count = 0 
-        div1_exists = False 
         text_found = False
   
   #print(div2_printed_count, file=sys.stderr)
-  return div1s, div2s, marginheaders
+  return div1s, div2s, marginheaders, margins_dict
    
-def organize_nodes(tf, div1s, div2s, marginheaders):
+def organize_nodes(tf, div1s, div2s, marginheaders, margins_dict):
   
   # this will be a list of paragraph nodes
   current_prose = []
   current_prose = create_p(current_prose) 
 
-  new_trip = False
+  #new_trip = False
   current_div1 = 0
   empty_lines = 0
   last_empty = False
@@ -495,7 +509,7 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         body.appendChild(div1s[0])
         if len(div1s) > 1:
           div1s.pop(0)  
-        new_trip = True
+        #new_trip = True
         
         #div2s[0].setAttribute('part', 'I')
         
@@ -507,10 +521,10 @@ def organize_nodes(tf, div1s, div2s, marginheaders):
         
       m = TEXTLINE_RE.match(l)
       if m:
-        new_trip = True
+        #new_trip = True
         continue
        
-      new_trip = False
+      #new_trip = False
       
       #organizes div2s. This section is the one with the most bugs I think, mainly the part
       #attribute issue
@@ -574,7 +588,7 @@ if __name__ in "__main__":
     print("Errors found. Please check error log and try again later.")
   else:	
     #to_xml_dom(tf)
-    div1s, div2s, marginheaders = create_dom_nodes(tf)
+    div1s, div2s, marginheaders, margins_dict = create_dom_nodes(tf)
   
-    organize_nodes(tf, div1s, div2s, marginheaders)
+    organize_nodes(tf, div1s, div2s, marginheaders, margins_dict)
     print(newdoc.toprettyxml('\t', '\n', None))
