@@ -1,5 +1,4 @@
 ToDo List:
-  * Program crashes for unknown reason with error message that is commented out
   * Initial, Middle, Final
     --If you set the attribute as I or F in the current set up of the program, div2s may be out of order since the 
       program checks the page header for new div2s before checking the body for div1s. In order to assign the part attribute
@@ -36,6 +35,7 @@ Fixed:
   * Div2 and div1 entries labeled starting from 1, not 0, as we are now doing with linecount.
   * Keep a hash of ids to robustly check for duplicates (add "i" on duplicates)
   * Warning for duplicate pages ^and ids
+  * Program crashes for unknown reason with error message that is commented out
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:

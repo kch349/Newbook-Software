@@ -157,13 +157,13 @@ class TranscriptionFile:
     n = -1
     while len(lines) > 0:
       m1 = PAGE_RE.match(lines[0])
-     # m2 = PAGENOTES_RE.match(lines[0])
-     # m3 = PAGETABBED_RE.match(lines[0])
+      m2 = PAGENOTES_RE.match(lines[0])
+      m3 = PAGETABBED_RE.match(lines[0])
+      if m2:
+        error_protocol(m2.group(1), -1, lines[0], 5)
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
-      #  if m2:
-       #   error_protocol(m2.group(1), -1, lines[0], 5)
         # if n==-1, we're on the first page, so keep going
         # if n is already defined, we've found a new page, so
         #    process the old one
@@ -176,12 +176,12 @@ class TranscriptionFile:
         else:
           n = int(m1.group(1))
           lines.pop(0)
-     # elif m3:
-      #  error_protocol(m3.group(1), -1, lines[0], 5)
-       # self.pages.append(TranscriptionPage(str(n), p))
-       # p = []
-       # n = int(m3.group(1))
-       # lines.pop(0)
+      elif m3:
+        error_protocol(m3.group(1), -1, lines[0], 5)
+        self.pages.append(TranscriptionPage(str(n), p))
+        p = []
+        n = int(m3.group(1))
+        lines.pop(0)
       else:
         p.append(lines[0])
         lines.pop(0)
