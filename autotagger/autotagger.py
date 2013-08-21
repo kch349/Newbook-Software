@@ -347,13 +347,13 @@ def create_dom_nodes(tf):
   """function that sets up in a DOM form with the nodes: Document, header and body, 
   header type divlines and trip titles, margin notes and text"""
 
-  div1s = [] # contains all trip div headers
+  
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
   margins_dict = {}
   margins = []
   
-  div1_count = 1
+  #div1_count = 1
   div2_printed_count = 1
   div2_count = 1
   marginline_count = 1
@@ -399,159 +399,156 @@ def create_dom_nodes(tf):
           margins_dict[id_value] = 1
           text = newdoc.createTextNode(m.group(2))
           head.appendChild(text)
-
-    # now looping through page body to find div1s, which we may want to figure out how to 
-    # do in the organize_nodes method later so as not to loop through the file as much.                
-    previous_text = False
-    current_head = None
-    text_found = False
-    for l in page.body:
-    # need line number stored in an attribute? 
+  return div2s, marginheaders, margins_dict
+   
+def organize_nodes(tf, div2s, marginheaders, margins_dict):
+  
+  # this will be a list of paragraph nodes
+  current_prose = []
+  current_prose = create_p(current_prose) 
+  div1s = [] # contains all trip div headers
+  
+  #new_trip = False
+  empty_lines = 0
+  last_empty = False
+  
+  current_div1 = None
+  previous_text = False
+  current_head = None
+  text_found = False
+  div1_count = 1
+  # need line number stored in an attribute? 
+  for page in tf.pages:
+    if page.num == "1":
+      current_head, div1 = create_div1(str(div1_count))
+      current_div1 = div1
+      text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
+      current_head.appendChild(text)
+      div1_count += 1
+      current_div1.appendChild(div2s[0])
       
+    linecount = 0  
+    for l in page.body:
       #if "Text:" matched and if "Line #:" is found right after "Text:", or it  
       #is the first line of the entire file, create a div 1 and add it to the list div1s 
       m = TEXT_RE.match(l)
       if m:
         text_found = True
         continue
-      m = TEXTLINE_RE.match(l) 
-      
-      #if it is the first line in the file, just create a generic and arbitrary div1
-      #to hold diary entries until the first real div1 trip heading is found.  
-      if len(div1s) == 0:
-        current_head, div1 = create_div1(str(div1_count))
-        div1s.append(div1)
-        text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
-        current_head.appendChild(text)
-        div1_count += 1
-        
-      if m and text_found:
-        if not previous_text:  
-          current_head, div1 = create_div1(str(div1_count))
-          div1s.append(div1)
-          div1_count += 1
-          
-          #creates a cloned div2 with all its nodes to serve as the medial or final part
-          #then labeled as the next number in the div2_count
-          if len(div2s) >= 2:
-            next_div2 = div2s[div2_count - 2].cloneNode(True)
-            #print("d " + str(page.num) + " split", file=sys.stderr)
-            next_div2.setAttribute('n', str(div2_count))
-            #next_div2.setAttribute('part', 'F')
-           # div2s[div2_count - 2].setAttribute('part', 'I')
-            div2s.append(next_div2)
-            div2_count += 1
-            
-        #if it actually is a trip heading, print the text as the header (and added in the
-        #line number here just in case, since I don't know if that is important or not
-        text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
-        current_head.appendChild(text)
-        previous_text = True
-    
       else:
-        #text line for trip header isn't matched, variables set accordingly.
-        previous_text = False
-        text_found = False
-  
-  #print(div2_printed_count, file=sys.stderr)
-  return div1s, div2s, marginheaders, margins_dict
-   
-def organize_nodes(tf, div1s, div2s, marginheaders, margins_dict):
-  
-  # this will be a list of paragraph nodes
-  current_prose = []
-  current_prose = create_p(current_prose) 
-
-  #new_trip = False
-  current_div1 = 0
-  empty_lines = 0
-  last_empty = False
-  for page in tf.pages:
-    linecount = 0  
-    for l in page.body:
-      linecount += 1
-      if linecount == 1:
-        div1s[0].appendChild(div2s[0])
-        
-      if len(marginheaders) > 0:
-        current_lineheader = marginheaders[0]
-        if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
-          div2s[0].appendChild(current_lineheader[0])
-          #marginheaders.pop(0)
-          marginheaders.remove(current_lineheader)
-      #else:
-        #print("ran out of marginheaders",file=sys.stderr)
+        linecount += 1
+        if len(marginheaders) > 0:
+          current_lineheader = marginheaders[0]
+          if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
+            div2s[0].appendChild(current_lineheader[0])
+            #marginheaders.pop(0)
+            marginheaders.remove(current_lineheader)
+        #else:
+          #print("ran out of marginheaders",file=sys.stderr)
       
-      #organizing div1s
-      m = EMPTYLINE_RE.match(l)
-      if m:
-        #found empty line
-        last_empty = True
-        empty_lines += 1
-        continue
-      elif last_empty:
-        for i in range(1, empty_lines + 1):
-          lb = newdoc.createElement('lb')
-          lb.setAttribute('n',str((linecount - empty_lines + (i - 1)))) 
-          current_prose[-1].appendChild(lb)
-        last_empty = False
-        empty_lines = 0
-          
-      m = TEXT_RE.match(l)
-      if m:
-        div2s[0].childNodes.extend(current_prose)
-        # create a new next paragaraph
-        current_prose = create_p(current_prose, fresh=True) 
-        div1s[0].appendChild(div2s[0])
-        #div1s[current_div1].appendChild(div2s[0])
-        #if current_div1 < (len(div1s) - 1):
-          #current_div1 += 1
-        body.appendChild(div1s[0])
-        if len(div1s) > 1:
-          div1s.pop(0)  
-        #new_trip = True
-        
-        #div2s[0].setAttribute('part', 'I')
-        
-        if len(div2s) > 1:
-          headCheck = div2s[0].getElementsByTagName('head')
-          #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
-          div2s.pop(0)
-        continue
-        
-      m = TEXTLINE_RE.match(l)
-      if m:
-        #new_trip = True
-        continue
-       
-      #new_trip = False
-      
-      #organizes div2s. This section is the one with the most bugs I think, mainly the part
-      #attribute issue
-      m = STAR_RE.match(l) 
-      if m: 
-        #appends children to div2 and that div2 to div1, then moves to the next div2
-        div2s[0].childNodes.extend(current_prose)
-        div1s[0].appendChild(div2s[0])
-        #div1s[current_div1].appendChild(div2s[0])
-
-        # delete the star and add this line to the current paragraph of current prose
-        current_prose = create_p(current_prose,[re.sub('\s+\*','',l),linecount],fresh=True)
-        if len(div2s) > 1:
-          headCheck = div2s[0].getElementsByTagName('head')
-          div2s.pop(0)
-      else:
-        m = PARA_RE.match(l)
+        #organizing div1s
+        m = EMPTYLINE_RE.match(l)
         if m:
-          ## found a paragraph starting line of text
-          # start a new paragraph
-          current_prose = create_p(current_prose,[l,linecount])
+          #found empty line
+          last_empty = True
+          empty_lines += 1
+          continue
+        elif last_empty:
+          for i in range(1, empty_lines + 1):
+            lb = newdoc.createElement('lb')
+            lb.setAttribute('n',str((linecount - empty_lines + (i - 1)))) 
+            current_prose[-1].appendChild(lb)
+          last_empty = False
+          empty_lines = 0
+          
+      
+        # now looping through page body to find div1s, which we may want to figure out how to 
+        # do in the organize_nodes method later so as not to loop through the file as much.    
+        m = TEXTLINE_RE.match(l)
+        if m and text_found:
+        
+          # create a new next paragaraph
+      
+          #div1s[current_div1].appendChild(div2s[0])
+          #if current_div1 < (len(div1s) - 1):
+            #current_div1 += 1
+          body.appendChild(current_div1)
+        
+        
+          #div2s[0].setAttribute('part', 'I')
+        
+          
+
+          if not previous_text:
+            #creates a cloned div2 with all its nodes to serve as the medial or final part
+            #then labeled as the next number in the div2_count     
+            if len(div2s) >= 1:
+              #no new header titles... fix that
+              next_div2 = div2s[0].cloneNode(False)
+              #print("d " + str(page.num) + " split", file=sys.stderr)
+              #next_div2.setAttribute('n', str("New n here"))
+              next_div2.setAttribute('part', 'F')
+              div2s[0].setAttribute('part', 'I')
+              #div2s[div2_count - 2].setAttribute('part', 'I')
+              div2s[0].childNodes.extend(current_prose)
+              current_prose = create_p(current_prose, fresh=True) 
+              current_div1.appendChild(div2s[0])
+
+              if len(div2s) > 1:
+                headCheck = div2s[0].getElementsByTagName('head')
+                #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
+                div2s.pop(0)
+            
+             #if it is the first line in the file, just create a generic and arbitrary div1
+             #to hold diary entries until the first real div1 trip heading is found.  
+              current_head, div1 = create_div1(str(div1_count))
+              current_div1 = div1
+              div1_count += 1
+              div2s.insert(0, next_div2)
+              
+            #creates a cloned div2 with all its nodes to serve as the medial or final part
+            #then labeled as the next number in the div2_count
+              #div2_count += 1
+          
+          #if it actually is a trip heading, print the text as the header (and added in the
+          #line number here just in case, since I don't know if that is important or not
+          text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
+          current_head.appendChild(text)
+          previous_text = True
+    
+          continue
         else:
-          ## found a vanilla line of text
-          lb = newdoc.createElement('lb')
-          lb.setAttribute('n',str(linecount))
-          current_prose[-1].appendChild(newdoc.createTextNode(l))
-          current_prose[-1].appendChild(lb)
+          #text line for trip header isn't matched, variables set accordingly.
+          previous_text = False
+          text_found = False 
+        #new_trip = False
+      
+        #organizes div2s. This section is the one with the most bugs I think, mainly the part
+        #attribute issue
+        m = STAR_RE.match(l) 
+        if m: 
+          #appends children to div2 and that div2 to div1, then moves to the next div2
+          div2s[0].childNodes.extend(current_prose)
+          current_div1.appendChild(div2s[0])
+          #div1s[current_div1].appendChild(div2s[0])
+
+          # delete the star and add this line to the current paragraph of current prose
+          current_prose = create_p(current_prose,[re.sub('\s+\*','',l),linecount],fresh=True)
+          if len(div2s) > 1:
+            headCheck = div2s[0].getElementsByTagName('head')
+            div2s.pop(0)
+        else:
+          m = PARA_RE.match(l)
+          if m:
+            ## found a paragraph starting line of text
+            # start a new paragraph
+            current_prose = create_p(current_prose,[l,linecount])
+          else:
+            ## found a vanilla line of text
+            lb = newdoc.createElement('lb')
+            lb.setAttribute('n',str(linecount))
+            current_prose[-1].appendChild(newdoc.createTextNode(l))
+            current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break before creating 
     #the next page to fix that bug?
     last_empty = False
@@ -562,8 +559,8 @@ def organize_nodes(tf, div1s, div2s, marginheaders, margins_dict):
       # print([c.toxml() for c in current_prose],file=sys.stderr)
   # done looping, everything organized so stick the nodes onto the document
   div2s[0].childNodes.extend(current_prose)
-  #div1s[0].childNodes.extend(div2s) 
-  body.childNodes.extend(div1s)
+  current_div1.childNodes.extend(div2s) 
+  body.appendChild(current_div1)
 
 if __name__ in "__main__":
   # accept svoboda transcription format file
@@ -588,7 +585,7 @@ if __name__ in "__main__":
     print("Errors found. Please check error log and try again later.")
   else:	
     #to_xml_dom(tf)
-    div1s, div2s, marginheaders, margins_dict = create_dom_nodes(tf)
+    div2s, marginheaders, margins_dict = create_dom_nodes(tf)
   
-    organize_nodes(tf, div1s, div2s, marginheaders, margins_dict)
+    organize_nodes(tf, div2s, marginheaders, margins_dict)
     print(newdoc.toprettyxml('\t', '\n', None))
