@@ -5,7 +5,11 @@ ToDo List:
       properly I think we may need to move it into the later organize_nodes method. 
   * Include an error message about having too few or too many stars on a page, or in the file. 
     Maybe do that for div1s too.
-  * Add warning if double spacing is found in the body.	
+  * Add warning if double spacing is found in the body.
+  * Verify or add attribute for line numbers of trip headings and margin notes, and remove the line number from the output
+  * remove "Text:" lines from the linecount
+  * Check and see if British pound sign is displayed correctly by Python
+  * Maybe record which pages trip headings occur on in order to verify if they are working correctly
  
 Questions:
  *   Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
