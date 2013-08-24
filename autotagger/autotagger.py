@@ -262,7 +262,7 @@ class TranscriptionPage:
           elif m1 or m2 or m3:
             error_protocol(self.num, i, lines[i], 2)
           else:		  
-            b.append(lines[i])
+            b.append(lines[i].strip())
             multi_headers = False
     self.head = h
     self.body = b	
