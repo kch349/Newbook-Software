@@ -228,7 +228,8 @@ class TranscriptionPage:
 					  
     length = len(lines)
     text = False #true if previous line was Text:
-    multi_headers = False #true if multiple "Lines" are allowed	
+    multi_headers = False #true if multiple "Lines" are allowed
+    divlines = 0	
     for i in range(0, length): 
       m1 = MARGINS_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
@@ -240,6 +241,8 @@ class TranscriptionPage:
       elif not switch:
         if m1 or m2 or m3:
           h.append(lines[i])
+          if m2:
+            divlines += 1
         elif lines[i].strip() == "":
           switch = True		
         else:	
@@ -254,8 +257,12 @@ class TranscriptionPage:
           text = False
         else:
           m4 = TEXT_RE.match(lines[i])
+          m7 = STAR_RE.match(lines[i])
           if m4:
             text = True
+            b.append(lines[i])
+          if m7:
+            divlines -= 1
             b.append(lines[i])
           elif multi_headers and m3:
             b.append(lines[i])
@@ -264,6 +271,8 @@ class TranscriptionPage:
           else:		  
             b.append(lines[i].strip())
             multi_headers = False
+    if divlines != 0:
+      error_protocol(self.num, None, None, None)
     self.head = h
     self.body = b	
 
@@ -272,8 +281,18 @@ def error_protocol(page_num, line_num, line, error_code):
 	
   global errors_found
   errors_found = True
-  print_errors(page_num, line_num, line, error_code)
-	
+  if line_num == None:
+    print_incorrect_stars(page_num)
+  else:
+    print_errors(page_num, line_num, line, error_code)
+
+def print_incorrect_stars(page_num):
+  """prints an error message saying there are too many or too few asterisks. Contains
+  the page number."""
+  
+  print("The number of asterisks in the body does not match the number of DivLines " +
+       "in the header on page " + page_num + ".\n", file=sys.stderr)
+  
 def print_errors(page_num, line_num, line, error_code):
   """prints an error message. Contains the line and page number, the faulty line,
   and what the error is."""
