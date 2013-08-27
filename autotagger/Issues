@@ -1,6 +1,5 @@
 ToDo List:
-  * Include an error message about having too few or too many stars on a page, or in the file. 
-    Maybe do that for div1s too.
+  * Include an error message for too few or too many div1s.
   * Add warning if double spacing is found in the body.
   * Verify or add attribute for line numbers of trip headings and margin notes, and remove the line number from the output
   * Check and see if British pound sign is displayed correctly by Python
@@ -43,6 +42,7 @@ Fixed:
       properly I think we may need to move it into the later organize_nodes method. 
   * remove "Text:" lines from the linecount
   * Add in a possible "M" or medial part attribute. Right now the program assumes there are only "I", "F", or "N" parts.
+  * Include an error message about having too few or too many stars on a page, or in the file. 
 
 Desiderata for future iterations:
   * provide configuration model for autotagger:
