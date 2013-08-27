@@ -407,6 +407,7 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
   current_prose = []
   current_prose = create_p(current_prose) 
   div1s = [] # contains all trip div headers
+  journeys_dict = {}
   
   #new_trip = False
   empty_lines = 0
@@ -465,31 +466,25 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
         # now looping through page body to find div1s, which we may want to figure out how to 
         # do in the organize_nodes method later so as not to loop through the file as much.    
         m = TEXTLINE_RE.match(l)
-        if m and text_found:
-        
-          # create a new next paragaraph
-      
-          #div1s[current_div1].appendChild(div2s[0])
-          #if current_div1 < (len(div1s) - 1):
-            #current_div1 += 1
+        if m and text_found:      
           body.appendChild(current_div1)
-        
-        
-          #div2s[0].setAttribute('part', 'I')
-        
-          
-
           if not previous_text:
             #creates a cloned div2 with all its nodes to serve as the medial or final part
             #then labeled as the next number in the div2_count     
+            
+            #check and see if the last one was part f. if so make the last one part m instead.
             if len(div2s) >= 1:
-              #no new header titles... fix that
               next_div2 = div2s[0].cloneNode(False)
               #print("d " + str(page.num) + " split", file=sys.stderr)
               #next_div2.setAttribute('n', str("New n here"))
               next_div2.setAttribute('part', 'F')
-              div2s[0].setAttribute('part', 'I')
-              #div2s[div2_count - 2].setAttribute('part', 'I')
+              
+              atr = div2s[0].getAttributeNode('part')
+              x = atr.nodeValue
+              if x == 'F':
+                div2s[0].setAttribute('part', 'M')
+              else:
+                div2s[0].setAttribute('part', 'I')
               div2s[0].childNodes.extend(current_prose)
               current_prose = create_p(current_prose, fresh=True) 
               current_div1.appendChild(div2s[0])
@@ -506,16 +501,34 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
               div1_count += 1
               div2s.insert(0, next_div2)
               
+              
+            trip_id_value = "p" + page.num + '-' + m.group(1)
+            try:
+              exists = journeys_dict[id_value]
+              if exists == 1:
+                print("Warning: Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+                id_value = id_value + "i"
+            except:
+              pass
+            current_head.setAttribute('xml:id', trip_id_value)
+            journeys_dict[trip_id_value] = 1
+            
+            previous_text = True
+              
             #creates a cloned div2 with all its nodes to serve as the medial or final part
             #then labeled as the next number in the div2_count
               #div2_count += 1
           
           #if it actually is a trip heading, print the text as the header (and added in the
           #line number here just in case, since I don't know if that is important or not
-          text = newdoc.createTextNode("Line " + m.group(1) + ': ' + m.group(2))
+          
+           
+          text = newdoc.createTextNode(m.group(2))
           current_head.appendChild(text)
-          previous_text = True
-    
+          lb = newdoc.createElement("lb")
+          lb.setAttribute("n", m.group(1))
+          current_head.appendChild(lb)
+          
           continue
         else:
           #text line for trip header isn't matched, variables set accordingly.
