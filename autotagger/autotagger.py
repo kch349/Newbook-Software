@@ -634,9 +634,7 @@ if __name__ in "__main__":
     for e in tf.errors:
       print(e,file=sys.stderr)
   else:	
-    #to_xml_dom(tf)
     document = setup_DOM()
     div2s, marginheaders, margins_dict = create_dom_nodes(document, tf)
-  
     organize_nodes(document, tf, div2s, marginheaders, margins_dict)
     print(document.toprettyxml('\t', '\n', None))
