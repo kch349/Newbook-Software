@@ -140,12 +140,12 @@ document.appendChild(text)
 #text.appendChild(back)
 body = newdoc.createElement('body')
 text.appendChild(body)
-errors_found = False
 	
 class TranscriptionFile:
   """class to parse and hold a series of TranscriptionPage objects"""
 
   pages = []
+  errors = []
 
   def __init__(self, lines):
     self.parse_lines(lines)
@@ -160,7 +160,7 @@ class TranscriptionFile:
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
       if m2:
-        error_protocol(m2.group(1), -1, lines[0], 5)
+        self.errors.append(error_protocol(m2.group(1), -1, lines[0], 5))
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
@@ -177,7 +177,7 @@ class TranscriptionFile:
           n = int(m1.group(1))
           lines.pop(0)
       elif m3:
-        error_protocol(m3.group(1), -1, lines[0], 5)
+        self.errors.append(error_protocol(m3.group(1), -1, lines[0], 5))
         self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
@@ -187,7 +187,10 @@ class TranscriptionFile:
         lines.pop(0)
       
    # try: 
-    self.pages.append(TranscriptionPage(str(n), p))
+    tp = TranscriptionPage(str(n),p)
+    if len(tp.errors) > 0:
+      self.errors.extend(tp.errors)
+    self.pages.append(tp)
     #except:
      # """Error with page creation. There is not another page to append."""
     
@@ -203,6 +206,7 @@ class TranscriptionPage:
   num = -1
   head = [] 
   body = []
+  errors = []
 
   def __init__(self, num, lines):
 
@@ -237,7 +241,7 @@ class TranscriptionPage:
       m5 = MARGINLINELIST_RE.match(lines[i])
       m6 = MARGINLINERANGE_RE.match(lines[i])
       if m5 or m6:
-        error_protocol(self.num, i, lines[i], 4)
+        self.errors.append(error_protocol(self.num, i, lines[i], 4))
       elif not switch:
         if m1 or m2 or m3:
           h.append(lines[i])
@@ -246,14 +250,14 @@ class TranscriptionPage:
         elif lines[i].strip() == "":
           switch = True		
         else:	
-          error_protocol(self.num, i, lines[i], 1)
+          self.errors.append(error_protocol(self.num, i, lines[i], 1))
       else:
         if text:
           if m3:
             b.append(lines[i])
             multi_headers = True
           else:
-            error_protocol(self.num, i, lines[i], 3)
+            self.errors.append(error_protocol(self.num, i, lines[i], 3))
           text = False
         else:
           m4 = TEXT_RE.match(lines[i])
@@ -267,63 +271,64 @@ class TranscriptionPage:
           elif multi_headers and m3:
             b.append(lines[i])
           elif m1 or m2 or m3:
-            error_protocol(self.num, i, lines[i], 2)
+            self.errors.append(error_protocol(self.num, i, lines[i], 2))
           else:		  
             b.append(lines[i].strip())
             multi_headers = False
     if divlines != 0:
-      error_protocol(self.num, None, None, None)
+      self.errors.append(error_protocol(self.num, None, None, None))
     self.head = h
     self.body = b	
 
 def error_protocol(page_num, line_num, line, error_code):
   """sets errors_found variable to True and prints an error message."""
 	
-  global errors_found
-  errors_found = True
   if line_num == None:
-    print_incorrect_stars(page_num)
+    return print_incorrect_stars(page_num)
   else:
-    print_errors(page_num, line_num, line, error_code)
+    return print_errors(page_num, line_num, line, error_code)
 
 def print_incorrect_stars(page_num):
-  """prints an error message saying there are too many or too few asterisks. Contains
-  the page number."""
+  """produces an error message saying there are too many or too few 
+  asterisks. Contains the page number."""
   
-  print("The number of asterisks in the body does not match the number of DivLines " +
-       "in the header on page " + page_num + ".\n", file=sys.stderr)
+  return "The number of asterisks in the body does not match the number"+\
+         "of DivLines in the header on page "+ page_num +"."
   
 def print_errors(page_num, line_num, line, error_code):
-  """prints an error message. Contains the line and page number, the faulty line,
-  and what the error is."""
+  """Produces an error message. Contains the line and page number, the 
+  faulty line, and what the error is."""
 	
-  print("An error was found on page " + str(page_num) +
-	", line " +  str(line_num + 1) + ":", 
-	file=sys.stderr)
-  print("	" + line.strip(), file=sys.stderr)
-  if error_code == 1:
-    print("Error with head section. Please add either \"Line #\" or \"DivLine\"" +
-     	 " to the indicated line.\nPlease make sure to format these exactly as shown.\n" +
-		 "If this line belongs in the body, please remember to put a space before it.\n",
-		 file=sys.stderr) 
-  elif error_code == 2:
-    print("This line belongs in the head. If you meant for this to be in the head," +
-         " there may be an issue with the spacing.\nMake sure there are no spaces between" +
-		  " the lines \"Page #:\" and \"Margin:\" and that you don't use double spacing.\n" + 
-		  "If this is a diary entry header, make sure to use \"*\" " +
-		  "rather than \"DivLine\".\nIf this is a journey header, add the line \"Text:\" before it.\n"
-		  , file=sys.stderr)
-  elif error_code == 3:
-    print("This line should be a journey header. If it is, please make sure to begin " +
-         "it with \"Line #\". If not, please put in a journey header before this line.",
-    	 file=sys.stderr)
-  elif error_code == 4:
-    print("Lines cannot be formatted like \"Line #, #, #:\" or \"Lines #-#\" or any similar " +
-         "format.\nEach part of the line must get its own line and must begin with \"Line #:\".\n",
-         file=sys.stderr)	
-  elif error_code == 5:
-    print("This line must be formatted \"Page #\". No additional formatting is allowed.\n", file=sys.stderr)  
+  err_str = "An error was found on page " + str(page_num) +\
+            ", line " +  str(line_num + 1) + ": " + line.strip()
 
+  if error_code == 1:
+    err_str += "Error with head section. Please add either \"Line #\" "+\
+               "or \"DivLine\" to the indicated line.\nPlease make sure"+\
+               " to format these exactly as shown.\n" +\
+               "If this line belongs in the body, please remember to put"+\
+               " a space before it.\n"
+  elif error_code == 2:
+    err_str += "This line belongs in the head. If you meant for this to "+\
+               "be in the head," +\
+               " there may be an issue with the spacing.\nMake sure there "+\
+               "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
+               " and that you don't use double spacing.\n"+\
+               "If this is a diary entry header, make sure to use \"*\" " +\
+               "rather than \"DivLine\".\nIf this is a journey header, add "+\
+               " the line \"Text:\" before it.\n"
+  elif error_code == 3:
+    err_str += "This line should be a journey header. If it is, please make "+\
+               "sure to begin it with \"Line #\". If not, please put in a "+\
+               "journey header before this line."
+  elif error_code == 4:
+    err_str += "Lines cannot be formatted like \"Line #, #, #:\" or "+\
+               "\"Lines #-#\" or any similar format.\nEach part of the"+\
+               "line must get its own line and must begin with \"Line #:\".\n"
+  elif error_code == 5:
+    err_str += "This line must be formatted \"Page #\". No additional "+\
+               "formatting is allowed.\n"  
+  return err_str
 
 def create_div1(n): 
   div1 = newdoc.createElement('div1')
@@ -610,11 +615,10 @@ if __name__ in "__main__":
   # into a series of 'page objects'  
  
   tf = TranscriptionFile(infilelines)
-
-  print("found "+str(len(tf.pages))+" transcription pages", file=sys.stderr)
-  
-  if errors_found:
+  if len(tf.errors) > 0:
     print("Errors found. Please check error log and try again later.")
+    for e in tf.errors:
+      print(e,file=sys.stderr)
   else:	
     #to_xml_dom(tf)
     div2s, marginheaders, margins_dict = create_dom_nodes(tf)
