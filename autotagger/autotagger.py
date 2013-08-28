@@ -13,6 +13,8 @@
 
 import sys
 import re
+import logging
+import argparse
 from xml.dom.minidom import *
 
 ## some regexes that we need
@@ -290,39 +292,34 @@ def print_incorrect_stars(page_num):
   """prints an error message saying there are too many or too few asterisks. Contains
   the page number."""
   
-  print("The number of asterisks in the body does not match the number of DivLines " +
-       "in the header on page " + page_num + ".\n", file=sys.stderr)
+  logging.error(" The number of asterisks in the body does not match the number of DivLines " +
+       "in the header on page " + page_num + ".\n")
   
 def print_errors(page_num, line_num, line, error_code):
   """prints an error message. Contains the line and page number, the faulty line,
   and what the error is."""
 	
-  print("An error was found on page " + str(page_num) +
-	", line " +  str(line_num + 1) + ":", 
-	file=sys.stderr)
-  print("	" + line.strip(), file=sys.stderr)
+  error = " Page %s, Line %s:\n" % (str(page_num), str(line_num + 1))
+  error += "	   	%s\n" % line.strip()
   if error_code == 1:
-    print("Error with head section. Please add either \"Line #\" or \"DivLine\"" +
-     	 " to the indicated line.\nPlease make sure to format these exactly as shown.\n" +
-		 "If this line belongs in the body, please remember to put a space before it.\n",
-		 file=sys.stderr) 
+    error += "       Error with head section. Please add either \"Line #\" or \"DivLine\""
+    error += " to the indicated line.\n       Please make sure to format these exactly as shown.\n"
+    error += "       If this line belongs in the body, please remember to put a space before it.\n"
   elif error_code == 2:
-    print("This line belongs in the head. If you meant for this to be in the head," +
-         " there may be an issue with the spacing.\nMake sure there are no spaces between" +
-		  " the lines \"Page #:\" and \"Margin:\" and that you don't use double spacing.\n" + 
-		  "If this is a diary entry header, make sure to use \"*\" " +
-		  "rather than \"DivLine\".\nIf this is a journey header, add the line \"Text:\" before it.\n"
-		  , file=sys.stderr)
+    error += "       This line belongs in the head. If you meant for this to be in the head,"
+    error += " there may be an issue with the spacing.\n       Make sure there are no spaces between"
+    error += " the lines \"Page #:\" and \"Margin:\" and that you don't use double spacing.\n" 
+    error += "       If this is a diary entry header, make sure to use \"*\" "
+    error += "rather than \"DivLine\".\n       If this is a journey header, add the line \"Text:\" before it.\n"
   elif error_code == 3:
-    print("This line should be a journey header. If it is, please make sure to begin " +
-         "it with \"Line #\". If not, please put in a journey header before this line.",
-    	 file=sys.stderr)
+    error += "       This line should be a journey header. If it is, please make sure to begin "
+    error += "it with \"Line #\". If not, please put in a journey header before this line."
   elif error_code == 4:
-    print("Lines cannot be formatted like \"Line #, #, #:\" or \"Lines #-#\" or any similar " +
-         "format.\nEach part of the line must get its own line and must begin with \"Line #:\".\n",
-         file=sys.stderr)	
+    error += "       Lines cannot be formatted like \"Line #, #, #:\" or \"Lines #-#\" or any similar "
+    error += "format.\n       Each part of the line must get its own line and must begin with \"Line #:\".\n"	
   elif error_code == 5:
-    print("This line must be formatted \"Page #\". No additional formatting is allowed.\n", file=sys.stderr)  
+    error += "       This line must be formatted \"Page #\". No additional formatting is allowed.\n"
+  logging.error(error)
 
 
 def create_div1(n): 
@@ -410,7 +407,7 @@ def create_dom_nodes(tf):
           try:
             exists = margins_dict[id_value]
             if exists == 1:
-              print("Warning: Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+              logging.warning(" Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
               id_value = id_value + "i"
           except:
             pass
@@ -525,7 +522,7 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
             try:
               exists = journeys_dict[id_value]
               if exists == 1:
-                print("Warning: Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+                logging.warning(" Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
                 id_value = id_value + "i"
             except:
               pass
@@ -594,16 +591,24 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
   current_div1.childNodes.extend(div2s) 
   body.appendChild(current_div1)
 
+def setup_argparse():
+  ap = argparse.ArgumentParser()
+  ap.add_argument('--file', '-f', help='choose a file for the autotagger')
+  return ap
+
 if __name__ in "__main__":
   # accept svoboda transcription format file
   # on stdin
 
-  try:
-    filename = sys.argv[1]
-    infilelines = open(filename, 'r').readlines()
-  except:
+  ap = setup_argparse()
+  args = ap.parse_args()
+  if args.file: 
+    infile = open(args.file, encoding="utf-8")
+    infilelines = infile.readlines()
+  else:	
     infilelines = sys.stdin.readlines()
   
+  logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
   # to keep things clean, and check for errors in
   # the input,
   # before we start, parse these lines
@@ -611,7 +616,7 @@ if __name__ in "__main__":
  
   tf = TranscriptionFile(infilelines)
 
-  print("found "+str(len(tf.pages))+" transcription pages", file=sys.stderr)
+  logging.info(" found "+str(len(tf.pages))+" transcription pages")
   
   if errors_found:
     print("Errors found. Please check error log and try again later.")
