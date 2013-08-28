@@ -565,7 +565,7 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
           #div1s[current_div1].appendChild(div2s[0])
 
           # delete the star and add this line to the current paragraph of current prose
-          current_prose = create_p(current_prose,[re.sub('\s+\*','',l),linecount],fresh=True)
+          current_prose = create_p(current_prose,[re.sub('\s*\*','',l),linecount],fresh=True)
           if len(div2s) > 1:
             headCheck = div2s[0].getElementsByTagName('head')
             div2s.pop(0)
