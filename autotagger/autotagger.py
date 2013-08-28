@@ -13,6 +13,8 @@
 
 import sys
 import re
+import logging
+import argparse
 from xml.dom.minidom import *
 
 ## some regexes that we need
@@ -34,118 +36,118 @@ MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 
-def create_respSt():
-  resp_statement = newdoc.createElement('respStmt')	
-  resp = newdoc.createElement('resp')
+def create_respSt(document):
+  resp_statement = document.createElement('respStmt')	
+  resp = document.createElement('resp')
   resp_statement.appendChild(resp)
-  resp.appendChild(newdoc.createTextNode('OTAP'))
-  name = newdoc.createElement('name')
+  resp.appendChild(document.createTextNode('OTAP'))
+  name = document.createElement('name')
   resp_statement.appendChild(name)
-  name.appendChild(newdoc.createTextNode('Walter Andrews'))
+  name.appendChild(document.createTextNode('Walter Andrews'))
   return resp_statement
    
-def create_teiHeader():
-  header = newdoc.createElement('teiHeader')
-  fileDesc = newdoc.createElement('fileDesc')
+def create_teiHeader(document):
+  header = document.createElement('teiHeader')
+  fileDesc = document.createElement('fileDesc')
   header.appendChild(fileDesc)
-  title_statement = newdoc.createElement('titleStmt')
+  title_statement = document.createElement('titleStmt')
   fileDesc.appendChild(title_statement)
   
-  title = newdoc.createElement('title')
+  title = document.createElement('title')
   title_statement.appendChild(title)
-  title.appendChild(newdoc.createTextNode('Diary 48'))
+  title.appendChild(document.createTextNode('Diary 48'))
   
-  author =  newdoc.createElement('author')
+  author =  document.createElement('author')
   title_statement.appendChild(author)
-  author.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
+  author.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
   
   for i in range (0, 2):
-    title_statement.appendChild(create_respSt())
+    title_statement.appendChild(create_respSt(document))
   
-  pubSt = newdoc.createElement('publicationStmt')
+  pubSt = document.createElement('publicationStmt')
   fileDesc.appendChild(pubSt)
-  distributor = newdoc.createElement('distributor')
+  distributor = document.createElement('distributor')
   pubSt.appendChild(distributor)
-  distributor.appendChild(newdoc.createTextNode('OTAP'))
+  distributor.appendChild(document.createTextNode('OTAP'))
   
-  address = newdoc.createElement('address')
+  address = document.createElement('address')
   pubSt.appendChild(address)
-  addrLine = newdoc.createElement('addrLine')
+  addrLine = document.createElement('addrLine')
   address.appendChild(addrLine)
   
-  idno = newdoc.createElement('idno')
+  idno = document.createElement('idno')
   pubSt.appendChild(idno)
   idno.setAttribute('type', 'OTAP')
-  idno.appendChild(newdoc.createTextNode('1898-1899'))
+  idno.appendChild(document.createTextNode('1898-1899'))
   
-  availability = newdoc.createElement('availability')
+  availability = document.createElement('availability')
   pubSt.appendChild(availability)
-  p = newdoc.createElement('p')
+  p = document.createElement('p')
   availability.appendChild(p)
-  p.appendChild(newdoc.createTextNode('Copyright 2012 OTAP. All Rights Reserved.'))
+  p.appendChild(document.createTextNode('Copyright 2012 OTAP. All Rights Reserved.'))
   
-  date = newdoc.createElement('date')
+  date = document.createElement('date')
   pubSt.appendChild(date)
   date.setAttribute('when', '2007')
-  date.appendChild(newdoc.createTextNode('2011'))
+  date.appendChild(document.createTextNode('2011'))
   
-  sourceDesc = newdoc.createElement('sourceDesc')
+  sourceDesc = document.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
-  bibl = newdoc.createElement('bibl')
+  bibl = document.createElement('bibl')
   sourceDesc.appendChild(bibl)
-  bibl.appendChild(newdoc.createTextNode('Joseph Mathia Svoboda'))
+  bibl.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
   
-  encodingDesc = newdoc.createElement('encodingDesc')
+  encodingDesc = document.createElement('encodingDesc')
   header.appendChild(encodingDesc)
-  projectDesc = newdoc.createElement('projectDesc')
+  projectDesc = document.createElement('projectDesc')
   encodingDesc.appendChild(projectDesc)
-  p2 = newdoc.createElement('p')
+  p2 = document.createElement('p')
   projectDesc.appendChild(p2)
-  p2.appendChild(newdoc.createTextNode('OTAP'))
+  p2.appendChild(document.createTextNode('OTAP'))
   
-  revisionDesc = newdoc.createElement('revisionDesc')
+  revisionDesc = document.createElement('revisionDesc')
   header.appendChild(revisionDesc)
   
-  listNode = newdoc.createElement('list')
+  listNode = document.createElement('list')
   revisionDesc.appendChild(listNode)
   
-  item = newdoc.createElement('item')
+  item = document.createElement('item')
   listNode.appendChild(item)
   
-  date = newdoc.createElement('date')
+  date = document.createElement('date')
   item.appendChild(date)
   date.setAttribute('when', '2012-30-08')
-  date.appendChild(newdoc.createTextNode('30 August 12'))
-  item.appendChild(newdoc.createTextNode('Last checked'))
+  date.appendChild(document.createTextNode('30 August 12'))
+  item.appendChild(document.createTextNode('Last checked'))
   return header
   
 
-impl = getDOMImplementation()
+def setup_DOM():
+  impl = getDOMImplementation()
+  doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd')
 
-doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd')
+  newdoc = impl.createDocument(None, "TEI", doctype)
+  document = newdoc.documentElement
+  newdoc.appendChild(document)
+  teiHeader = create_teiHeader(newdoc)
+  document.appendChild(teiHeader)
 
-# def createDocument(self, namespaceURI, qualifiedName, doctype):
-newdoc = impl.createDocument(None, "TEI", doctype)
-document = newdoc.documentElement
-newdoc.appendChild(document)
-teiHeader = create_teiHeader()
-document.appendChild(teiHeader)
-
-text = newdoc.createElement('text')
-document.appendChild(text)
+  text = newdoc.createElement('text')
+  document.appendChild(text)
 
 #front = newdoc.createElement('front')
 #text.appendChild(front)
 #back = newdoc.createElement('back')
 #text.appendChild(back)
-body = newdoc.createElement('body')
-text.appendChild(body)
-errors_found = False
+  body = newdoc.createElement('body')
+  text.appendChild(body)
+  return newdoc
 	
 class TranscriptionFile:
   """class to parse and hold a series of TranscriptionPage objects"""
 
   pages = []
+  errors = []
 
   def __init__(self, lines):
     self.parse_lines(lines)
@@ -160,7 +162,7 @@ class TranscriptionFile:
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
       if m2:
-        error_protocol(m2.group(1), -1, lines[0], 5)
+        self.errors.append(error_protocol(m2.group(1), -1, lines[0], 5))
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
@@ -177,7 +179,7 @@ class TranscriptionFile:
           n = int(m1.group(1))
           lines.pop(0)
       elif m3:
-        error_protocol(m3.group(1), -1, lines[0], 5)
+        self.errors.append(error_protocol(m3.group(1), -1, lines[0], 5))
         self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
@@ -187,7 +189,10 @@ class TranscriptionFile:
         lines.pop(0)
       
    # try: 
-    self.pages.append(TranscriptionPage(str(n), p))
+    tp = TranscriptionPage(str(n),p)
+    if len(tp.errors) > 0:
+      self.errors.extend(tp.errors)
+    self.pages.append(tp)
     #except:
      # """Error with page creation. There is not another page to append."""
     
@@ -203,6 +208,7 @@ class TranscriptionPage:
   num = -1
   head = [] 
   body = []
+  errors = []
 
   def __init__(self, num, lines):
 
@@ -237,7 +243,7 @@ class TranscriptionPage:
       m5 = MARGINLINELIST_RE.match(lines[i])
       m6 = MARGINLINERANGE_RE.match(lines[i])
       if m5 or m6:
-        error_protocol(self.num, i, lines[i], 4)
+        self.errors.append(error_protocol(self.num, i, lines[i], 4))
       elif not switch:
         if m1 or m2 or m3:
           h.append(lines[i])
@@ -246,14 +252,14 @@ class TranscriptionPage:
         elif lines[i].strip() == "":
           switch = True		
         else:	
-          error_protocol(self.num, i, lines[i], 1)
+          self.errors.append(error_protocol(self.num, i, lines[i], 1))
       else:
         if text:
           if m3:
             b.append(lines[i])
             multi_headers = True
           else:
-            error_protocol(self.num, i, lines[i], 3)
+            self.errors.append(error_protocol(self.num, i, lines[i], 3))
           text = False
         else:
           m4 = TEXT_RE.match(lines[i])
@@ -267,102 +273,103 @@ class TranscriptionPage:
           elif multi_headers and m3:
             b.append(lines[i])
           elif m1 or m2 or m3:
-            error_protocol(self.num, i, lines[i], 2)
+            self.errors.append(error_protocol(self.num, i, lines[i], 2))
           else:		  
             b.append(lines[i].strip())
             multi_headers = False
     if divlines != 0:
-      error_protocol(self.num, None, None, None)
+      self.errors.append(error_protocol(self.num, None, None, None))
     self.head = h
     self.body = b	
 
 def error_protocol(page_num, line_num, line, error_code):
   """sets errors_found variable to True and prints an error message."""
 	
-  global errors_found
-  errors_found = True
   if line_num == None:
-    print_incorrect_stars(page_num)
+    return print_incorrect_stars(page_num)
   else:
-    print_errors(page_num, line_num, line, error_code)
+    return print_errors(page_num, line_num, line, error_code)
 
 def print_incorrect_stars(page_num):
-  """prints an error message saying there are too many or too few asterisks. Contains
-  the page number."""
+  """produces an error message saying there are too many or too few 
+  asterisks. Contains the page number."""
   
-  print("The number of asterisks in the body does not match the number of DivLines " +
-       "in the header on page " + page_num + ".\n", file=sys.stderr)
+  return "The number of asterisks in the body does not match the number"+\
+         "of DivLines in the header on page "+ page_num +"."
   
 def print_errors(page_num, line_num, line, error_code):
-  """prints an error message. Contains the line and page number, the faulty line,
-  and what the error is."""
+  """Produces an error message. Contains the line and page number, the 
+  faulty line, and what the error is."""
 	
-  print("An error was found on page " + str(page_num) +
-	", line " +  str(line_num + 1) + ":", 
-	file=sys.stderr)
-  print("	" + line.strip(), file=sys.stderr)
+  err_str = "An error was found on page " + str(page_num) +\
+            ", line " +  str(line_num + 1) + ": " + line.strip()
+
   if error_code == 1:
-    print("Error with head section. Please add either \"Line #\" or \"DivLine\"" +
-     	 " to the indicated line.\nPlease make sure to format these exactly as shown.\n" +
-		 "If this line belongs in the body, please remember to put a space before it.\n",
-		 file=sys.stderr) 
+    err_str += "Error with head section. Please add either \"Line #\" "+\
+               "or \"DivLine\" to the indicated line.\nPlease make sure"+\
+               " to format these exactly as shown.\n" +\
+               "If this line belongs in the body, please remember to put"+\
+               " a space before it.\n"
   elif error_code == 2:
-    print("This line belongs in the head. If you meant for this to be in the head," +
-         " there may be an issue with the spacing.\nMake sure there are no spaces between" +
-		  " the lines \"Page #:\" and \"Margin:\" and that you don't use double spacing.\n" + 
-		  "If this is a diary entry header, make sure to use \"*\" " +
-		  "rather than \"DivLine\".\nIf this is a journey header, add the line \"Text:\" before it.\n"
-		  , file=sys.stderr)
+    err_str += "This line belongs in the head. If you meant for this to "+\
+               "be in the head," +\
+               " there may be an issue with the spacing.\nMake sure there "+\
+               "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
+               " and that you don't use double spacing.\n"+\
+               "If this is a diary entry header, make sure to use \"*\" " +\
+               "rather than \"DivLine\".\nIf this is a journey header, add "+\
+               " the line \"Text:\" before it.\n"
   elif error_code == 3:
-    print("This line should be a journey header. If it is, please make sure to begin " +
-         "it with \"Line #\". If not, please put in a journey header before this line.",
-    	 file=sys.stderr)
+    err_str += "This line should be a journey header. If it is, please make "+\
+               "sure to begin it with \"Line #\". If not, please put in a "+\
+               "journey header before this line."
   elif error_code == 4:
-    print("Lines cannot be formatted like \"Line #, #, #:\" or \"Lines #-#\" or any similar " +
-         "format.\nEach part of the line must get its own line and must begin with \"Line #:\".\n",
-         file=sys.stderr)	
+    err_str += "Lines cannot be formatted like \"Line #, #, #:\" or "+\
+               "\"Lines #-#\" or any similar format.\nEach part of the"+\
+               "line must get its own line and must begin with \"Line #:\".\n"
   elif error_code == 5:
-    print("This line must be formatted \"Page #\". No additional formatting is allowed.\n", file=sys.stderr)  
+    err_str += "This line must be formatted \"Page #\". No additional "+\
+               "formatting is allowed.\n"  
+  return err_str
 
-
-def create_div1(n): 
-  div1 = newdoc.createElement('div1')
+def create_div1(document,n): 
+  div1 = document.createElement('div1')
   div1.setAttribute('type','journey')
   div1.setAttribute('n',n)
-  head = newdoc.createElement('head')
+  head = document.createElement('head')
   div1.appendChild(head)
   head.setAttribute('type','journey')
   return head, div1
   
-def create_div2(n,part,content):
-  div2 = newdoc.createElement('div2')
+def create_div2(document,n,part,content):
+  div2 = document.createElement('div2')
   div2.setAttribute('type','diaryentry')
   div2.setAttribute('n',n)
   div2.setAttribute('part', part)
   
-  head = newdoc.createElement('head')
+  head = document.createElement('head')
   div2.appendChild(head)
   head.setAttribute('type','diaryentry')
 
-  text = newdoc.createTextNode(content)
+  text = document.createTextNode(content)
   head.appendChild(text)
   return div2
 
-def create_p(current_prose, first_line=None, fresh=False):
+def create_p(document,current_prose, first_line=None, fresh=False):
   '''method to create a paragraph, needs the list of paragraphs
      possibly also receive a first line (and it's linenum in a list of len 2).
      fresh tells us whether to empty the list before we start'''
   if fresh: current_prose = []
-  current_prose.append(newdoc.createElement('p')) 
+  current_prose.append(document.createElement('p')) 
   if first_line != None:
-    lb = newdoc.createElement('lb')
+    lb = document.createElement('lb')
     lb.setAttribute('n',str(first_line[1]))
-    current_prose[-1].appendChild(newdoc.createTextNode(first_line[0])) 
+    current_prose[-1].appendChild(document.createTextNode(first_line[0])) 
     current_prose[-1].appendChild(lb) 
   return current_prose 
 
        
-def create_dom_nodes(tf):
+def create_dom_nodes(doc,tf):
   """function that sets up in a DOM form with the nodes: Document, header and body, 
   header type divlines and trip titles, margin notes and text"""
 
@@ -388,14 +395,14 @@ def create_dom_nodes(tf):
       #Part N means the node isn't fragmented at all.
       if len(div2s)==0:
         ## create first div2
-        div2s.append(create_div2(str(div2_count),part,"First diary entry, no title given in text."))
+        div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
         div2_count += 1
 
       m = DIVLINE_RE.match(l)
       if m:
         # matched a Divline, create a new div2
         part="N" # what's part="N"? I though these values were "I" and "F"
-        div2s.append(create_div2(str(div2_count),part,m.group(1)))
+        div2s.append(create_div2(doc,str(div2_count),part,m.group(1)))
         #print("d " + str(page.num) + " " + m.group(1), file=sys.stderr)
         div2_printed_count += 1
         div2_count += 1
@@ -403,30 +410,33 @@ def create_dom_nodes(tf):
       else:
         m = MARGINLINE_RE.match(l)
         if m:
-          head = newdoc.createElement('head')
+          head = doc.createElement('head')
           marginheaders.append([head, page.num, m.group(1)])
           head.setAttribute('type','marginnote')
           id_value = "p" + page.num + '-' + m.group(1)
           try:
             exists = margins_dict[id_value]
             if exists == 1:
-              print("Warning: Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+              logging.warning(" Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
               id_value = id_value + "i"
           except:
             pass
           head.setAttribute('xml:id', id_value)
           margins_dict[id_value] = 1
-          text = newdoc.createTextNode(m.group(2))
+          text = doc.createTextNode(m.group(2))
           head.appendChild(text)
   return div2s, marginheaders, margins_dict
    
-def organize_nodes(tf, div2s, marginheaders, margins_dict):
+def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
   
   # this will be a list of paragraph nodes
   current_prose = []
-  current_prose = create_p(current_prose) 
+  current_prose = create_p(document,current_prose) 
   div1s = [] # contains all trip div headers
   journeys_dict = {}
+
+  # get document body to appending below
+  body = document.getElementsByTagName('body')[0]
   
   #new_trip = False
   empty_lines = 0
@@ -440,9 +450,9 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
   # need line number stored in an attribute? 
   for page in tf.pages:
     if page.num == "1":
-      current_head, div1 = create_div1(str(div1_count))
+      current_head, div1 = create_div1(document, str(div1_count))
       current_div1 = div1
-      text = newdoc.createTextNode("First Journey in Diary; No Journey Title")
+      text = document.createTextNode("First Journey in Diary; No Journey Title")
       current_head.appendChild(text)
       div1_count += 1
       current_div1.appendChild(div2s[0])
@@ -475,29 +485,26 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
           continue
         elif last_empty:
           for i in range(1, empty_lines + 1):
-            lb = newdoc.createElement('lb')
+            lb = document.createElement('lb')
             lb.setAttribute('n',str((linecount - empty_lines + (i - 1)))) 
             current_prose[-1].appendChild(lb)
           last_empty = False
           empty_lines = 0
-          
       
-        # now looping through page body to find div1s, which we may want to figure out how to 
-        # do in the organize_nodes method later so as not to loop through the file as much.    
+        # now looping through page body to find div1s, which we may 
+        # want to figure out how to do in the organize_nodes method 
+        # later so as not to loop through the file as much.    
         m = TEXTLINE_RE.match(l)
         if m and text_found:      
           body.appendChild(current_div1)
           if not previous_text:
-            #creates a cloned div2 with all its nodes to serve as the medial or final part
-            #then labeled as the next number in the div2_count     
-            
-            #check and see if the last one was part f. if so make the last one part m instead.
+            #creates a cloned div2 with all its nodes to serve as the medial 
+            # or final part then labeled as the next number in the div2_count     
+            # check and see if the last one was part f. if so make the 
+            # last one part m instead.
             if len(div2s) >= 1:
               next_div2 = div2s[0].cloneNode(False)
-              #print("d " + str(page.num) + " split", file=sys.stderr)
-              #next_div2.setAttribute('n', str("New n here"))
               next_div2.setAttribute('part', 'F')
-              
               atr = div2s[0].getAttributeNode('part')
               x = atr.nodeValue
               if x == 'F':
@@ -505,17 +512,17 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
               else:
                 div2s[0].setAttribute('part', 'I')
               div2s[0].childNodes.extend(current_prose)
-              current_prose = create_p(current_prose, fresh=True) 
+              current_prose = create_p(document,current_prose, fresh=True) 
               current_div1.appendChild(div2s[0])
 
               if len(div2s) > 1:
                 headCheck = div2s[0].getElementsByTagName('head')
-                #print("popped div2 #" + div2s[0].getAttribute('n'), file=sys.stderr)
                 div2s.pop(0)
             
-             #if it is the first line in the file, just create a generic and arbitrary div1
-             #to hold diary entries until the first real div1 trip heading is found.  
-              current_head, div1 = create_div1(str(div1_count))
+             #if it is the first line in the file, just create a generic and 
+             # arbitrary div1 to hold diary entries until the first real div1 
+             # trip heading is found.  
+              current_head, div1 = create_div1(document, str(div1_count))
               current_div1 = div1
               div1_count += 1
               div2s.insert(0, next_div2)
@@ -525,7 +532,7 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
             try:
               exists = journeys_dict[id_value]
               if exists == 1:
-                print("Warning: Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.", file=sys.stderr)
+                logging.warning(" Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
                 id_value = id_value + "i"
             except:
               pass
@@ -542,9 +549,9 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
           #line number here just in case, since I don't know if that is important or not
           
            
-          text = newdoc.createTextNode(m.group(2))
+          text = document.createTextNode(m.group(2))
           current_head.appendChild(text)
-          lb = newdoc.createElement("lb")
+          lb = document.createElement("lb")
           lb.setAttribute("n", m.group(1))
           current_head.appendChild(lb)
           
@@ -555,17 +562,18 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
           text_found = False 
         #new_trip = False
       
-        #organizes div2s. This section is the one with the most bugs I think, mainly the part
-        #attribute issue
+        #organizes div2s. This section is the one with the most bugs 
+        # I think, mainly the part attribute issue
         m = STAR_RE.match(l) 
         if m: 
-          #appends children to div2 and that div2 to div1, then moves to the next div2
+          #appends children to div2 and that div2 to div1, then moves to 
+          # the next div2
           div2s[0].childNodes.extend(current_prose)
           current_div1.appendChild(div2s[0])
           #div1s[current_div1].appendChild(div2s[0])
 
           # delete the star and add this line to the current paragraph of current prose
-          current_prose = create_p(current_prose,[re.sub('\s*\*','',l),linecount],fresh=True)
+          current_prose = create_p(document,current_prose,[re.sub('\s*\*','',l),linecount],fresh=True)
           if len(div2s) > 1:
             headCheck = div2s[0].getElementsByTagName('head')
             div2s.pop(0)
@@ -577,15 +585,15 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
             current_prose = create_p(current_prose,[l,linecount])
           else:
             ## found a vanilla line of text
-            lb = newdoc.createElement('lb')
+            lb = document.createElement('lb')
             lb.setAttribute('n',str(linecount))
-            current_prose[-1].appendChild(newdoc.createTextNode(l))
+            current_prose[-1].appendChild(document.createTextNode(l))
             current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break before creating 
     #the next page to fix that bug?
     last_empty = False
     empty_lines = 0
-    pb = newdoc.createElement('pb')
+    pb = document.createElement('pb')
     pb.setAttribute('n',str(page.num))
     current_prose[-1].appendChild(pb)
       # print([c.toxml() for c in current_prose],file=sys.stderr)
@@ -594,30 +602,38 @@ def organize_nodes(tf, div2s, marginheaders, margins_dict):
   current_div1.childNodes.extend(div2s) 
   body.appendChild(current_div1)
 
+def setup_argparse():
+  ap = argparse.ArgumentParser()
+  ap.add_argument('--file', '-f', help='choose a file for the autotagger')
+  return ap
+
 if __name__ in "__main__":
   # accept svoboda transcription format file
   # on stdin
 
-  try:
-    filename = sys.argv[1]
-    infilelines = open(filename, 'r').readlines()
-  except:
+  ap = setup_argparse()
+  args = ap.parse_args()
+  if args.file: 
+    infile = open(args.file, encoding="utf-8")
+    infilelines = infile.readlines()
+  else:	
     infilelines = sys.stdin.readlines()
   
+  logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
   # to keep things clean, and check for errors in
   # the input,
   # before we start, parse these lines
   # into a series of 'page objects'  
  
   tf = TranscriptionFile(infilelines)
-
-  print("found "+str(len(tf.pages))+" transcription pages", file=sys.stderr)
+  logging.info(" found "+str(len(tf.pages))+" transcription pages")
   
-  if errors_found:
+  if len(tf.errors) > 0:
     print("Errors found. Please check error log and try again later.")
+    for e in tf.errors:
+      print(e,file=sys.stderr)
   else:	
-    #to_xml_dom(tf)
-    div2s, marginheaders, margins_dict = create_dom_nodes(tf)
-  
-    organize_nodes(tf, div2s, marginheaders, margins_dict)
-    print(newdoc.toprettyxml('\t', '\n', None))
+    document = setup_DOM()
+    div2s, marginheaders, margins_dict = create_dom_nodes(document, tf)
+    organize_nodes(document, tf, div2s, marginheaders, margins_dict)
+    print(document.toprettyxml('\t', '\n', None))

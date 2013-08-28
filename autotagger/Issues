@@ -6,6 +6,7 @@ ToDo List:
   * Maybe record which pages trip headings occur on in order to verify if they are working correctly
   * Make the dictionary scanning and error message section it's own method.
   * Finalize comments in code
+  * Correctly implement Argument Parser
  
 Questions:
  *   Need to figure out how to encode the XML output. With encoding in toprettyxml() set at None,
