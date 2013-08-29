@@ -10,6 +10,7 @@ import os
 import time
 import glob
 from random import randint
+from distutils.dir_util import remove_tree
 
 HTTP_HEADERS = "Content-type: text/html\n"
 
