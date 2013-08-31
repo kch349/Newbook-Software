@@ -131,7 +131,7 @@ if 'sdtf' in form_data:
     except:
       print("error getting the outfile for writing")
 
-    document.writexml(outfile)
+    document.writexml(outfile, addindent="  ",newl="\n")
     print(SUCCESS_PAGE % {'outfile': session_path+"/output.xml"})
 else:
   print(WELCOME_PAGE)
