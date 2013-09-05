@@ -61,7 +61,7 @@ def create_teiHeader(document):
   title_statement.appendChild(author)
   author.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
 
-  for i in range (0, 2):
+  for i in range (0, 1):
     title_statement.appendChild(create_respSt(document))
 
   pubSt = document.createElement('publicationStmt')
