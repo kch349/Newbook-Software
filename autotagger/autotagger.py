@@ -236,6 +236,8 @@ class TranscriptionPage:
     text = False #true if previous line was Text:
     multi_headers = False #true if multiple "Lines" are allowed
     divlines = 0
+    empty = False #true if previous line in body was empty
+    double_spacing = False #true if double spacing found on page
     for i in range(0, length):
       m1 = MARGINS_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
@@ -254,6 +256,12 @@ class TranscriptionPage:
         else:
           self.errors.append(error_protocol(self.num, i, lines[i], 1))
       else:
+        if double_spacing != True:
+          if lines[i].strip() == "":
+            empty = True
+          if empty == True and lines[i].strip() != "":
+            logging.warning(" There may be unintentional double spacing on page " + self.num + ".")
+            double_spacing = True
         if text:
           if m3:
             b.append(lines[i])
