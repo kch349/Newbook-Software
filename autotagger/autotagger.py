@@ -162,7 +162,7 @@ class TranscriptionFile:
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
       if m2:
-        self.errors.append(error_protocol(m2.group(1), -1, lines[0], 5))
+        self.errors.append(errors(m2.group(1), -1, lines[0], 5))
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
@@ -179,7 +179,7 @@ class TranscriptionFile:
           n = int(m1.group(1))
           lines.pop(0)
       elif m3:
-        self.errors.append(error_protocol(m3.group(1), -1, lines[0], 5))
+        self.errors.append(errors(m3.group(1), -1, lines[0], 5))
         self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
@@ -246,7 +246,7 @@ class TranscriptionPage:
       m5 = MARGINLINELIST_RE.match(lines[i])
       m6 = MARGINLINERANGE_RE.match(lines[i])
       if m5 or m6:
-        self.errors.append(error_protocol(self.num, i, lines[i], 4))
+        self.errors.append(errors(self.num, i, lines[i], 4))
       elif not switch:
         if m1 or m2 or m3:
           h.append(lines[i])
@@ -255,7 +255,7 @@ class TranscriptionPage:
         elif lines[i].strip() == "":
           switch = True
         else:
-          self.errors.append(error_protocol(self.num, i, lines[i], 1))
+          self.errors.append(errors(self.num, i, lines[i], 1))
       else:
         if double_spacing == 3 and double_spacing_found == False:
           logging.warning(" There may be unintentional double spacing on page " + self.num + ".")	
@@ -273,7 +273,7 @@ class TranscriptionPage:
             b.append(lines[i])
             multi_headers = True
           else:
-            self.errors.append(error_protocol(self.num, i, lines[i], 3))
+            self.errors.append(errors(self.num, i, lines[i], 3))
           text = False
         else:
           m4 = TEXT_RE.match(lines[i])
@@ -287,31 +287,23 @@ class TranscriptionPage:
           elif multi_headers and m3:
             b.append(lines[i])
           elif m1 or m2 or m3:
-            self.errors.append(error_protocol(self.num, i, lines[i], 2))
+            self.errors.append(errors(self.num, i, lines[i], 2))
           else:
             b.append(lines[i].strip())
             multi_headers = False
     if divlines != 0:
-      self.errors.append(error_protocol(self.num, None, None, None))
+      self.errors.append(incorrect_stars_error(self.num))
     self.head = h
     self.body = b
 
-def error_protocol(page_num, line_num, line, error_code):
-  """sets errors_found variable to True and prints an error message."""
-
-  if line_num == None:
-    return print_incorrect_stars(page_num)
-  else:
-    return print_errors(page_num, line_num, line, error_code)
-
-def print_incorrect_stars(page_num):
-  """produces an error message saying there are too many or too few
+def incorrect_stars_error(page_num):
+  """Produces an error message saying there are too many or too few
   asterisks. Contains the page number."""
 
   return "The number of asterisks in the body does not match the number"+\
          "of DivLines in the header on page "+ page_num +"."
 
-def print_errors(page_num, line_num, line, error_code):
+def errors(page_num, line_num, line, error_code):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
 
