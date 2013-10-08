@@ -289,7 +289,7 @@ class TranscriptionPage:
           elif m1 or m2 or m3:
             self.errors.append(errors(self.num, i, lines[i], 2))
           else:
-            b.append(lines[i].strip())
+            b.append(lines[i].rstrip())
             multi_headers = False
     if divlines != 0:
       self.errors.append(incorrect_stars_error(self.num))
@@ -595,15 +595,15 @@ def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
           if m:
             ## found a paragraph starting line of text
             # start a new paragraph
-            current_prose = create_p(current_prose,[l,linecount])
+            current_prose = create_p(document, current_prose,[l,linecount])
           else:
             ## found a vanilla line of text
             lb = document.createElement('lb')
             lb.setAttribute('n',str(linecount))
             current_prose[-1].appendChild(document.createTextNode(l))
             current_prose[-1].appendChild(lb)
-    #maybe add in something that says to delete the last line break before creating
-    #the next page to fix that bug?
+    #maybe add in something that says to delete the last line break 
+    # before creating the next page to fix that bug?
     last_empty = False
     empty_lines = 0
     pb = document.createElement('pb')
@@ -618,6 +618,8 @@ def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
 def setup_argparse():
   ap = argparse.ArgumentParser()
   ap.add_argument('--file', '-f', help='choose a file for the autotagger')
+  ap.add_argument('--verbose', '-v', action='count', dest='verbosity', 
+      default=2, help='increase the verbosity (can be repeated: -vvv)') 
   return ap
 
 if __name__ in "__main__":
@@ -632,7 +634,8 @@ if __name__ in "__main__":
   else:
     infilelines = sys.stdin.readlines()
 
-  logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+  logging.basicConfig(format='%(levelname)s:%(message)s',
+                          level=50-(args.verbosity*10)) 
   # to keep things clean, and check for errors in
   # the input,
   # before we start, parse these lines
