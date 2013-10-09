@@ -27,21 +27,24 @@ SUCCESS_PAGE = """
 
 <p>Find the result <a href="%(outfile)s">here</a> 
 (right click the link to save the file to your computer).</p>
-  <p>
+<ul>
+  <li>
   <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
   <input type="hidden" name="tei" value="on"/>
-  Process your TEI-XML to generate an HTML file: <input type="submit" value="Go!"/></form></p>
-
-<h4>other options (coming soon):</h4>
-<ul>
-  <li>Validate: check that you're TEI-XML output is valid</li>
-  <li>Apply diary.xslt and get an html output</li>
+  Process your TEI-XML to generate an HTML file: <input type="submit" value="Go!"/></form>
+  </li>
   <li>Try again with another transcription format file 
    <form action="autotagger.cgi" method="post" enctype="multipart/form-data">
    <input type="file" name="sdtf" /><br />
    <input type="submit" value="Upload transcription file"/>
    </form>
   </li>
+</ul>
+
+<h4>other options (coming soon):</h4>
+<ul>
+  <li>Validate: check that you're TEI-XML output is valid</li>
+  <li>Apply diary.xslt and get an html output</li>
 </ul>
 </body>
 </html>"""
