@@ -1,0 +1,71 @@
+Autotagger Transcription Format Ver. 0.0
+
+1. A Transcription File consists of a list of Transcription Pages.
+A Transcription Page necessarily starts with strings that match this regex:
+
+/^Page\s+(\d+)/
+
+This string must appear on its own line and match this regex exactly. 
+No white space is allowed in front of the word "Page" and nothing is allowed to follow
+the page number.
+
+
+
+2. A Transcription Page consists of a "header" followed by a "body" where the header
+is indicated by a string matching this regex:
+
+/\s*Margins?:?/
+	
+Do not include anything else on this line. Information for the "header" will follow
+in the lines below it. Also, make sure that there are no empty lines between this 
+and the line with the page number.
+
+3. The header contains two kinds of information: marginal notes and titles for 
+div2s. Marginal notes are indicated with a string matching this regex:
+
+/\s*Line\s+(\d+):?\s*(.*)$/
+
+Once again, it is important that the strings match perfectly. A string such as
+"Line 2-4" or "Line 2,3,4" will not work with the autotagger. 
+div2 titles are indicated with a string matching this regex:
+
+/\s*DivLine:?\s*(.*)$/
+
+As before, these strings should appear on their own line. Every "Line" and 
+"DivLine" must appear at the top of the page with no empty lines in between them
+as well as no empty space between "Margins:" and the topmost line of header content.
+No other content is allowed in the header. If a line that doesn't match any of these
+keywords is found in the header, an error will be thrown.
+
+4. The end of the header is indicated by an empty line. All content found below the
+first empty line is considered content for the body.
+
+5. Paragraphs are indicated by a string matching this regex:
+
+/^\s+(\S+)/
+
+Any sort of white space can be used to indicate a paragraph.
+
+6.  div1s are indicated in the body text with two lines. The first line is a string
+match this regex:
+
+/\s*Text:?/
+
+The second line is a string matching this regex:
+
+/\s*Line\s+(\d+):?\s*(.*)$/
+
+As always, the strings must match the regexes perfectly. Also, these two lines must
+always be found together. If a line containing "Text:" is found without "Line" 
+directly underneath it (or vice-versa), the autotagger considers that to be an error.
+
+7. Every DivLine found in the header must have a corresponding line in the body
+that matches this regex:
+
+/^\s*\*(.*)$/
+
+If there are too many or too few of these lines in the body, an error will be thrown.
+
+8. Beware of unintentional double-spacing. If a file is found to contain double-spacing,
+a warning will be issued although the autotagger will work normally in case it is 
+intentional.
