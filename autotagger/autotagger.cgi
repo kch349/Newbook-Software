@@ -44,7 +44,7 @@ SUCCESS_PAGE = """
 <h4>other options (coming soon):</h4>
 <ul>
   <li>Validate: check that you're TEI-XML output is valid</li>
-  <li>Apply diary.xslt and get an html output</li>
+  <li>Configuration options for the autotagging process</li>
 </ul>
 </body>
 </html>"""
