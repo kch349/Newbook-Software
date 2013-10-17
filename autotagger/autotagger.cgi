@@ -13,6 +13,8 @@ import glob
 from random import randint
 from distutils.dir_util import remove_tree
 
+import datetime
+
 
 
 HTTP_HEADERS = "Content-type: text/html\nSet-cookie: session=%(cookie)s"
@@ -21,24 +23,28 @@ SUCCESS_PAGE = """
 <head><title>Autotagger Success!</title></head>
 <body>
 <h3>Your %(filetype)s is ready!</h3>
+<h4>%(timestamp)s</h4>
 
 <p>Find the result <a href="%(outfile)s">here</a> 
 (right click the link to save the file to your computer).</p>
-
-<h4>other options (coming soon):</h4>
 <ul>
-  <li>Validate: check that you're TEI-XML output is valid</li>
-  <li>Apply diary.xslt and get an html output</li>
+  <li>
+  <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
+  <input type="hidden" name="tei" value="on"/>
+  Process your TEI-XML to generate an HTML file: <input type="submit" value="Go!"/></form>
+  </li>
   <li>Try again with another transcription format file 
    <form action="autotagger.cgi" method="post" enctype="multipart/form-data">
    <input type="file" name="sdtf" /><br />
    <input type="submit" value="Upload transcription file"/>
    </form>
   </li>
-  <li>
-  <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
-  <input type="hidden" name="tei" value="on"/>
-  Process your TEI-XML to generate an HTML file: <input type="submit" value="Go!"/></form></li>
+</ul>
+
+<h4>other options (coming soon):</h4>
+<ul>
+  <li>Validate: check that you're TEI-XML output is valid</li>
+  <li>Configuration options for the autotagging process</li>
 </ul>
 </body>
 </html>"""
@@ -102,6 +108,7 @@ if cookie and not os.path.exists(session_path):
 
 print(HTTP_HEADERS % {'cookie':cookie }) 
 form_data = cgi.FieldStorage() 
+timestamp = datetime.datetime.now().ctime()
 
 if 'sdtf' in form_data:
   ## run autotagger on input
@@ -137,7 +144,8 @@ if 'sdtf' in form_data:
       print("error getting the outfile for writing")
 
     document.writexml(outfile, addindent="  ",newl="\n")
-    print(SUCCESS_PAGE % {'filetype': "TEI-XML", 'outfile': session_path+"/output.xml"})
+    print(SUCCESS_PAGE % {'filetype': "TEI-XML", 'timestamp':timestamp, 
+                          'outfile': session_path+"/output.xml"})
 
 elif 'tei' in form_data: 
   import xslt
@@ -145,7 +153,8 @@ elif 'tei' in form_data:
   if r != 0:
     print("<p>xsltproc returned nonzero</p>")
   else:
-    print(SUCCESS_PAGE % {'filetype': "HTML", 'outfile': session_path+"/output.html"})
+    print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
+                          'outfile': session_path+"/output.html"})
 
 else:
   print(WELCOME_PAGE)
