@@ -20,7 +20,7 @@ from xml.dom.minidom import *
 ## some regexes that we need
 PAGE_RE = re.compile('^Page\s+(\d+)')
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
-MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
+MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') #should combine Margin and Text line regexes
 PARA_RE = re.compile('^\s+(\S+)')
 STAR_RE = re.compile('^\s*\*(.*)$')
 MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
@@ -29,6 +29,8 @@ TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
 TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
+
+VERSION_RE = re.compile('\s*Version:?(\d+)') #for determining if uprev is needed
 
 #regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),')
@@ -187,6 +189,7 @@ class TranscriptionFile:
       else:
         p.append(lines[0])
         lines.pop(0)
+        
 
    # try:
     tp = TranscriptionPage(str(n),p)
@@ -195,8 +198,8 @@ class TranscriptionFile:
     self.pages.append(tp)
     #except:
      # """Error with page creation. There is not another page to append."""
-
-
+     
+  
 
 class TranscriptionPage:
   """class to hold a transcription page in a nice object
@@ -227,11 +230,56 @@ class TranscriptionPage:
 
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
+    #h = []
+  #  b = []
+  #  switch = False #false means we're still in head
+	               #true means we've switched to body
+
+ #   length = len(lines)
+  #  text = False #true if previous line was Text:
+   # multi_headers = False #true if multiple "Lines" are allowed
+  #  divlines = 0
+  #  empty = False #true if previous line in body was empty
+  #  double_spacing = 0 #number of double spaced lines found in body
+  #  double_spacing_found = False #true if double spacing found
+    m = VERSION_RE.match(lines[0])
+    if not m:
+      self.uprev(lines)
+    
+    
+  def uprev(self, lines):
+    
+    #for page in tf.pages:
+     # for l in page.head:
+      #  m = MARGINS_RE.match(l)
+       # if m:
+        #  re.sub('\s*Margins?:?','\tNotes:',l)    
+        #m = MARGINLINE_RE.match(l)
+        #if m:
+        #  re.sub('^\s*', '\tMargin\s', l)
+        #m = DIVLINE_RE.match(l)
+     #   if m:
+      #    temp_div_headers.append(m.group1())
+       #   l = ""
+      
+     # for l in page.body:
+      #  m = TEXT_RE.match(l)
+       # if m:
+        #  re.sub('\s*Text:?', '\tChapter:', l)
+    #    m = TEXTLINE_RE.match(l)
+     #   if m:
+      #    l.strip('\s*Line\s+(\d+):?') #will it work without some sort of indication that this
+       #                            #isn't just a tabbed in body text line?
+     #   m = STAR_RE.match(l)
+      #  if m:
+       #   re.sub('\s*\*','\tSubchapter:\n\t' + temp_div_headers(0) + '/n',l) #do newLines work like this?
+        #  temp_div_headers.pop(0)
+
+    temp_div_headers = [] 
     h = []
     b = []
     switch = False #false means we're still in head
-	               #true means we've switched to body
-
+	               #true means we've switched to body    length = len(lines)
     length = len(lines)
     text = False #true if previous line was Text:
     multi_headers = False #true if multiple "Lines" are allowed
@@ -239,6 +287,7 @@ class TranscriptionPage:
     empty = False #true if previous line in body was empty
     double_spacing = 0 #number of double spaced lines found in body
     double_spacing_found = False #true if double spacing found
+    linecount = 0
     for i in range(0, length):
       m1 = MARGINS_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
@@ -247,16 +296,27 @@ class TranscriptionPage:
       m6 = MARGINLINERANGE_RE.match(lines[i])
       if m5 or m6:
         self.errors.append(errors(self.num, i, lines[i], 4))
-      elif not switch:
-        if m1 or m2 or m3:
+      elif not switch: #in head
+        if m1 or m3:
+          if m1:
+            #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
+            lines[i] = '\tNotes:' #should alter line or just add in a new line?
+            print("Margin to Note" + lines[i], file=sys.stderr)
+          if m3:
+            lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
+            #adds a new \n character in for some reason...why?
+            print("Margin added to Line#" + lines[i], file=sys.stderr)
           h.append(lines[i])
-          if m2:
-            divlines += 1
+        elif m2:
+          temp_div_headers.append(m2.group(1))
+          #lines[i] = ""
+          divlines += 1
         elif lines[i].strip() == "":
           switch = True
         else:
           self.errors.append(errors(self.num, i, lines[i], 1))
-      else:
+      else: #in body
+        linecount = linecount + 1
         if double_spacing == 3 and double_spacing_found == False:
           logging.warning(" There may be unintentional double spacing on page " + self.num + ".")	
           double_spacing_found = True
@@ -278,12 +338,18 @@ class TranscriptionPage:
         else:
           m4 = TEXT_RE.match(lines[i])
           m7 = STAR_RE.match(lines[i])
-          if m4:
-            text = True
-            b.append(lines[i])
-          if m7:
-            divlines -= 1
-            b.append(lines[i])
+          if m4 or m7:
+            if m4:
+              text = True
+              lines[i] = '\tSection'
+              linecount = linecount - 1
+            elif m7:
+              divlines -= 1
+              b.append('\tSubsection:')
+              b.append('\tLine ' + str(linecount) + ': ' + temp_div_headers[0])
+              temp_div_headers.pop(0)
+            #lines[i] = re.sub('*', '', lines[i]) #removes *, need to remove that later in code since not here
+            b.append(lines[i]) #could pose a problem adding multiple lines.
           elif multi_headers and m3:
             b.append(lines[i])
           elif m1 or m2 or m3:
@@ -644,12 +710,18 @@ if __name__ in "__main__":
   tf = TranscriptionFile(infilelines)
   logging.info(" found "+str(len(tf.pages))+" transcription pages")
 
-  if len(tf.errors) > 0:
-    print("Errors found. Please check error log and try again later.")
-    for e in tf.errors:
-      print(e,file=sys.stderr)
-  else:
-    document = setup_DOM()
-    div2s, marginheaders, margins_dict = create_dom_nodes(document, tf)
-    organize_nodes(document, tf, div2s, marginheaders, margins_dict)
-    print(document.toprettyxml('\t', '\n', None))
+  for page in tf.pages:
+    for l in page.head:
+      print(l)
+    for l in page.body:
+      print(l)
+      
+  #if len(tf.errors) > 0:
+   # print("Errors found. Please check error log and try again later.")
+    #for e in tf.errors:
+     # print(e,file=sys.stderr)
+  #else:
+   # document = setup_DOM()
+    #div2s, marginheaders, margins_dict = create_dom_nodes(document, tf)
+   # organize_nodes(document, tf, div2s, marginheaders, margins_dict)
+   # print(document.toprettyxml('\t', '\n', None))
