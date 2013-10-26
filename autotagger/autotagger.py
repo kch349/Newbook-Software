@@ -17,26 +17,37 @@ import logging
 import argparse
 from xml.dom.minidom import *
 
-## some regexes that we need
+##class constants
+CURRENT_VERSION = 1.0
+
+## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
+PARA_RE = re.compile('^\s+(\S+)')
+EMPTYLINE_RE = re.compile('^\s*$')
+AMP_RE = re.compile('\&')
+VERSION_RE = re.compile('\s*Version:?(\d+)') #for determining if uprev is needed
+# regexes for incorrect formatting (e.g. Line #, #, #:)
+MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
+MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
+PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
+PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
+TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') # change just to line or something
+
+## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
 MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') #should combine Margin and Text line regexes
-PARA_RE = re.compile('^\s+(\S+)')
 STAR_RE = re.compile('^\s*\*(.*)$')
 MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
 #new regexes looking for "Text:" or the "Line #:" indicating trip headings in body text
 TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
-TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
-EMPTYLINE_RE = re.compile('^\s*$')
-AMP_RE = re.compile('\&')
 
-VERSION_RE = re.compile('\s*Version:?(\d+)') #for determining if uprev is needed
 
-#regexes for incorrect formatting (e.g. Line #, #, #:)
-MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),')
-MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
-PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
-PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
+## version 1 regexes
+NOTES_RE = re.compile('^\s*Notes:?', re.IGNORECASE)
+MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(d+)')
+FOOTNOTE_RE = re.compile('^\s*Footnote:?')
+SECTION_RE = re.compile('^\s*Section:?')
+SUBSECTION_RE = re.compile('^\s*SubSection:?')
 
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
@@ -63,8 +74,7 @@ def create_teiHeader(document):
   title_statement.appendChild(author)
   author.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
 
-  for i in range (0, 1):
-    title_statement.appendChild(create_respSt(document))
+  title_statement.appendChild(create_respSt(document))
 
   pubSt = document.createElement('publicationStmt')
   fileDesc.appendChild(pubSt)
@@ -230,137 +240,138 @@ class TranscriptionPage:
 
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
-    #h = []
-  #  b = []
-  #  switch = False #false means we're still in head
-	               #true means we've switched to body
-
- #   length = len(lines)
-  #  text = False #true if previous line was Text:
-   # multi_headers = False #true if multiple "Lines" are allowed
-  #  divlines = 0
-  #  empty = False #true if previous line in body was empty
-  #  double_spacing = 0 #number of double spaced lines found in body
-  #  double_spacing_found = False #true if double spacing found
+  
     m = VERSION_RE.match(lines[0])
     if not m:
-      self.uprev(lines)
+      self.uprev(lines, 0)
+    elif m.group(1) < CURRENT_VERSION:
+      self.uprev(lines, m.group(1))
+    else:
+      h = []
+      b = []
+      switch = False #false means we're still in head
+                   #true means we've switched to body    length = len(lines)
+      length = len(lines)
+      text = False #true if previous line was Text:
+      multi_headers = False #true if multiple "Lines" are allowed
+      divlines = 0
+      empty = False #true if previous line in body was empty
+      double_spacing = 0 #number of double spaced lines found in body
+      double_spacing_found = False #true if double spacing found
+      linecount = 0
+      for i in range(0, length):
+        m1 = NOTES_RE
+        m2 = MARGINNOTE_RE
+        m3 = FOOTNOTE_RE
+        m4 = SECTION_RE
+        m5 = SUBSECTION_RE
+        m6 = MARGINLINELIST_RE.match(lines[i])
+        m7 = MARGINLINERANGE_RE.match(lines[i])
+        ##finish method
+        
+        
+        
     
-    
-  def uprev(self, lines):
-    
-    #for page in tf.pages:
-     # for l in page.head:
-      #  m = MARGINS_RE.match(l)
-       # if m:
-        #  re.sub('\s*Margins?:?','\tNotes:',l)    
-        #m = MARGINLINE_RE.match(l)
-        #if m:
-        #  re.sub('^\s*', '\tMargin\s', l)
-        #m = DIVLINE_RE.match(l)
-     #   if m:
-      #    temp_div_headers.append(m.group1())
-       #   l = ""
-      
-     # for l in page.body:
-      #  m = TEXT_RE.match(l)
-       # if m:
-        #  re.sub('\s*Text:?', '\tChapter:', l)
-    #    m = TEXTLINE_RE.match(l)
-     #   if m:
-      #    l.strip('\s*Line\s+(\d+):?') #will it work without some sort of indication that this
-       #                            #isn't just a tabbed in body text line?
-     #   m = STAR_RE.match(l)
-      #  if m:
-       #   re.sub('\s*\*','\tSubchapter:\n\t' + temp_div_headers(0) + '/n',l) #do newLines work like this?
-        #  temp_div_headers.pop(0)
+  def print(self, lines):
+    print('Page ' + self.num + ':', file=sys.stderr)
+    for l in lines:
+      print(l, file=sys.stderr)
+        
+  def uprev(self, lines, version):
+    #why does this introduce tons of double spaces (new lines) to the file?
+    logging.debug(self.print(lines))
+    self.bump(lines, version)
 
-    temp_div_headers = [] 
-    h = []
-    b = []
-    switch = False #false means we're still in head
-	               #true means we've switched to body    length = len(lines)
-    length = len(lines)
-    text = False #true if previous line was Text:
-    multi_headers = False #true if multiple "Lines" are allowed
-    divlines = 0
-    empty = False #true if previous line in body was empty
-    double_spacing = 0 #number of double spaced lines found in body
-    double_spacing_found = False #true if double spacing found
-    linecount = 0
-    for i in range(0, length):
-      m1 = MARGINS_RE.match(lines[i])
-      m2 = DIVLINE_RE.match(lines[i])
-      m3 = MARGINLINE_RE.match(lines[i])
-      m5 = MARGINLINELIST_RE.match(lines[i])
-      m6 = MARGINLINERANGE_RE.match(lines[i])
-      if m5 or m6:
-        self.errors.append(errors(self.num, i, lines[i], 4))
-      elif not switch: #in head
-        if m1 or m3:
-          if m1:
-            #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
-            lines[i] = '\tNotes:' #should alter line or just add in a new line?
-            print("Margin to Note" + lines[i], file=sys.stderr)
-          if m3:
-            lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
-            #adds a new \n character in for some reason...why?
-            print("Margin added to Line#" + lines[i], file=sys.stderr)
-          h.append(lines[i])
-        elif m2:
-          temp_div_headers.append(m2.group(1))
-          #lines[i] = ""
-          divlines += 1
-        elif lines[i].strip() == "":
-          switch = True
-        else:
-          self.errors.append(errors(self.num, i, lines[i], 1))
-      else: #in body
-        linecount = linecount + 1
-        if double_spacing == 3 and double_spacing_found == False:
-          logging.warning(" There may be unintentional double spacing on page " + self.num + ".")	
-          double_spacing_found = True
-        elif double_spacing < 3:
-          if lines[i].strip() == "":
-            empty = True
-          elif empty == True:
-            double_spacing += 1
-            empty = False
-          elif empty == False:
-            double_spacing = 0		
-        if text:
-          if m3:
-            b.append(lines[i])
-            multi_headers = True
+  def bump(self, lines, version):
+    if version == 0:
+      temp_div_headers = [] 
+      h = []
+      b = []
+      switch = False #false means we're still in head
+                 #true means we've switched to body    length = len(lines)
+      length = len(lines)
+      text = False #true if previous line was Text:
+      multi_headers = False #true if multiple "Lines" are allowed
+      divlines = 0
+      empty = False #true if previous line in body was empty
+      double_spacing = 0 #number of double spaced lines found in body
+      double_spacing_found = False #true if double spacing found
+      linecount = 0
+      for i in range(0, length):
+        m1 = MARGINS_RE.match(lines[i])
+        m2 = DIVLINE_RE.match(lines[i])
+        m3 = MARGINLINE_RE.match(lines[i])
+        m5 = MARGINLINELIST_RE.match(lines[i])
+        m6 = MARGINLINERANGE_RE.match(lines[i])
+        if m5 or m6:
+          self.errors.append(errors(self.num, i, lines[i], 4))
+        elif not switch: #in head
+          if m1 or m3:
+            if m1:
+              #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
+              lines[i] = '\tNotes:' #should alter line or just add in a new line?
+              print("Margin to Note" + lines[i], file=sys.stderr)
+            if m3:
+              lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
+              #adds a new \n character in for some reason...why?
+              print("Margin added to Line#" + lines[i], file=sys.stderr)
+            h.append(lines[i])
+          elif m2:
+              temp_div_headers.append(m2.group(1))
+              #lines[i] = ""
+              divlines += 1
+          elif lines[i].strip() == "":
+            switch = True
           else:
-            self.errors.append(errors(self.num, i, lines[i], 3))
-          text = False
-        else:
-          m4 = TEXT_RE.match(lines[i])
-          m7 = STAR_RE.match(lines[i])
-          if m4 or m7:
-            if m4:
-              text = True
-              lines[i] = '\tSection'
-              linecount = linecount - 1
-            elif m7:
-              divlines -= 1
-              b.append('\tSubsection:')
-              b.append('\tLine ' + str(linecount) + ': ' + temp_div_headers[0])
-              temp_div_headers.pop(0)
-            #lines[i] = re.sub('*', '', lines[i]) #removes *, need to remove that later in code since not here
-            b.append(lines[i]) #could pose a problem adding multiple lines.
-          elif multi_headers and m3:
-            b.append(lines[i])
-          elif m1 or m2 or m3:
-            self.errors.append(errors(self.num, i, lines[i], 2))
+            self.errors.append(errors(self.num, i, lines[i], 1))
+        else: #in body
+          linecount = linecount + 1
+          if linecount == 1:
+            b.append('version = 1')
+          if double_spacing == 3 and double_spacing_found == False:
+            logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
+            double_spacing_found = True
+          elif double_spacing < 3:
+            if lines[i].strip() == "":
+              empty = True
+            elif empty == True:
+              double_spacing += 1
+              empty = False
+            elif empty == False:
+              double_spacing = 0    
+          if text:
+            if m3:
+              b.append(lines[i])
+              multi_headers = True
+            else:
+              self.errors.append(errors(self.num, i, lines[i], 3))
+            text = False
           else:
-            b.append(lines[i].rstrip())
-            multi_headers = False
-    if divlines != 0:
-      self.errors.append(incorrect_stars_error(self.num))
-    self.head = h
-    self.body = b
+            m4 = TEXT_RE.match(lines[i])
+            m7 = STAR_RE.match(lines[i])
+            if m4 or m7:
+              if m4:
+                text = True
+                lines[i] = '\tSection'
+                linecount = linecount - 1
+              elif m7:
+                divlines -= 1
+                b.append('\tSubsection:')
+                b.append('\tLine ' + str(linecount) + ': ' + temp_div_headers[0])
+                temp_div_headers.pop(0)
+              #lines[i] = re.sub('*', '', lines[i]) #removes *, need to remove that later in code since not here
+              b.append(lines[i]) #could pose a problem adding multiple lines.
+            elif multi_headers and m3:
+              b.append(lines[i])
+            elif m1 or m2 or m3:
+              self.errors.append(errors(self.num, i, lines[i], 2))
+            else:
+              b.append(lines[i].rstrip())
+              multi_headers = False
+      if divlines != 0:
+        self.errors.append(incorrect_stars_error(self.num))
+      self.head = h
+      self.body = b
 
 def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
