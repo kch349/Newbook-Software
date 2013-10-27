@@ -459,7 +459,7 @@ def create_dom_nodes(doc,tf):
 
   div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
-  margins_dict = {}
+  margins_journeys_dict = {}
   margins = []
 
   #div1_count = 1
@@ -497,15 +497,18 @@ def create_dom_nodes(doc,tf):
           marginheaders.append([head, page.num, m.group(1)])
           head.setAttribute('type','marginnote')
           id_value = "p" + page.num + '-' + m.group(1)
+          #need to figure out a way to make it so dict can record if there is both a journey
+          # and margin id for this number.
           try:
-            exists = margins_dict[id_value]
-            if exists == 1:
-              logging.warning(" Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
+            exists = margins_journeys_dict[id_value]
+            if exists == "1m" or "1j":
               id_value = id_value + "i"
+              if exists == "1m":
+                logging.warning(" Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
           except:
             pass
           head.setAttribute('xml:id', id_value)
-          margins_dict[id_value] = 1
+          margins_journeys_dict[id_value] = "1m"
           text = doc.createTextNode(m.group(2))
           head.appendChild(text)
 
@@ -515,14 +518,13 @@ def create_dom_nodes(doc,tf):
     div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
     div2_count += 1
     #print("div2s at end of create dom nodes method count" + str(len(div2s)), file=sys.stderr)
-  return div2s, marginheaders, margins_dict
+  return div2s, marginheaders, margins_journeys_dict
 
-def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
+def organize_nodes(document, tf, div2s, marginheaders, margins_journeys_dict):
   # this will be a list of paragraph nodes
   current_prose = []
   current_prose = create_p(document,current_prose)
   div1s = [] # contains all trip div headers
-  journeys_dict = {}
 
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
@@ -609,9 +611,9 @@ def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
                 headCheck = div2s[0].getElementsByTagName('head')
                 div2s.pop(0)
 
-             #if it is the first line in the file, just create a generic and
-             # arbitrary div1 to hold diary entries until the first real div1
-             # trip heading is found.
+              #if it is the first line in the file, just create a generic and
+              # arbitrary div1 to hold diary entries until the first real div1
+              # trip heading is found.
               current_head, div1 = create_div1(document, str(div1_count))
               current_div1 = div1
               div1_count += 1
@@ -620,15 +622,16 @@ def organize_nodes(document, tf, div2s, marginheaders, margins_dict):
 
             trip_id_value = "p" + page.num + '-' + m.group(1)
             try:
-              exists = journeys_dict[id_value]
-              if exists == 1:
-                logging.warning(" Duplicate journey id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
-                id_value = id_value + "i"
+              exists = margins_journeys_dict[trip_id_value]
+              if exists == "1m" or "1j":
+                trip_id_value = trip_id_value + "i"
+                if exists == "1j":
+                  logging.warning(" Duplicate journey id found: " + trip_id_value + ". There may be duplicate pages in the Transcription File.")
             except:
               pass
             current_head.setAttribute('xml:id', trip_id_value)
-            journeys_dict[trip_id_value] = 1
-
+            margins_journeys_dict[trip_id_value] = "1j"
+            
             previous_text = True
 
             #creates a cloned div2 with all its nodes to serve as the medial or final part
@@ -733,6 +736,6 @@ if __name__ in "__main__":
      # print(e,file=sys.stderr)
   #else:
    # document = setup_DOM()
-    #div2s, marginheaders, margins_dict = create_dom_nodes(document, tf)
-   # organize_nodes(document, tf, div2s, marginheaders, margins_dict)
+    #div2s, marginheaders, margins_journeys_dict = create_dom_nodes(document, tf)
+   # organize_nodes(document, tf, div2s, marginheaders, margins_journeys_dict)
    # print(document.toprettyxml('\t', '\n', None))
