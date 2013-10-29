@@ -32,6 +32,7 @@ MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') # change just to line or something
+LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 
 ## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
@@ -160,6 +161,7 @@ class TranscriptionFile:
 
   pages = []
   errors = []
+  version = -1
 
   def __init__(self, lines):
     self.parse_lines(lines)
@@ -173,6 +175,12 @@ class TranscriptionFile:
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
+      m4 = VERSION_RE.match(lines[0])
+      if n == -1:
+        if m4:
+          version = m4.group(1)
+        else:
+          version = 0        
       if m2:
         self.errors.append(errors(m2.group(1), -1, lines[0], 5))
       if m1:
@@ -183,7 +191,7 @@ class TranscriptionFile:
         #    process the old one
         if n > -1:
           # print(m1.group(1) + " found page", file=sys.stderr)
-          self.pages.append(TranscriptionPage(str(n),p))
+          self.pages.append(TranscriptionPage(str(n), p, version))
           p = []
           lines.pop(0)
           n = int(m1.group(1))
@@ -192,7 +200,7 @@ class TranscriptionFile:
           lines.pop(0)
       elif m3:
         self.errors.append(errors(m3.group(1), -1, lines[0], 5))
-        self.pages.append(TranscriptionPage(str(n), p))
+        self.pages.append(TranscriptionPage(str(n), p, version))
         p = []
         n = int(m3.group(1))
         lines.pop(0)
@@ -202,7 +210,7 @@ class TranscriptionFile:
         
 
    # try:
-    tp = TranscriptionPage(str(n),p)
+    tp = TranscriptionPage(str(n), p, version)
     if len(tp.errors) > 0:
       self.errors.extend(tp.errors)
     self.pages.append(tp)
@@ -222,11 +230,13 @@ class TranscriptionPage:
   head = []
   body = []
   errors = []
+  version = -1
 
-  def __init__(self, num, lines):
+  def __init__(self, num, lines, version):
 
     # sys.stderr.write("process transcription page ... ")
     self.num = num
+    self.version = version
     self.parse_lines(lines)
     # print(self.num + " page created", file=sys.stderr)
 
@@ -241,18 +251,16 @@ class TranscriptionPage:
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
   
-    m = VERSION_RE.match(lines[0])
-    if not m:
-      self.uprev(lines, 0)
-    elif m.group(1) < CURRENT_VERSION:
-      self.uprev(lines, m.group(1))
+    if self.version < CURRENT_VERSION:
+      self.uprev(lines)
     else:
       h = []
       b = []
       switch = False #false means we're still in head
                    #true means we've switched to body    length = len(lines)
       length = len(lines)
-      text = False #true if previous line was Text:
+      section = False #true if previous line was Section:
+      subsection = False #true if previous line was Subsection:
       multi_headers = False #true if multiple "Lines" are allowed
       divlines = 0
       empty = False #true if previous line in body was empty
@@ -260,30 +268,83 @@ class TranscriptionPage:
       double_spacing_found = False #true if double spacing found
       linecount = 0
       for i in range(0, length):
-        m1 = NOTES_RE
-        m2 = MARGINNOTE_RE
-        m3 = FOOTNOTE_RE
-        m4 = SECTION_RE
-        m5 = SUBSECTION_RE
-        m6 = MARGINLINELIST_RE.match(lines[i])
-        m7 = MARGINLINERANGE_RE.match(lines[i])
-        ##finish method
-        
-        
-        
-    
+        m1 = NOTES_RE.match(lines[i])
+        m2 = MARGINNOTE_RE.match(lines[i])
+        m3 = FOOTNOTE_RE.match(lines[i])
+        m4 = LINE_RE.match(lines[i])
+        m7 = MARGINLINELIST_RE.match(lines[i])
+        m8 = MARGINLINERANGE_RE.match(lines[i])
+        if m7 or m8:
+          self.errors.append(errors(self.num, i, lines[i], 4))
+        elif not switch:
+          if m1 or m2 or m3 or m4:
+            h.append(lines[i])
+          elif lines[i].strip() == "":
+            switch = True
+          else:
+            self.errors.append(errors(self.num, i, lines[i], 1))
+        else: #in body
+          #do we need this linecount? I don't think so...
+          linecount = linecount + 1
+          if double_spacing == 3 and double_spacing_found == False:
+            logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
+            double_spacing_found = True
+          elif double_spacing < 3:
+            if lines[i].strip() == "":
+              empty = True
+            elif empty == True:
+              double_spacing += 1
+              empty = False
+            elif empty == False:
+              double_spacing = 0    
+          if section or subsection:
+            if m4:
+              b.append(lines[i])
+              multi_headers = True
+            else:
+              self.errors.append(errors(self.num, i, lines[i], 3))
+            if section:
+              section = False
+            else:
+              subsection = False
+          else:
+            m5 = SECTION_RE.match(lines[i])
+            m6 = SUBSECTION_RE.match(lines[i])
+            if m5 or m6:
+              if m5:
+                section = True
+                #linecount = linecount - 1
+              else:
+                subsection = True
+              b.append(lines[i]) #could pose a problem adding multiple lines.
+            elif multi_headers and m4:
+              b.append(lines[i])
+            elif m1 or m2 or m3 or m4:
+              self.errors.append(errors(self.num, i, lines[i], 2))
+            else:
+              b.append(lines[i].rstrip())
+              multi_headers = False
+      #if divlines != 0:
+        #self.errors.append(incorrect_stars_error(self.num))
+      self.head = h
+      self.body = b
+
+
   def print(self, lines):
+    if self.num == '1': # what if different starting number? Account for that with a variable? 
+      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
     print('Page ' + self.num + ':', file=sys.stderr)
     for l in lines:
       print(l, file=sys.stderr)
-        
-  def uprev(self, lines, version):
+   
+            
+  def uprev(self, lines):
     #why does this introduce tons of double spaces (new lines) to the file?
     logging.debug(self.print(lines))
-    self.bump(lines, version)
+    self.bump(lines)
 
-  def bump(self, lines, version):
-    if version == 0:
+  def bump(self, lines):
+    if self.version == 0:
       temp_div_headers = [] 
       h = []
       b = []
@@ -326,8 +387,8 @@ class TranscriptionPage:
             self.errors.append(errors(self.num, i, lines[i], 1))
         else: #in body
           linecount = linecount + 1
-          if linecount == 1:
-            b.append('version = 1')
+          #if linecount == 1:
+           # b.append('version = 1')
           if double_spacing == 3 and double_spacing_found == False:
             logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
             double_spacing_found = True
