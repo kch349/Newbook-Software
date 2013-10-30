@@ -1,10 +1,8 @@
-Newbook XSLT
-============
+=======
+Newbook-Software XSLT
+=====================
 
-These scripts provide:
- * tei2html
-   -- a mapping from tei to web markup
- * tei2latex
-   -- a mapping from tei to latex markup
-      (towards later PDF output)
-
+ * tei2html.xslt
+   This file converts Newbook TEI files to basic HTML.
+ * tei2latex.xslt
+   This file converts Newbook TEI files to LaTeX markup.
