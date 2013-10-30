@@ -1,0 +1,17 @@
+README for Newbook install script
+=================================
+
+run with LOCATION as a local path or a host:path or user@host:path
+
+ # Needs rsync and permission to write to /tmp and LOCATION 
+
+./install LOCATION
+
+ Ideally, this  sets up to access LOCATION as a web interface for Newbook
+autotagger and xslt.
+
+potential problems:
+ * permission to create LOCATION/sessions and subdirs
+ * cgi permission in LOCATION
+   ** this is really up to the owner of LOCATION
+ * need to have rsync installed
