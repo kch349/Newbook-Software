@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# install Newbook-Software autotagger and xslt
+
+if [[ -z $1 ]]; then
+  echo "provide an install location"
+else
+  dest=$1
+  tempdir=/tmp/autotagger.$$
+  rsync -a --include=".htaccess" --exclude={outputs/,docs/,README.md,Issues} autotagger/* $tempdir
+  rsync -a --exclude={README.md} xslt $tempdir
+
+  # Redirect directory index to cgi script (rather than index.html)
+  echo "DirectoryIndex autotagger.cgi" >> $tempdir/.htaccess
+  
+  # do the copy
+  rsync -Kvzrlt $tempdir/ $dest
+
+  # Clean up
+  rm -rf $tempdir
+fi
