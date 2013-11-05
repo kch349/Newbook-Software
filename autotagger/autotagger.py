@@ -19,13 +19,14 @@ from xml.dom.minidom import *
 
 ##class constants
 CURRENT_VERSION = 1.0
+version = -1
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
 PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
-VERSION_RE = re.compile('\s*Version:?(\d+)') #for determining if uprev is needed
+VERSION_RE = re.compile('\s*version == (.*)') #for determining if uprev is needed
 # regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
 MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
@@ -171,6 +172,7 @@ class TranscriptionFile:
        a series of Transcription Page objects"""
     p = []
     n = -1
+    #version = -1
     while len(lines) > 0:
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
@@ -178,9 +180,11 @@ class TranscriptionFile:
       m4 = VERSION_RE.match(lines[0])
       if n == -1:
         if m4:
-          version = m4.group(1)
+          self.version = float(m4.group(1))
+          #print("version check in tf: " + str(self.version), file=sys.stderr)
         else:
           version = 0        
+      #print("version check in tf after if statement: " + str(self.version), file=sys.stderr)
       if m2:
         self.errors.append(errors(m2.group(1), -1, lines[0], 5))
       if m1:
@@ -191,7 +195,7 @@ class TranscriptionFile:
         #    process the old one
         if n > -1:
           # print(m1.group(1) + " found page", file=sys.stderr)
-          self.pages.append(TranscriptionPage(str(n), p, version))
+          self.pages.append(TranscriptionPage(str(n), p, self.version))
           p = []
           lines.pop(0)
           n = int(m1.group(1))
@@ -200,7 +204,7 @@ class TranscriptionFile:
           lines.pop(0)
       elif m3:
         self.errors.append(errors(m3.group(1), -1, lines[0], 5))
-        self.pages.append(TranscriptionPage(str(n), p, version))
+        self.pages.append(TranscriptionPage(str(n), p, self.version))
         p = []
         n = int(m3.group(1))
         lines.pop(0)
@@ -210,7 +214,7 @@ class TranscriptionFile:
         
 
    # try:
-    tp = TranscriptionPage(str(n), p, version)
+    tp = TranscriptionPage(str(n), p, self.version)
     if len(tp.errors) > 0:
       self.errors.extend(tp.errors)
     self.pages.append(tp)
@@ -250,7 +254,7 @@ class TranscriptionPage:
 
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
-  
+    #print("version check in tfp parse lines: " + str(self.version), file=sys.stderr)
     if self.version < CURRENT_VERSION:
       self.uprev(lines)
     else:
@@ -337,13 +341,24 @@ class TranscriptionPage:
     for l in lines:
       print(l, file=sys.stderr)
    
+  def printAfter(self):
+    if self.num == '1': # what if different starting number? Account for that with a variable? 
+      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    print('Page ' + self.num + ':', file=sys.stderr)
+    for l in self.head:
+      print(l, file=sys.stderr)
+    print('', file=sys.stderr)
+    for l in self.body:
+      print(l, file=sys.stderr)
             
   def uprev(self, lines):
     #why does this introduce tons of double spaces (new lines) to the file?
-    logging.debug(self.print(lines))
+    #self.print(lines)
     self.bump(lines)
+    self.printAfter()
 
   def bump(self, lines):
+    #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
     if self.version == 0:
       temp_div_headers = [] 
       h = []
@@ -370,13 +385,15 @@ class TranscriptionPage:
           if m1 or m3:
             if m1:
               #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
-              lines[i] = '\tNotes:' #should alter line or just add in a new line?
-              print("Margin to Note" + lines[i], file=sys.stderr)
+              lines[i] = '\tNotes:'
+              #print("Margin to Note" + lines[i], file=sys.stderr)
             if m3:
+              #print(lines[i])
               lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
               #adds a new \n character in for some reason...why?
-              print("Margin added to Line#" + lines[i], file=sys.stderr)
-            h.append(lines[i])
+              #print(lines[i])
+              #print("Margin added to Line#" + lines[i], file=sys.stderr)
+            h.append(lines[i].rstrip())
           elif m2:
               temp_div_headers.append(m2.group(1))
               #lines[i] = ""
@@ -402,7 +419,7 @@ class TranscriptionPage:
               double_spacing = 0    
           if text:
             if m3:
-              b.append(lines[i])
+              b.append(lines[i].rstrip())
               multi_headers = True
             else:
               self.errors.append(errors(self.num, i, lines[i], 3))
@@ -420,10 +437,10 @@ class TranscriptionPage:
                 b.append('\tSubsection:')
                 b.append('\tLine ' + str(linecount) + ': ' + temp_div_headers[0])
                 temp_div_headers.pop(0)
-              #lines[i] = re.sub('*', '', lines[i]) #removes *, need to remove that later in code since not here
-              b.append(lines[i]) #could pose a problem adding multiple lines.
+              lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
+              b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
             elif multi_headers and m3:
-              b.append(lines[i])
+              b.append(lines[i].rstrip())
             elif m1 or m2 or m3:
               self.errors.append(errors(self.num, i, lines[i], 2))
             else:
@@ -785,11 +802,11 @@ if __name__ in "__main__":
   tf = TranscriptionFile(infilelines)
   logging.info(" found "+str(len(tf.pages))+" transcription pages")
 
-  for page in tf.pages:
-    for l in page.head:
-      print(l)
-    for l in page.body:
-      print(l)
+  #for page in tf.pages:
+   # for l in page.head:
+    #  print(l)
+    #for l in page.body:
+     # print(l)
       
   #if len(tf.errors) > 0:
    # print("Errors found. Please check error log and try again later.")
