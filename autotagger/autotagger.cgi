@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # autotagger web interface
 # 
 
@@ -18,6 +18,20 @@ import datetime
 
 
 HTTP_HEADERS = "Content-type: text/html\nSet-cookie: session=%(cookie)s"
+ERROR_PAGE = """
+<html>
+<head>
+</head>
+<body>
+    <h3>Errors in the input, they are listed below</h3>
+    <p>
+ <form action="autotagger.cgi" method="post" 
+          enctype="multipart/form-data">
+ <input type="submit" name=""  value="Upload another transcription file"/>
+ <input type="file" name="sdtf" /></p>
+    %(errors)s
+</form>
+</html>"""
 SUCCESS_PAGE = """
 <html>
 <head><title>Autotagger Success!</title></head>
@@ -120,19 +134,11 @@ if 'sdtf' in form_data:
   tf = autotagger.TranscriptionFile(infilelines)
   # check for errors
   if len(tf.errors) > 0:
-    print("<h3>errors in the input, they are listed below</h3>")
-    print("""
-<form action="autotagger.cgi" method="post" 
-      enctype="multipart/form-data">
- <input type="submit" name=""  value="Upload another transcription file"/>
- <input type="file" name="sdtf" /></p>
-</form>""")
-         
-    
-    print("<pre>")
+    errhtml="<pre>"
     for e in tf.errors:
-      print(e)
-    print("</pre>")
+      errhtml+=e
+    errhtml+="</pre>"
+    print(ERROR_PAGE % { 'errors':errhtml })
   else:
    # no errors, run the tagger
     document = autotagger.setup_DOM()
