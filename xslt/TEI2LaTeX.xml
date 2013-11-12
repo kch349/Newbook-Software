@@ -1,0 +1,41 @@
+<?xml version"1.0" encoding= "utf-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"> 
+<xsl:output method="text" />
+<xsl:strip-space elements="*"/>
+<xsl:temple match="/">\documentclass{book}
+
+
+<xsl:apply-template select = "//title"/> 
+\title{<xsl:value-of select=".">}
+</xsl:template>
+
+\author{\textsc{Alexandre Svoboda}
+\date{\today}
+
+\begin{document}
+<xsl:apply-template select="//p"/>
+
+
+<xsl:template match ="head[@type='margin']">
+\marginpar{<xsl:value-of select = ".">}
+</xsl:template>
+
+\end{document}
+</xsl:template>
+
+<xsl:template match ="head[@type = 'chapter']">
+\chapter{<xsl:value-of select = "."/>}
+</xsl:template>
+
+<xsl:template match ="quote[ancestor::front]">
+\begin{quote}<xsl:apply:templates /> \end{quote}
+
+<xsl:template match="list">
+\begin{itemize}
+  <xsl:apply-templates />
+\end{itemize} </xsl:template>
+
+<xsl:template match="item">
+\item <xsl:apply-templates />
+</xsl:template>
+
