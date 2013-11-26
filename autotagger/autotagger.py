@@ -11,8 +11,6 @@
 ## justin yoon
 ## ... (add your names as you edit this file)
 
-#test git push
-
 import sys
 import re
 import logging
@@ -48,8 +46,8 @@ TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
 
 ## version 1 regexes
 NOTES_RE = re.compile('^\s*Notes:?', re.IGNORECASE)
-MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(d+)')
-FOOTNOTE_RE = re.compile('^\s*Footnote:?')
+MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(\d+):?\s*(.*)$')
+FOOTNOTE_RE = re.compile('^\s*Footnote:?\s*(.*)$')
 SECTION_RE = re.compile('^\s*Section:?')
 SUBSECTION_RE = re.compile('^\s*SubSection:?')
 
@@ -283,8 +281,8 @@ class TranscriptionPage:
         if m7 or m8:
           self.errors.append(errors(self.num, i, lines[i], 4))
         elif not switch:
-          if m1 or m2 or m3 or m4:
-            h.append(lines[i])
+          if m1 or m2 or m3:
+            h.append(lines[i].rstrip())
           elif lines[i].strip() == "":
             switch = True
           else:
@@ -322,9 +320,9 @@ class TranscriptionPage:
                 #linecount = linecount - 1
               else:
                 subsection = True
-              b.append(lines[i]) #could pose a problem adding multiple lines.
+              b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
             elif multi_headers and m4:
-              b.append(lines[i])
+              b.append(lines[i].rstrip())
             elif m1 or m2 or m3 or m4:
               self.errors.append(errors(self.num, i, lines[i], 2))
             else:
@@ -334,6 +332,8 @@ class TranscriptionPage:
         #self.errors.append(incorrect_stars_error(self.num))
       self.head = h
       self.body = b
+      
+      self.printAfter()
 
 
   def print(self, lines):
@@ -532,65 +532,91 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   return current_prose
 
 
+def process_id(dict, id, element_type):        
+    if id in dict:
+      duplicates = dict[value]
+      if element_type in duplicates:
+        if element_type = 'm':
+          logging.warning(" Duplicate marginnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
+        elif element_type = 'j':
+          logging.warning(" Duplicate journey id found: " + id + ". There may be duplicate pages in the Transcription File.")
+        else:
+          logging.warning(" Duplicate footnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
+      duplicates += element_type
+      dict[id] = duplicates
+      for i in duplicates.len() - 1:
+        value += 'i'
+    else:
+      dict[id] = element_type
+    return id
+    
 def create_dom_nodes(doc,tf):
   """function that sets up in a DOM form with the nodes: Document, header and body,
   header type divlines and trip titles, margin notes and text"""
 
-
-  div2s = [] # contains all diary div headers
+  #div2s = [] # contains all diary div headers
   marginheaders = []# triples: [content,pagenum,linenum]
-  margins_journeys_dict = {}
-  margins = []
+  footnotes = [] # doubles: [content, pagenum]
+  xml_ids_dict = {}
+  margins = [] #what is this?
 
   #div1_count = 1
-  div2_printed_count = 1
-  div2_count = 1
+  #div2_printed_count = 1
+  #div2_count = 1
   marginline_count = 1
   for page in tf.pages:
     for l in page.head:
        # DivLine: "..." are 'diaryentry' headers
        # Line: "..." are 'margin_note' headers
-      m = MARGINS_RE.match(l)
+      m = NOTES_RE.match(l)
       if m:
         continue
 
-      if len(div2s)==0:
+      #if len(div2s)==0:
         ## create first div2
-        part = "N"
-        div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
-        div2_count += 1
+        #part = "N"
+       # div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
+      #  div2_count += 1
         #print("div2s header count" + str(len(div2s)), file=sys.stderr)
 
-      m = DIVLINE_RE.match(l)
-      if m:
+     # m = DIVLINE_RE.match(l)
+      #if m:
         # matched a Divline, create a new div2
-        part="N" # what's part="N"? I though these values were "I" and "F"
-        div2s.append(create_div2(doc,str(div2_count),part,m.group(1)))
+       # part="N" # what's part="N"? I though these values were "I" and "F"
+        #div2s.append(create_div2(doc,str(div2_count),part,m.group(1)))
         #print("d " + str(page.num) + " " + m.group(1), file=sys.stderr)
-        div2_printed_count += 1
-        div2_count += 1
+       # div2_printed_count += 1
+       # div2_count += 1
 
-      else:
-        m = MARGINLINE_RE.match(l)
-        if m:
-          head = doc.createElement('head')
-          marginheaders.append([head, page.num, m.group(1)])
-          head.setAttribute('type','marginnote')
-          id_value = "p" + page.num + '-' + m.group(1)
-          #need to figure out a way to make it so dict can record if there is both a journey
-          # and margin id for this number.
-          try:
-            exists = margins_journeys_dict[id_value]
-            if exists == "1m" or "1j":
-              id_value = id_value + "i"
-              if exists == "1m":
-                logging.warning(" Duplicate margin note id found: " + id_value + ". There may be duplicate pages in the Transcription File.")
-          except:
-            pass
-          head.setAttribute('xml:id', id_value)
-          margins_journeys_dict[id_value] = "1m"
-          text = doc.createTextNode(m.group(2))
-          head.appendChild(text)
+     # else:
+      m = MARGINNOTE_RE.match(l)
+      if m:
+        head = doc.createElement('head')
+        marginheaders.append([head, page.num, m.group(1)])
+        head.setAttribute('type','marginnote')
+        marginnote_id = "p" + page.num + '-' + m.group(1)
+        #need to figure out a way to make it so dict can record if there is both a journey
+        # and margin id for this number.
+        
+        marginnote_id = process_id(xml_ids_dict, marginnote_id, 'm')
+
+        head.setAttribute('xml:id', marginnote_id) # could factor out all process of
+        # creating and assigning xml id, or creating headers in general eventually.
+        text = doc.createTextNode(m.group(2))
+        head.appendChild(text)
+      
+      m = FOOTNOTE_RE.match(l)
+      #factor out head creation code?
+      if m:
+        head = doc.createElement('head')
+        footnotes.append([head, page.num])
+        head.setAttribute('type', 'footnote')
+        footnote_id = "p" + page.num 
+        footnote_id process_id(xml_ids_dict, footnote_id, 'f')
+        head.setAttribute('xml:id', footnote_id) # could factor out all process of
+        # creating and assigning xml id, or creating headers in general eventually.
+        text = doc.createTextNode(m.group(1))
+        head.appendChild(text)
 
   if len(div2s)==0:
     ## create first div2 if there is no header, and therefore still are no div2s.
@@ -598,13 +624,14 @@ def create_dom_nodes(doc,tf):
     div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
     div2_count += 1
     #print("div2s at end of create dom nodes method count" + str(len(div2s)), file=sys.stderr)
-  return div2s, marginheaders, margins_journeys_dict
+  return marginheaders, footnotes, xml_ids_dict
 
-def organize_nodes(document, tf, div2s, marginheaders, margins_journeys_dict):
+def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   # this will be a list of paragraph nodes
   current_prose = []
   current_prose = create_p(document,current_prose)
   div1s = [] # contains all trip div headers
+  div2s = [] # contains all diary div headers
 
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
@@ -700,17 +727,11 @@ def organize_nodes(document, tf, div2s, marginheaders, margins_journeys_dict):
               div2s.insert(0, next_div2)
 
 
-            trip_id_value = "p" + page.num + '-' + m.group(1)
-            try:
-              exists = margins_journeys_dict[trip_id_value]
-              if exists == "1m" or "1j":
-                trip_id_value = trip_id_value + "i"
-                if exists == "1j":
-                  logging.warning(" Duplicate journey id found: " + trip_id_value + ". There may be duplicate pages in the Transcription File.")
-            except:
-              pass
-            current_head.setAttribute('xml:id', trip_id_value)
-            margins_journeys_dict[trip_id_value] = "1j"
+            journey_id = "p" + page.num + '-' + m.group(1)
+            
+            journey_id = process_id(xml_ids_dict, journey_id, 'j')
+            
+            current_head.setAttribute('xml:id', journey_id)
             
             previous_text = True
 
@@ -810,12 +831,12 @@ if __name__ in "__main__":
     #for l in page.body:
      # print(l)
       
-  #if len(tf.errors) > 0:
-   # print("Errors found. Please check error log and try again later.")
-    #for e in tf.errors:
-     # print(e,file=sys.stderr)
-  #else:
-   # document = setup_DOM()
-    #div2s, marginheaders, margins_journeys_dict = create_dom_nodes(document, tf)
-   # organize_nodes(document, tf, div2s, marginheaders, margins_journeys_dict)
-   # print(document.toprettyxml('\t', '\n', None))
+  if len(tf.errors) > 0:
+    print("Errors found. Please check error log and try again later.")
+    for e in tf.errors:
+      print(e,file=sys.stderr)
+  else:
+    document = setup_DOM()
+    marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
+    organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    print(document.toprettyxml('\t', '\n', None))
