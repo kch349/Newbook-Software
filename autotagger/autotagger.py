@@ -11,6 +11,10 @@
 ## justin yoon
 ## ... (add your names as you edit this file)
 
+#get rid of journey header xml ids, there will be no more line numbers.
+#only ids for margin notes now... not footnotes, correct?
+
+
 import sys
 import re
 import logging
@@ -32,15 +36,14 @@ MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for jo
 MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
-TEXTLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') # change just to line or something
 LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
+DIVLINENUMBER_RE = re.compile('\s*DivLine\s+(\d+):?\s*(.*)$', re.IGNORECASE)
 
 ## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
-MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') #should combine Margin and Text line regexes
+#MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') #should combine Margin and Text line regexes
 STAR_RE = re.compile('^\s*\*(.*)$')
 MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
-#new regexes looking for "Text:" or the "Line #:" indicating trip headings in body text
 TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
 
 
@@ -48,8 +51,8 @@ TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
 NOTES_RE = re.compile('^\s*Notes:?', re.IGNORECASE)
 MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(\d+):?\s*(.*)$')
 FOOTNOTE_RE = re.compile('^\s*Footnote:?\s*(.*)$')
-SECTION_RE = re.compile('^\s*Section:?')
-SUBSECTION_RE = re.compile('^\s*SubSection:?')
+SECTION_RE = re.compile('^\s*Section:?\s*(.*)$')
+SUBSECTION_RE = re.compile('^\s*SubSection:?\s*(.*)$')
 
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
@@ -149,10 +152,10 @@ def setup_DOM():
   text = newdoc.createElement('text')
   document.appendChild(text)
 
-#front = newdoc.createElement('front')
-#text.appendChild(front)
-#back = newdoc.createElement('back')
-#text.appendChild(back)
+  #front = newdoc.createElement('front')
+  #text.appendChild(front)
+  #back = newdoc.createElement('back')
+  #text.appendChild(back)
   body = newdoc.createElement('body')
   text.appendChild(body)
   return newdoc
@@ -172,18 +175,22 @@ class TranscriptionFile:
        a series of Transcription Page objects"""
     p = []
     n = -1
-    #version = -1
+    version = -1
     while len(lines) > 0:
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
       m4 = VERSION_RE.match(lines[0])
+      #print("n = " + str(n), file = sys.stderr)
       if n == -1:
+        #print("entered n == -1", file = sys.stderr)
         if m4:
+          #print("entered m4", file = sys.stderr)
           self.version = float(m4.group(1))
           #print("version check in tf: " + str(self.version), file=sys.stderr)
         else:
-          version = 0        
+          #print("entered else", file = sys.stderr)
+          self.version = 0        
       #print("version check in tf after if statement: " + str(self.version), file=sys.stderr)
       if m2:
         self.errors.append(errors(m2.group(1), -1, lines[0], 5))
@@ -332,7 +339,6 @@ class TranscriptionPage:
         #self.errors.append(incorrect_stars_error(self.num))
       self.head = h
       self.body = b
-      
       self.printAfter()
 
 
@@ -345,13 +351,13 @@ class TranscriptionPage:
    
   def printAfter(self):
     if self.num == '1': # what if different starting number? Account for that with a variable? 
-      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
-    print('Page ' + self.num + ':', file=sys.stderr)
+      print('version == ' + str(CURRENT_VERSION))#, file=sys.stderr)
+    print('Page ' + self.num + ':')#, file=sys.stderr)
     for l in self.head:
-      print(l, file=sys.stderr)
-    print('', file=sys.stderr)
+      print(l)#, file=sys.stderr)
+    print('')#, file=sys.stderr)
     for l in self.body:
-      print(l, file=sys.stderr)
+      print(l)#, file=sys.stderr)
             
   def uprev(self, lines):
     #why does this introduce tons of double spaces (new lines) to the file?
@@ -361,7 +367,9 @@ class TranscriptionPage:
 
   def bump(self, lines):
     #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
+    #print("entered bump", file = sys.stderr)
     if self.version == 0:
+      #print("entered version==0", file = sys.stderr)
       temp_div_headers = [] 
       h = []
       b = []
@@ -378,9 +386,10 @@ class TranscriptionPage:
       for i in range(0, length):
         m1 = MARGINS_RE.match(lines[i])
         m2 = DIVLINE_RE.match(lines[i])
-        m3 = MARGINLINE_RE.match(lines[i])
+        m3 = LINE_RE.match(lines[i])
         m5 = MARGINLINELIST_RE.match(lines[i])
         m6 = MARGINLINERANGE_RE.match(lines[i])
+        m8 = DIVLINENUMBER_RE.match(lines[i])
         if m5 or m6:
           self.errors.append(errors(self.num, i, lines[i], 4))
         elif not switch: #in head
@@ -396,10 +405,16 @@ class TranscriptionPage:
               #print(lines[i])
               #print("Margin added to Line#" + lines[i], file=sys.stderr)
             h.append(lines[i].rstrip())
-          elif m2:
-              temp_div_headers.append(m2.group(1))
-              #lines[i] = ""
-              divlines += 1
+          elif m2 or m8:
+            if m8:
+              #self.errors.append(errors(self.num, i, lines[i], 6))
+              logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                              self.num + ". Make sure the line number is not included.")
+            
+            #print("m2.group(1) = " + m2.group(1), file = sys.stderr)
+            temp_div_headers.append(m2.group(1))
+            #lines[i] = ""
+            divlines += 1
           elif lines[i].strip() == "":
             switch = True
           else:
@@ -418,10 +433,11 @@ class TranscriptionPage:
               double_spacing += 1
               empty = False
             elif empty == False:
-              double_spacing = 0    
+              double_spacing = 0   
+               
           if text:
             if m3:
-              b.append(lines[i].rstrip())
+              b.append('\tSection: ' + re.sub('\tLine:?\s+(\d+):?\s+', '', lines[i].rstrip()))
               multi_headers = True
             else:
               self.errors.append(errors(self.num, i, lines[i], 3))
@@ -429,29 +445,34 @@ class TranscriptionPage:
           else:
             m4 = TEXT_RE.match(lines[i])
             m7 = STAR_RE.match(lines[i])
-            if m4 or m7:
-              if m4:
-                text = True
-                lines[i] = '\tSection'
-                linecount = linecount - 1
-              elif m7:
-                divlines -= 1
-                b.append('\tSubsection:')
-                b.append('\tLine ' + str(linecount) + ': ' + temp_div_headers[0])
+            if m4:
+              text = True
+              #lines[i] = '\tSection'
+              linecount = linecount - 1 # do we need line count?
+            elif m7:
+              divlines -= 1
+              #print(temp_div_headers[0], file=sys.stderr)
+              if len(temp_div_headers) >= 1:
+                b.append('\tSubsection: ' + temp_div_headers[0])
                 temp_div_headers.pop(0)
+              else: 
+                self.errors.append(incorrect_stars_error(self.num)) 
               lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
               b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
             elif multi_headers and m3:
-              b.append(lines[i].rstrip())
+              b.append('\tSection: ' + re.sub('\tLine:?\s+(\d+):?\s+', '', lines[i].rstrip()))
             elif m1 or m2 or m3:
               self.errors.append(errors(self.num, i, lines[i], 2))
             else:
               b.append(lines[i].rstrip())
               multi_headers = False
+              
       if divlines != 0:
         self.errors.append(incorrect_stars_error(self.num))
       self.head = h
+      #print("appended h", file = sys.stderr)
       self.body = b
+      #print("appended b", file = sys.stderr)
 
 def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
@@ -493,9 +514,13 @@ def errors(page_num, line_num, line, error_code):
   elif error_code == 5:
     err_str += "This line must be formatted \"Page #\". No additional "+\
                "formatting is allowed.\n"
+  #elif error_code == 6:
+   # err_str += "DivLines should not specify the line number. This line "+\
+    #           "should be introduced by \"DivLine:\" only.\n"
   return err_str
 
 def create_div1(document,n):
+  """Creates a new div1 element, and returns that div1 and its head node"""
   div1 = document.createElement('div1')
   div1.setAttribute('type','journey')
   div1.setAttribute('n',n)
@@ -504,7 +529,8 @@ def create_div1(document,n):
   head.setAttribute('type','journey')
   return head, div1
 
-def create_div2(document,n,part,content):
+def create_div2(document,n,part):
+  """Creates a new div2 element, and returns that div2 and its head node"""
   div2 = document.createElement('div2')
   div2.setAttribute('type','diaryentry')
   div2.setAttribute('n',n)
@@ -513,10 +539,8 @@ def create_div2(document,n,part,content):
   head = document.createElement('head')
   div2.appendChild(head)
   head.setAttribute('type','diaryentry')
-
-  text = document.createTextNode(content)
-  head.appendChild(text)
-  return div2
+  
+  return head, div2
 
 def create_p(document,current_prose, first_line=None, fresh=False):
   '''method to create a paragraph, needs the list of paragraphs
@@ -532,23 +556,20 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   return current_prose
 
 
-def process_id(dict, id, element_type):        
-    if id in dict:
-      duplicates = dict[value]
-      if element_type in duplicates:
-        if element_type = 'm':
-          logging.warning(" Duplicate marginnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
-        elif element_type = 'j':
-          logging.warning(" Duplicate journey id found: " + id + ". There may be duplicate pages in the Transcription File.")
-        else:
-          logging.warning(" Duplicate footnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
-      duplicates += element_type
-      dict[id] = duplicates
-      for i in duplicates.len() - 1:
-        value += 'i'
-    else:
-      dict[id] = element_type
-    return id
+def process_id(dict, id):
+  """Makes sure every assigned xml-id is valid by checking for duplicates. Adds "i" 
+  characters where necessary"""     
+  if id in dict:
+    duplicates = dict[id]
+    dict[id] = dict[id] + 1
+    logging.warning(" Duplicate marginnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
+    for i in duplicates:
+      id += 'i'
+  else:
+    dict[id] = 1
+  return id
+    
+    
     
 def create_dom_nodes(doc,tf):
   """function that sets up in a DOM form with the nodes: Document, header and body,
@@ -572,33 +593,14 @@ def create_dom_nodes(doc,tf):
       if m:
         continue
 
-      #if len(div2s)==0:
-        ## create first div2
-        #part = "N"
-       # div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
-      #  div2_count += 1
-        #print("div2s header count" + str(len(div2s)), file=sys.stderr)
-
-     # m = DIVLINE_RE.match(l)
-      #if m:
-        # matched a Divline, create a new div2
-       # part="N" # what's part="N"? I though these values were "I" and "F"
-        #div2s.append(create_div2(doc,str(div2_count),part,m.group(1)))
-        #print("d " + str(page.num) + " " + m.group(1), file=sys.stderr)
-       # div2_printed_count += 1
-       # div2_count += 1
-
-     # else:
       m = MARGINNOTE_RE.match(l)
       if m:
         head = doc.createElement('head')
         marginheaders.append([head, page.num, m.group(1)])
         head.setAttribute('type','marginnote')
         marginnote_id = "p" + page.num + '-' + m.group(1)
-        #need to figure out a way to make it so dict can record if there is both a journey
-        # and margin id for this number.
         
-        marginnote_id = process_id(xml_ids_dict, marginnote_id, 'm')
+        marginnote_id = process_id(xml_ids_dict, marginnote_id)
 
         head.setAttribute('xml:id', marginnote_id) # could factor out all process of
         # creating and assigning xml id, or creating headers in general eventually.
@@ -611,19 +613,8 @@ def create_dom_nodes(doc,tf):
         head = doc.createElement('head')
         footnotes.append([head, page.num])
         head.setAttribute('type', 'footnote')
-        footnote_id = "p" + page.num 
-        footnote_id process_id(xml_ids_dict, footnote_id, 'f')
-        head.setAttribute('xml:id', footnote_id) # could factor out all process of
-        # creating and assigning xml id, or creating headers in general eventually.
         text = doc.createTextNode(m.group(1))
         head.appendChild(text)
-
-  if len(div2s)==0:
-    ## create first div2 if there is no header, and therefore still are no div2s.
-    part = "N"
-    div2s.append(create_div2(doc,str(div2_count),part,"First diary entry, no title given in text."))
-    div2_count += 1
-    #print("div2s at end of create dom nodes method count" + str(len(div2s)), file=sys.stderr)
   return marginheaders, footnotes, xml_ids_dict
 
 def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
@@ -641,35 +632,60 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   last_empty = False
 
   current_div1 = None
-  previous_text = False
-  current_head = None
-  text_found = False
+  current_div2 = None
+  previous_section_text = False
+  previous_subsection_text = False
+  div1_head = None
+  div2_head = None
+  section_found = False
+  subsection_found = False
   div1_count = 1
+  div2_count = 1
   # need line number stored in an attribute?
   for page in tf.pages:
     #if page.num == "1":
+    #if it is the first line in the file, just create a generic and
+    # arbitrary div1 to hold diary entries until the first real div1
+    # trip heading is found.
     if current_div1 == None:
-      current_head, div1 = create_div1(document, str(div1_count))
+      div1_head, div1 = create_div1(document, str(div1_count))
       current_div1 = div1
-      text = document.createTextNode("First Journey in Diary; No Journey Title")
-      current_head.appendChild(text)
+      text = document.createTextNode("First Journey in Diary; No Journey Title")#generalize
+      div1_head.appendChild(text)
       div1_count += 1
-      current_div1.appendChild(div2s[0])
+      current_div1.appendChild(div2s[0])# change
 
+    if current_div2 == None:
+        ## create first div2
+      part = "N"
+      div2_head, div2 = create_div2(document, str(div2_count), part)
+      text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
+      div2_head.appendChild(text)
+      div2_count += 1
+      
+      current_div2 = div2
+      current_div1.appendChild(current_div2)
+      #print("div2s header count" + str(len(div2s)), file=sys.stderr)
+        
     linecount = 0
     for l in page.body:
-      #if "Text:" matched and if "Line #:" is found right after "Text:", or it
+      #if "Section:" matched and if "Line #:" is found right after "Text:", or it
       #is the first line of the entire file, create a div 1 and add it to the list div1s
-      m = TEXT_RE.match(l)
-      if m:
-        text_found = True
+      m1 = SECTION_RE.match(l)
+      m2 = SUBSECTION_RE.match(l)
+      if m1:
+        section_found = True
+        continue
+      elif m2:
+        subsection_found = True
         continue
       else:
+        #not a section or subsection heading
         linecount += 1
         if len(marginheaders) > 0:
           current_lineheader = marginheaders[0]
           if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
-            div2s[0].appendChild(current_lineheader[0])
+            current_div2.appendChild(current_lineheader[0])
             #marginheaders.pop(0)
             marginheaders.remove(current_lineheader)
         #else:
@@ -693,96 +709,110 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         # now looping through page body to find div1s, which we may
         # want to figure out how to do in the organize_nodes method
         # later so as not to loop through the file as much.
-        m = TEXTLINE_RE.match(l)
-        if m and text_found:
-          body.appendChild(current_div1)
-          if not previous_text:
+        m = LINE_RE.match(l)
+        if m and section_found:
+          if not previous_section_text:
+            body.appendChild(current_div1) #why was this outside?
             #creates a cloned div2 with all its nodes to serve as the medial
             # or final part then labeled as the next number in the div2_count
             # check and see if the last one was part f. if so make the
             # last one part m instead.
-            if len(div2s) >= 1:
-              next_div2 = div2s[0].cloneNode(False)
-              next_div2.setAttribute('part', 'F')
-              atr = div2s[0].getAttributeNode('part')
-              x = atr.nodeValue
-              if x == 'F':
-                div2s[0].setAttribute('part', 'M')
-              else:
-                div2s[0].setAttribute('part', 'I')
-              div2s[0].childNodes.extend(current_prose)
-              current_prose = create_p(document,current_prose, fresh=True)
-              current_div1.appendChild(div2s[0])
+            #if len(div2s) >= 1:
+            next_div2 = current_div2.cloneNode(False)
+            next_div2.setAttribute('part', 'F')
+            atr = current_div2.getAttributeNode('part')
+            x = atr.nodeValue
+            if x == 'F':
+              current_div2.setAttribute('part', 'M')
+            else:
+              current_div2.setAttribute('part', 'I')
+            current_div2.childNodes.extend(current_prose)
+            current_prose = create_p(document,current_prose, fresh=True)
+            current_div1.appendChild(current_div2)
 
-              if len(div2s) > 1:
-                headCheck = div2s[0].getElementsByTagName('head')
-                div2s.pop(0)
+            #update div2s to get rid of original one 
+            div1_head, div1 = create_div1(document, str(div1_count))
+            current_div1 = div1
+            div1_count += 1
+            current_div2 = next_div2
 
-              #if it is the first line in the file, just create a generic and
-              # arbitrary div1 to hold diary entries until the first real div1
-              # trip heading is found.
-              current_head, div1 = create_div1(document, str(div1_count))
-              current_div1 = div1
-              div1_count += 1
-              div2s.insert(0, next_div2)
-
-
-            journey_id = "p" + page.num + '-' + m.group(1)
+            #where is the journey id in the output?
+            #journey_id = "p" + page.num + '-' + m.group(1)
             
-            journey_id = process_id(xml_ids_dict, journey_id, 'j')
+           # journey_id = process_id(xml_ids_dict, journey_id, 'j')
             
-            current_head.setAttribute('xml:id', journey_id)
+            #current_head.setAttribute('xml:id', journey_id)
             
-            previous_text = True
+            previous_section_text = True
 
-            #creates a cloned div2 with all its nodes to serve as the medial or final part
-            #then labeled as the next number in the div2_count
-              #div2_count += 1
+            
 
           #if it actually is a trip heading, print the text as the header (and added in the
           #line number here just in case, since I don't know if that is important or not
 
 
           text = document.createTextNode(m.group(2))
-          current_head.appendChild(text)
+          div1_head.appendChild(text)
           lb = document.createElement("lb")
           lb.setAttribute("n", m.group(1))
-          current_head.appendChild(lb)
+          div1_head.appendChild(lb)
 
           continue
         else:
           #text line for trip header isn't matched, variables set accordingly.
-          previous_text = False
-          text_found = False
+          previous_section_text = False
+          section_found = False
+          
+        #add in creation of div2s here.
+        if m and subsection_found:   
+          
+          if not previous_subsection_text:
+            #attach previous div2
+            current_div2.childNodes.extend(current_prose)
+            current_div1.appendChild(current_div2)
+            current_prose = create_p(document,current_prose, fresh=True)
+            
+            #create new div2
+            part = "N"
+            div2_head, div2 = create_div2(document, str(div2_count), part)
+            div2_count += 1
+            current_div2 = div2
+            previous_subsection_text = True
+
+           # journey_id = "p" + page.num + '-' + m.group(1)
+            
+           # journey_id = process_id(xml_ids_dict, journey_id, 'j')
+            
+          #  current_head.setAttribute('xml:id', journey_id)
+            
+            
+
+
+
+          text = document.createTextNode(m.group(2))
+          div2_head.appendChild(text)
+          lb = document.createElement("lb")
+          lb.setAttribute("n", m.group(1))
+          div2_head.appendChild(lb)
+          continue
+          
+        else:
+          previous_subsection_text = False
+          subsection_found = False
         #new_trip = False
 
-        #organizes div2s. This section is the one with the most bugs
-        # I think, mainly the part attribute issue
-        m = STAR_RE.match(l)
+       
+        m = PARA_RE.match(l)
         if m:
-          #appends children to div2 and that div2 to div1, then moves to
-          # the next div2
-          div2s[0].childNodes.extend(current_prose)
-          current_div1.appendChild(div2s[0])
-          #div1s[current_div1].appendChild(div2s[0])
-
-          # delete the star and add this line to the current paragraph of current prose
-          current_prose = create_p(document,current_prose,[re.sub('\s*\*','',l),linecount],fresh=True)
-          if len(div2s) > 1:
-            headCheck = div2s[0].getElementsByTagName('head')
-            div2s.pop(0)
+          ## found a paragraph starting line of text
+          # start a new paragraph
+          current_prose = create_p(document, current_prose,[l,linecount])
         else:
-          m = PARA_RE.match(l)
-          if m:
-            ## found a paragraph starting line of text
-            # start a new paragraph
-            current_prose = create_p(document, current_prose,[l,linecount])
-          else:
-            ## found a vanilla line of text
-            lb = document.createElement('lb')
-            lb.setAttribute('n',str(linecount))
-            current_prose[-1].appendChild(document.createTextNode(l))
-            current_prose[-1].appendChild(lb)
+          ## found a vanilla line of text
+          lb = document.createElement('lb')
+          lb.setAttribute('n',str(linecount))
+          current_prose[-1].appendChild(document.createTextNode(l))
+          current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
     last_empty = False
@@ -792,8 +822,8 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
     current_prose[-1].appendChild(pb)
       # print([c.toxml() for c in current_prose],file=sys.stderr)
   # done looping, everything organized so stick the nodes onto the document
-  div2s[0].childNodes.extend(current_prose)
-  current_div1.appendChild(div2s[0])
+  current_div2.childNodes.extend(current_prose)
+  current_div1.appendChild(current_div2)
   body.appendChild(current_div1)
 
 def setup_argparse():
@@ -831,12 +861,12 @@ if __name__ in "__main__":
     #for l in page.body:
      # print(l)
       
-  if len(tf.errors) > 0:
-    print("Errors found. Please check error log and try again later.")
-    for e in tf.errors:
-      print(e,file=sys.stderr)
-  else:
-    document = setup_DOM()
-    marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
-    organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
-    print(document.toprettyxml('\t', '\n', None))
+  #if len(tf.errors) > 0:
+   # print("Errors found. Please check error log and try again later.")
+    #for e in tf.errors:
+     # print(e,file=sys.stderr)
+  #else:
+   # document = setup_DOM()
+    #marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
+    #organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    #print(document.toprettyxml('\t', '\n', None))
