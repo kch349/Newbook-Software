@@ -30,7 +30,8 @@ PAGE_RE = re.compile('^Page\s+(\d+)')
 PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
-VERSION_RE = re.compile('\s*version == (.*)') #for determining if uprev is needed
+VERSION_RE = re.compile('^version\s*==\s*(\d+.*)')
+#VERSION_RE = re.compile('\s*version\s+==\s+(\d*\.?d*)\s*$') #for determining if uprev is needed
 # regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
 MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
@@ -52,7 +53,8 @@ NOTES_RE = re.compile('^\s*Notes:?', re.IGNORECASE)
 MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(\d+):?\s*(.*)$')
 FOOTNOTE_RE = re.compile('^\s*Footnote:?\s*(.*)$')
 SECTION_RE = re.compile('^\s*Section:?\s*(.*)$')
-SUBSECTION_RE = re.compile('^\s*SubSection:?\s*(.*)$')
+SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
+SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
@@ -177,6 +179,7 @@ class TranscriptionFile:
     n = -1
     version = -1
     while len(lines) > 0:
+      #print("n = " + str(n), file=sys.stderr)
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
@@ -185,11 +188,11 @@ class TranscriptionFile:
       if n == -1:
         #print("entered n == -1", file = sys.stderr)
         if m4:
-          #print("entered m4", file = sys.stderr)
+          #print("entered m4, n= " + str(n), file = sys.stderr)
           self.version = float(m4.group(1))
           #print("version check in tf: " + str(self.version), file=sys.stderr)
-        else:
-          #print("entered else", file = sys.stderr)
+        elif (self.version == -1):
+          #print("entered else in version n= " + str(n), file = sys.stderr)
           self.version = 0        
       #print("version check in tf after if statement: " + str(self.version), file=sys.stderr)
       if m2:
@@ -265,6 +268,7 @@ class TranscriptionPage:
     if self.version < CURRENT_VERSION:
       self.uprev(lines)
     else:
+      #print("in else", file=sys.stderr)
       h = []
       b = []
       switch = False #false means we're still in head
@@ -285,6 +289,11 @@ class TranscriptionPage:
         m4 = LINE_RE.match(lines[i])
         m7 = MARGINLINELIST_RE.match(lines[i])
         m8 = MARGINLINERANGE_RE.match(lines[i])
+        #print(str(switch), file=sys.stderr)
+        #if m2:
+          #print("marginnote found", file = sys.stderr)
+        #if m1:
+          #print("note: found", file = sys.stderr)
         if m7 or m8:
           self.errors.append(errors(self.num, i, lines[i], 4))
         elif not switch:
@@ -321,11 +330,15 @@ class TranscriptionPage:
           else:
             m5 = SECTION_RE.match(lines[i])
             m6 = SUBSECTION_RE.match(lines[i])
-            if m5 or m6:
+            m9 = SUBSECTIONNUMBER_RE.match(lines[i])
+            if m5 or m6 or m9:
               if m5:
                 section = True
                 #linecount = linecount - 1
               else:
+                if m9:
+                  logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                                   self.num + ". Make sure the line number is not included.")
                 subsection = True
               b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
             elif multi_headers and m4:
@@ -360,6 +373,7 @@ class TranscriptionPage:
       print(l)#, file=sys.stderr)
             
   def uprev(self, lines):
+    #print("entered uprev", file = sys.stderr)
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.print(lines)
     self.bump(lines)
@@ -398,7 +412,7 @@ class TranscriptionPage:
               #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
               lines[i] = '\tNotes:'
               #print("Margin to Note" + lines[i], file=sys.stderr)
-            if m3:
+            elif m3:
               #print(lines[i])
               lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
               #adds a new \n character in for some reason...why?
