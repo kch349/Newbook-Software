@@ -274,10 +274,6 @@ class TranscriptionPage:
       switch = False #false means we're still in head
                    #true means we've switched to body    length = len(lines)
       length = len(lines)
-      section = False #true if previous line was Section:
-      subsection = False #true if previous line was Subsection:
-      multi_headers = False #true if multiple "Lines" are allowed
-      divlines = 0
       empty = False #true if previous line in body was empty
       double_spacing = 0 #number of double spaced lines found in body
       double_spacing_found = False #true if double spacing found
@@ -286,9 +282,10 @@ class TranscriptionPage:
         m1 = NOTES_RE.match(lines[i])
         m2 = MARGINNOTE_RE.match(lines[i])
         m3 = FOOTNOTE_RE.match(lines[i])
-        m4 = LINE_RE.match(lines[i])
+        #m4 = LINE_RE.match(lines[i])
         m7 = MARGINLINELIST_RE.match(lines[i])
         m8 = MARGINLINERANGE_RE.match(lines[i])
+        m10 = VERSION_RE.match(lines[i])
         #print(str(switch), file=sys.stderr)
         #if m2:
           #print("marginnote found", file = sys.stderr)
@@ -297,7 +294,9 @@ class TranscriptionPage:
         if m7 or m8:
           self.errors.append(errors(self.num, i, lines[i], 4))
         elif not switch:
-          if m1 or m2 or m3:
+          if m10: #how make sure it is at the beginning of first page?
+            continue
+          elif m1 or m2 or m3:
             h.append(lines[i].rstrip())
           elif lines[i].strip() == "":
             switch = True
@@ -317,42 +316,24 @@ class TranscriptionPage:
               empty = False
             elif empty == False:
               double_spacing = 0    
-          if section or subsection:
-            if m4:
-              b.append(lines[i])
-              multi_headers = True
-            else:
-              self.errors.append(errors(self.num, i, lines[i], 3))
-            if section:
-              section = False
-            else:
-              subsection = False
+          #if not m4:
+              #self.errors.append(errors(self.num, i, lines[i], 3))
+          m5 = SECTION_RE.match(lines[i])
+          m6 = SUBSECTION_RE.match(lines[i])
+          m9 = SUBSECTIONNUMBER_RE.match(lines[i])
+          if m5 or m6 or m9:      
+            if m9:
+              logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                               self.num + ". Make sure the line number is not included.")
+            b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
+          elif m1 or m2 or m3: #or m4:
+            self.errors.append(errors(self.num, i, lines[i], 2))
           else:
-            m5 = SECTION_RE.match(lines[i])
-            m6 = SUBSECTION_RE.match(lines[i])
-            m9 = SUBSECTIONNUMBER_RE.match(lines[i])
-            if m5 or m6 or m9:
-              if m5:
-                section = True
-                #linecount = linecount - 1
-              else:
-                if m9:
-                  logging.warning(" There may be an incorrectly formatted DivLine on page " +
-                                   self.num + ". Make sure the line number is not included.")
-                subsection = True
-              b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-            elif multi_headers and m4:
-              b.append(lines[i].rstrip())
-            elif m1 or m2 or m3 or m4:
-              self.errors.append(errors(self.num, i, lines[i], 2))
-            else:
-              b.append(lines[i].rstrip())
-              multi_headers = False
-      #if divlines != 0:
-        #self.errors.append(incorrect_stars_error(self.num))
+            b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
+            
       self.head = h
       self.body = b
-      self.printAfter()
+      #self.printAfter()
 
 
   def print(self, lines):
@@ -364,20 +345,20 @@ class TranscriptionPage:
    
   def printAfter(self):
     if self.num == '1': # what if different starting number? Account for that with a variable? 
-      print('version == ' + str(CURRENT_VERSION))#, file=sys.stderr)
-    print('Page ' + self.num + ':')#, file=sys.stderr)
+      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    print('Page ' + self.num + ':', file=sys.stderr)
     for l in self.head:
-      print(l)#, file=sys.stderr)
-    print('')#, file=sys.stderr)
+      print(l, file=sys.stderr)
+    print('', file=sys.stderr)
     for l in self.body:
-      print(l)#, file=sys.stderr)
+      print(l, file=sys.stderr)
             
   def uprev(self, lines):
     #print("entered uprev", file = sys.stderr)
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.print(lines)
     self.bump(lines)
-    self.printAfter()
+    #self.printAfter()
 
   def bump(self, lines):
     #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
@@ -577,7 +558,7 @@ def process_id(dict, id):
     duplicates = dict[id]
     dict[id] = dict[id] + 1
     logging.warning(" Duplicate marginnote id found: " + id + ". There may be duplicate pages in the Transcription File.")
-    for i in duplicates:
+    for i in range(0, duplicates):
       id += 'i'
   else:
     dict[id] = 1
@@ -631,6 +612,14 @@ def create_dom_nodes(doc,tf):
         head.appendChild(text)
   return marginheaders, footnotes, xml_ids_dict
 
+def create_generic_div2(div2_count):
+      part = "N"
+      div2_head, div2 = create_div2(document, str(div2_count), part)
+      text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
+      div2_head.appendChild(text)
+      div2_count += 1
+      return div2, div2_count
+  
 def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   # this will be a list of paragraph nodes
   current_prose = []
@@ -667,166 +656,132 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
       text = document.createTextNode("First Journey in Diary; No Journey Title")#generalize
       div1_head.appendChild(text)
       div1_count += 1
-      current_div1.appendChild(div2s[0])# change
+      if current_div2 == None:
+        current_div2, div2_count = create_generic_div2(div2_count)
+      current_div1.appendChild(current_div2)# change
 
     if current_div2 == None:
         ## create first div2
-      part = "N"
-      div2_head, div2 = create_div2(document, str(div2_count), part)
-      text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
-      div2_head.appendChild(text)
-      div2_count += 1
-      
-      current_div2 = div2
+      current_div2, div2_count = create_generic_div2(div2_count)
       current_div1.appendChild(current_div2)
+      #part = "N"
+      #div2_head, div2 = create_div2(document, str(div2_count), part)
+      #text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
+      #div2_head.appendChild(text)
+      #div2_count += 1
+      
+     # current_div2 = div2
+      #current_div1.appendChild(current_div2)
       #print("div2s header count" + str(len(div2s)), file=sys.stderr)
         
     linecount = 0
     for l in page.body:
       #if "Section:" matched and if "Line #:" is found right after "Text:", or it
       #is the first line of the entire file, create a div 1 and add it to the list div1s
-      m1 = SECTION_RE.match(l)
-      m2 = SUBSECTION_RE.match(l)
-      if m1:
+      m = SECTION_RE.match(l)
+      if m:
+        if not section_found:
+          body.appendChild(current_div1) #why was this outside?
+          #creates a cloned div2 with all its nodes to serve as the medial
+          # or final part then labeled as the next number in the div2_count
+          # check and see if the last one was part f. if so make the
+          # last one part m instead.
+          #if len(div2s) >= 1:
+          next_div2 = current_div2.cloneNode(False)
+          next_div2.setAttribute('part', 'F')
+          atr = current_div2.getAttributeNode('part')
+          x = atr.nodeValue
+          if x == 'F':
+            current_div2.setAttribute('part', 'M')
+          else:
+            current_div2.setAttribute('part', 'I')
+          current_div2.childNodes.extend(current_prose)
+          current_prose = create_p(document,current_prose, fresh=True)
+          current_div1.appendChild(current_div2)
+
+          #update div2s to get rid of original one 
+          div1_head, div1 = create_div1(document, str(div1_count))
+          current_div1 = div1
+          div1_count += 1
+          current_div2 = next_div2
+          
+        text = document.createTextNode(m.group(1))
+        div1_head.appendChild(text)
+        lb = document.createElement("lb")
+        #lb.setAttribute("n", m.group(1))     #use linecount?
+        div1_head.appendChild(lb)
         section_found = True
         continue
-      elif m2:
+      else:
+        section_found = False
+          
+      m = SUBSECTION_RE.match(l)
+      if m:
+        if not subsection_found:
+
+          #attach previous div2
+          current_div2.childNodes.extend(current_prose)
+          current_div1.appendChild(current_div2)
+          current_prose = create_p(document,current_prose, fresh=True)
+            
+          #create new div2
+          part = "N"
+          div2_head, div2 = create_div2(document, str(div2_count), part)
+          div2_count += 1
+          current_div2 = div2
+          
+        text = document.createTextNode(m.group(1))
+        div2_head.appendChild(text)
+        lb = document.createElement("lb")
+        #lb.setAttribute("n", m.group(1))     use linecount?
+        div2_head.appendChild(lb)
         subsection_found = True
         continue
+          
       else:
-        #not a section or subsection heading
-        linecount += 1
-        if len(marginheaders) > 0:
-          current_lineheader = marginheaders[0]
-          if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
-            current_div2.appendChild(current_lineheader[0])
-            #marginheaders.pop(0)
-            marginheaders.remove(current_lineheader)
-        #else:
-          #print("ran out of marginheaders",file=sys.stderr)
+        subsection_found = False
+       
+      #not a section or subsection heading
+      linecount += 1
+      if len(marginheaders) > 0:
+        current_lineheader = marginheaders[0]
+        if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
+          current_div2.appendChild(current_lineheader[0])
+          #marginheaders.pop(0)
+          marginheaders.remove(current_lineheader)
+      #else:
+        #print("ran out of marginheaders",file=sys.stderr)
 
-        #organizing div1s
-        m = EMPTYLINE_RE.match(l)
-        if m:
-          #found empty line
-          last_empty = True
-          empty_lines += 1
-          continue
-        elif last_empty:
-          for i in range(1, empty_lines + 1):
-            lb = document.createElement('lb')
-            lb.setAttribute('n',str((linecount - empty_lines + (i - 1))))
-            current_prose[-1].appendChild(lb)
-          last_empty = False
-          empty_lines = 0
+      #organizing div1s
+      m = EMPTYLINE_RE.match(l)
+      if m:
+        #found empty line
+        last_empty = True
+        empty_lines += 1
+        continue
+      elif last_empty:
+        for i in range(1, empty_lines + 1):
+          lb = document.createElement('lb')
+          lb.setAttribute('n',str((linecount - empty_lines + (i - 1))))
+          current_prose[-1].appendChild(lb)
+        last_empty = False
+        empty_lines = 0
 
         # now looping through page body to find div1s, which we may
         # want to figure out how to do in the organize_nodes method
         # later so as not to loop through the file as much.
-        m = LINE_RE.match(l)
-        if m and section_found:
-          if not previous_section_text:
-            body.appendChild(current_div1) #why was this outside?
-            #creates a cloned div2 with all its nodes to serve as the medial
-            # or final part then labeled as the next number in the div2_count
-            # check and see if the last one was part f. if so make the
-            # last one part m instead.
-            #if len(div2s) >= 1:
-            next_div2 = current_div2.cloneNode(False)
-            next_div2.setAttribute('part', 'F')
-            atr = current_div2.getAttributeNode('part')
-            x = atr.nodeValue
-            if x == 'F':
-              current_div2.setAttribute('part', 'M')
-            else:
-              current_div2.setAttribute('part', 'I')
-            current_div2.childNodes.extend(current_prose)
-            current_prose = create_p(document,current_prose, fresh=True)
-            current_div1.appendChild(current_div2)
-
-            #update div2s to get rid of original one 
-            div1_head, div1 = create_div1(document, str(div1_count))
-            current_div1 = div1
-            div1_count += 1
-            current_div2 = next_div2
-
-            #where is the journey id in the output?
-            #journey_id = "p" + page.num + '-' + m.group(1)
-            
-           # journey_id = process_id(xml_ids_dict, journey_id, 'j')
-            
-            #current_head.setAttribute('xml:id', journey_id)
-            
-            previous_section_text = True
-
-            
-
-          #if it actually is a trip heading, print the text as the header (and added in the
-          #line number here just in case, since I don't know if that is important or not
-
-
-          text = document.createTextNode(m.group(2))
-          div1_head.appendChild(text)
-          lb = document.createElement("lb")
-          lb.setAttribute("n", m.group(1))
-          div1_head.appendChild(lb)
-
-          continue
-        else:
-          #text line for trip header isn't matched, variables set accordingly.
-          previous_section_text = False
-          section_found = False
-          
-        #add in creation of div2s here.
-        if m and subsection_found:   
-          
-          if not previous_subsection_text:
-            #attach previous div2
-            current_div2.childNodes.extend(current_prose)
-            current_div1.appendChild(current_div2)
-            current_prose = create_p(document,current_prose, fresh=True)
-            
-            #create new div2
-            part = "N"
-            div2_head, div2 = create_div2(document, str(div2_count), part)
-            div2_count += 1
-            current_div2 = div2
-            previous_subsection_text = True
-
-           # journey_id = "p" + page.num + '-' + m.group(1)
-            
-           # journey_id = process_id(xml_ids_dict, journey_id, 'j')
-            
-          #  current_head.setAttribute('xml:id', journey_id)
-            
-            
-
-
-
-          text = document.createTextNode(m.group(2))
-          div2_head.appendChild(text)
-          lb = document.createElement("lb")
-          lb.setAttribute("n", m.group(1))
-          div2_head.appendChild(lb)
-          continue
-          
-        else:
-          previous_subsection_text = False
-          subsection_found = False
-        #new_trip = False
-
-       
-        m = PARA_RE.match(l)
-        if m:
-          ## found a paragraph starting line of text
-          # start a new paragraph
-          current_prose = create_p(document, current_prose,[l,linecount])
-        else:
-          ## found a vanilla line of text
-          lb = document.createElement('lb')
-          lb.setAttribute('n',str(linecount))
-          current_prose[-1].appendChild(document.createTextNode(l))
-          current_prose[-1].appendChild(lb)
+        
+      m = PARA_RE.match(l)
+      if m:
+        ## found a paragraph starting line of text
+        # start a new paragraph
+        current_prose = create_p(document, current_prose,[l,linecount])
+      else:
+        ## found a vanilla line of text
+        lb = document.createElement('lb')
+        lb.setAttribute('n',str(linecount))
+        current_prose[-1].appendChild(document.createTextNode(l))
+        current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
     last_empty = False
@@ -875,12 +830,12 @@ if __name__ in "__main__":
     #for l in page.body:
      # print(l)
       
-  #if len(tf.errors) > 0:
-   # print("Errors found. Please check error log and try again later.")
-    #for e in tf.errors:
-     # print(e,file=sys.stderr)
-  #else:
-   # document = setup_DOM()
-    #marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
-    #organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
-    #print(document.toprettyxml('\t', '\n', None))
+  if len(tf.errors) > 0:
+    print("Errors found. Please check error log and try again later.")
+    for e in tf.errors:
+      print(e,file=sys.stderr)
+  else:
+    document = setup_DOM()
+    marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
+    organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    print(document.toprettyxml('\t', '\n', None))
