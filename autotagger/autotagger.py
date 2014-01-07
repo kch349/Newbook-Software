@@ -358,7 +358,7 @@ class TranscriptionPage:
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.print(lines)
     self.bump(lines)
-    #self.printAfter()
+    self.printAfter()
 
   def bump(self, lines):
     #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
@@ -432,7 +432,7 @@ class TranscriptionPage:
                
           if text:
             if m3:
-              b.append('\tSection: ' + re.sub('\tLine:?\s+(\d+):?\s+', '', lines[i].rstrip()))
+              b.append('\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip()))
               multi_headers = True
             else:
               self.errors.append(errors(self.num, i, lines[i], 3))
@@ -448,14 +448,14 @@ class TranscriptionPage:
               divlines -= 1
               #print(temp_div_headers[0], file=sys.stderr)
               if len(temp_div_headers) >= 1:
-                b.append('\tSubsection: ' + temp_div_headers[0])
+                b.append('\tSubsection: ' + temp_div_headers[0].rstrip())
                 temp_div_headers.pop(0)
               else: 
                 self.errors.append(incorrect_stars_error(self.num)) 
               lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
               b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
             elif multi_headers and m3:
-              b.append('\tSection: ' + re.sub('\tLine:?\s+(\d+):?\s+', '', lines[i].rstrip()))
+              b.append('\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip()))
             elif m1 or m2 or m3:
               self.errors.append(errors(self.num, i, lines[i], 2))
             else:
@@ -626,7 +626,7 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   current_prose = create_p(document,current_prose)
   div1s = [] # contains all trip div headers
   div2s = [] # contains all diary div headers
-
+  
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
 
@@ -634,6 +634,7 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   empty_lines = 0
   last_empty = False
 
+  just_divided = False
   current_div1 = None
   current_div2 = None
   previous_section_text = False
@@ -676,6 +677,9 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         
     linecount = 0
     for l in page.body:
+      #section or subsection headings have the line included directly after
+      #so they should now be included in the linecount
+      linecount += 1
       #if "Section:" matched and if "Line #:" is found right after "Text:", or it
       #is the first line of the entire file, create a div 1 and add it to the list div1s
       m = SECTION_RE.match(l)
@@ -708,7 +712,7 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         text = document.createTextNode(m.group(1))
         div1_head.appendChild(text)
         lb = document.createElement("lb")
-        #lb.setAttribute("n", m.group(1))     #use linecount?
+        lb.setAttribute("n", str(linecount))
         div1_head.appendChild(lb)
         section_found = True
         continue
@@ -717,8 +721,11 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           
       m = SUBSECTION_RE.match(l)
       if m:
+        
+        #subsections do not have linecounts, they are divlines in the margin
+        linecount -= 1
         if not subsection_found:
-
+          just_divided = True
           #attach previous div2
           current_div2.childNodes.extend(current_prose)
           current_div1.appendChild(current_div2)
@@ -732,17 +739,15 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           
         text = document.createTextNode(m.group(1))
         div2_head.appendChild(text)
-        lb = document.createElement("lb")
+        #lb = document.createElement("lb")
         #lb.setAttribute("n", m.group(1))     use linecount?
-        div2_head.appendChild(lb)
+        #div2_head.appendChild(lb)
         subsection_found = True
         continue
           
       else:
         subsection_found = False
        
-      #not a section or subsection heading
-      linecount += 1
       if len(marginheaders) > 0:
         current_lineheader = marginheaders[0]
         if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
@@ -772,11 +777,17 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         # later so as not to loop through the file as much.
         
       m = PARA_RE.match(l)
-      if m:
+      if m: #and len(current_prose) == 0:
         ## found a paragraph starting line of text
         # start a new paragraph
-        current_prose = create_p(document, current_prose,[l,linecount])
+        if just_divided:
+          current_prose = create_p(document, current_prose, [l, linecount], fresh=True)
+          just_divided = False
+          #will this pose a problem if for some reason there isn't a paragraph right afterwards?
+        else:
+          current_prose = create_p(document, current_prose,[l,linecount])
       else:
+        just_divided = False
         ## found a vanilla line of text
         lb = document.createElement('lb')
         lb.setAttribute('n',str(linecount))
