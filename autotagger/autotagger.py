@@ -358,7 +358,7 @@ class TranscriptionPage:
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.print(lines)
     self.bump(lines)
-    self.printAfter()
+    #self.printAfter()
 
   def bump(self, lines):
     #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
@@ -736,6 +736,7 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           div2_head, div2 = create_div2(document, str(div2_count), part)
           div2_count += 1
           current_div2 = div2
+          #print("current div2 " + current_div2.getAttributeNode("n").nodeValue, file=sys.stderr)
           
         text = document.createTextNode(m.group(1))
         div2_head.appendChild(text)
