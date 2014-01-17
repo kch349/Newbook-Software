@@ -11,7 +11,7 @@
 <!-- This command uses -v = verbose -nonet = no not use internet to fetch DTD, etc -->
 <!-- This file was created and maintained by Aaron Gupta-->
 <!-- Copyright 2013-2014 NDTH-UW. All Rights Reserved.-->
-<!-- This was revised on 1-11-14.-->
+<!-- This was revised on 1-17-14.-->
 
 <xsl:template match="/">
  \documentclass{book}
