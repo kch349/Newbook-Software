@@ -634,6 +634,10 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   empty_lines = 0
   last_empty = False
 
+	#line count configurations:
+  section_in_text = True
+  subsection_in_text = False
+	
   just_divided = False
   current_div1 = None
   current_div2 = None
@@ -679,76 +683,13 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
     for l in page.body:
       #section or subsection headings have the line included directly after
       #so they should now be included in the linecount
-      linecount += 1
+      #linecount += 1
       #if "Section:" matched and if "Line #:" is found right after "Text:", or it
       #is the first line of the entire file, create a div 1 and add it to the list div1s
-      m = SECTION_RE.match(l)
-      if m:
-        if not section_found:
-          body.appendChild(current_div1) #why was this outside?
-          #creates a cloned div2 with all its nodes to serve as the medial
-          # or final part then labeled as the next number in the div2_count
-          # check and see if the last one was part f. if so make the
-          # last one part m instead.
-          #if len(div2s) >= 1:
-          next_div2 = current_div2.cloneNode(False)
-          next_div2.setAttribute('part', 'F')
-          atr = current_div2.getAttributeNode('part')
-          x = atr.nodeValue
-          if x == 'F':
-            current_div2.setAttribute('part', 'M')
-          else:
-            current_div2.setAttribute('part', 'I')
-          current_div2.childNodes.extend(current_prose)
-          current_prose = create_p(document,current_prose, fresh=True)
-          current_div1.appendChild(current_div2)
-
-          #update div2s to get rid of original one 
-          div1_head, div1 = create_div1(document, str(div1_count))
-          current_div1 = div1
-          div1_count += 1
-          current_div2 = next_div2
-          
-        text = document.createTextNode(m.group(1))
-        div1_head.appendChild(text)
-        lb = document.createElement("lb")
-        lb.setAttribute("n", str(linecount))
-        div1_head.appendChild(lb)
-        section_found = True
-        continue
-      else:
-        section_found = False
-          
-      m = SUBSECTION_RE.match(l)
-      if m:
-        
-        #subsections do not have linecounts, they are divlines in the margin
-        linecount -= 1
-        if not subsection_found:
-          just_divided = True
-          #attach previous div2
-          current_div2.childNodes.extend(current_prose)
-          current_div1.appendChild(current_div2)
-          current_prose = create_p(document,current_prose, fresh=True)
-            
-          #create new div2
-          part = "N"
-          div2_head, div2 = create_div2(document, str(div2_count), part)
-          div2_count += 1
-          current_div2 = div2
-          #print("current div2 " + current_div2.getAttributeNode("n").nodeValue, file=sys.stderr)
-          
-        text = document.createTextNode(m.group(1))
-        div2_head.appendChild(text)
-        #lb = document.createElement("lb")
-        #lb.setAttribute("n", m.group(1))     use linecount?
-        #div2_head.appendChild(lb)
-        subsection_found = True
-        continue
-          
-      else:
-        subsection_found = False
-       
+      
+      linecount += 1
+      #works if only have the above line count change, and no others
+      #that doesn't take into account the other lines though...
       if len(marginheaders) > 0:
         current_lineheader = marginheaders[0]
         if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
@@ -776,6 +717,94 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         # now looping through page body to find div1s, which we may
         # want to figure out how to do in the organize_nodes method
         # later so as not to loop through the file as much.
+      
+      m = SECTION_RE.match(l)
+      if m:
+        if not section_in_text:
+          linecount -= 1
+        if not section_found:
+          body.appendChild(current_div1) #why was this outside?
+          #creates a cloned div2 with all its nodes to serve as the medial
+          # or final part then labeled as the next number in the div2_count
+          # check and see if the last one was part f. if so make the
+          # last one part m instead.
+          #if len(div2s) >= 1:
+          next_div2 = current_div2.cloneNode(False)
+          next_div2.setAttribute('part', 'F')
+          atr = current_div2.getAttributeNode('part')
+          x = atr.nodeValue
+          if x == 'F':
+            current_div2.setAttribute('part', 'M')
+          else:
+            current_div2.setAttribute('part', 'I')
+          current_div2.childNodes.extend(current_prose)
+          current_prose = create_p(document,current_prose, fresh=True)
+          current_div1.appendChild(current_div2)
+
+          #update div2s to get rid of original one 
+          div1_head, div1 = create_div1(document, str(div1_count))
+          current_div1 = div1
+          div1_count += 1
+          current_div2 = next_div2
+          
+        text = document.createTextNode(m.group(1))
+        div1_head.appendChild(text)
+        if section_in_text:
+          lb = document.createElement("lb")
+          lb.setAttribute("n", str(linecount))
+          div1_head.appendChild(lb)
+        section_found = True
+        continue
+      else:
+        section_found = False
+        #below only for testing purposes, shouldn't be here
+        #section_lines = 0
+          
+      m = SUBSECTION_RE.match(l)
+      if m:
+        if not subsection_in_text:
+          linecount -= 1 
+        #subsections do not have linecounts, they are divlines in the margin
+        #linecount -= 1
+        if not subsection_found:
+          just_divided = True
+          #attach previous div2
+          current_div2.childNodes.extend(current_prose)
+          current_div1.appendChild(current_div2)
+          current_prose = create_p(document,current_prose, fresh=True)
+            
+          #create new div2
+          part = "N"
+          div2_head, div2 = create_div2(document, str(div2_count), part)
+          div2_count += 1
+          current_div2 = div2
+          #print("current div2 " + current_div2.getAttributeNode("n").nodeValue, file=sys.stderr)
+          
+        text = document.createTextNode(m.group(1))
+        div2_head.appendChild(text)
+        if subsection_in_text:
+          lb = document.createElement("lb")
+          lb.setAttribute("n", str(linecount))    # use linecount?
+          div2_head.appendChild(lb)
+        subsection_found = True
+        continue
+          
+      else:
+        subsection_found = False
+       
+       
+      #if section_in_text:
+     
+     #   linecount += section_lines
+      #  section_lines = 0
+        
+  #    if subsection_in_text:
+   #     linecount += subsection_lines
+   #     subsection_lines = 0
+      
+
+       
+
         
       m = PARA_RE.match(l)
       if m: #and len(current_prose) == 0:
