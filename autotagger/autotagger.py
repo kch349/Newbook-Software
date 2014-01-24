@@ -358,7 +358,7 @@ class TranscriptionPage:
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.print(lines)
     self.bump(lines)
-    #self.printAfter()
+    self.printAfter()
 
   def bump(self, lines):
     #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
@@ -840,7 +840,7 @@ def setup_argparse():
   ap = argparse.ArgumentParser()
   ap.add_argument('--file', '-f', help='choose a file for the autotagger')
   ap.add_argument('--verbose', '-v', action='count', dest='verbosity', 
-      default=2, help='increase the verbosity (can be repeated: -vvv)') 
+      default=1, help='increase the verbosity (can be repeated: -vvv)') 
   return ap
 
 if __name__ in "__main__":
