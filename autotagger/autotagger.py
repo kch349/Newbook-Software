@@ -170,6 +170,23 @@ class TranscriptionFile:
   version = -1
 
   def __init__(self, lines):
+    m4 = VERSION_RE.match(lines[0])
+    if m4:
+      #print("entered m4, n= " + str(n), file = sys.stderr)
+      self.version = float(m4.group(1))
+      #print("version check in tf: " + str(self.version), file=sys.stderr)
+      if self.version > CURRENT_VERSION:
+        self.version = CURRENT_VERSION
+        logging.warning("""Specified version is greater than the current version. Possibly
+                           typo or an update to the autotagger is necessary before usage""")
+    elif (self.version == -1):
+      #print("entered else in version n= " + str(n), file = sys.stderr)
+      self.version = 0  
+        
+    while self.version < CURRENT_VERSION:
+      lines, new_errors = self.uprev(lines)
+      if len(new_errors) > 0:
+        self.errors.append(new_errors)
     self.parse_lines(lines)
 
   def parse_lines(self, lines):
@@ -183,18 +200,7 @@ class TranscriptionFile:
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
-      m4 = VERSION_RE.match(lines[0])
-      #print("n = " + str(n), file = sys.stderr)
-      if n == -1:
-        #print("entered n == -1", file = sys.stderr)
-        if m4:
-          #print("entered m4, n= " + str(n), file = sys.stderr)
-          self.version = float(m4.group(1))
-          #print("version check in tf: " + str(self.version), file=sys.stderr)
-        elif (self.version == -1):
-          #print("entered else in version n= " + str(n), file = sys.stderr)
-          self.version = 0        
-      #print("version check in tf after if statement: " + str(self.version), file=sys.stderr)
+      
       if m2:
         self.errors.append(errors(m2.group(1), -1, lines[0], 5))
       if m1:
@@ -231,7 +237,125 @@ class TranscriptionFile:
     #except:
      # """Error with page creation. There is not another page to append."""
      
-  
+  def uprev(self, lines):
+    uprev_lines = []
+    uprev_errors = []
+    
+    logging.debug("Entered uprev.")
+    #why does this introduce tons of double spaces (new lines) to the file?
+    #self.printAfter()
+    
+    if self.version == 0:
+      logging.debug("entered version 0")
+      uprev_lines, uprev_errors = self.version0to1(lines)
+      self.version = 1
+      
+    self.print(uprev_lines)
+    return uprev_lines, uprev_errors #or should this be a different return statement each time?
+
+  def version0to1(self, lines):
+    #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
+    logging.debug("entered version0to1")
+    version1_lines = []
+    v1_errors = []
+    
+    current_page = -1  
+    temp_div_headers = [] 
+    switch = False #false means we're still in head
+                 #true means we've switched to body    length = len(lines)
+    length = len(lines)
+    text = False #true if previous line was Text:
+    multi_headers = False #true if multiple "Lines" are allowed
+    divlines = 0
+    empty = False #true if previous line in body was empty
+    double_spacing = 0 #number of double spaced lines found in body
+    double_spacing_found = False #true if double spacing found
+    linecount = 0
+    #while len(lines) > 0:
+    #do everything matching 0
+    for i in range(0, length):
+      m1 = MARGINS_RE.match(lines[i])
+      m2 = DIVLINE_RE.match(lines[i])
+      m3 = LINE_RE.match(lines[i])
+      m4 = TEXT_RE.match(lines[i])
+      m7 = STAR_RE.match(lines[i])
+      m8 = DIVLINENUMBER_RE.match(lines[i])
+      m9 = PAGE_RE.match(lines[i])
+      m10 = PAGENOTES_RE.match(lines[i])
+      m11 = PAGETABBED_RE.match(lines[i])
+      
+      if m2 or m8 or m4:
+        if m2 or m8:
+          if m8:
+            #self.errors.append(errors(self.num, i, lines[i], 6))
+            logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                            str(current_page) + ". Make sure the line number is not included.")
+            
+        #print("m2.group(1) = " + m2.group(1), file = sys.stderr)
+          temp_div_headers.append(m2.group(1))
+          divlines += 1
+        else:
+          text = True
+      else:
+        #keep track of pages so as to allow for error reporting
+        if m9 or m10 or m11:
+          if current_page == -1:
+            current_page = 1
+          else:
+            current_page += 1
+          logging.debug("Page number " + str(current_page))  
+        #alter as necessary    
+        elif m1:
+          lines[i] = '\tNotes:'
+        elif m7:
+          divlines -= 1
+          #print(temp_div_headers[0], file=sys.stderr)
+          if len(temp_div_headers) >= 1:
+            version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
+            temp_div_headers.pop(0)
+          else: 
+            v1_errors.append(incorrect_stars_error(str(current_page))) 
+          lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
+          #appending at end could pose a problem adding multiple lines.
+        elif text and m3:
+          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip())
+          #multi_headers = True
+          
+        else:
+          text = False
+          if m3:
+            #if multi_headers: #subsequent section header
+             # lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip())
+            #else: #margin note
+             # multi_headers = False
+            lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
+        version1_lines.append(lines[i].rstrip())          
+    if divlines != 0:
+      v1_errors.append(incorrect_stars_error(str(current_page)))  
+    return version1_lines, v1_errors
+
+  def print(self, lines):
+    #if self.num == '1': # what if different starting number? Account for that with a variable? 
+    #  print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    #print('Page ' + self.num + ':', file=sys.stderr)
+    #for l in lines:
+    #  print(l, file=sys.stderr)
+    
+    print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    for l in lines:
+      print(l, file=sys.stderr)
+   
+  def printAfter(self):
+    if self.num == '1': # what if different starting number? Account for that with a variable? 
+      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    print('Page ' + self.num + ':', file=sys.stderr)
+    for l in self.head:
+      print(l, file=sys.stderr)
+    print('', file=sys.stderr)
+    for l in self.body:
+      print(l, file=sys.stderr)            
+      
+          
 
 class TranscriptionPage:
   """class to hold a transcription page in a nice object
@@ -265,210 +389,75 @@ class TranscriptionPage:
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
     #print("version check in tfp parse lines: " + str(self.version), file=sys.stderr)
-    if self.version < CURRENT_VERSION:
-      self.uprev(lines)
-    else:
-      #print("in else", file=sys.stderr)
-      h = []
-      b = []
-      switch = False #false means we're still in head
+    h = []
+    b = []
+    switch = False #false means we're still in head
                    #true means we've switched to body    length = len(lines)
-      length = len(lines)
-      empty = False #true if previous line in body was empty
-      double_spacing = 0 #number of double spaced lines found in body
-      double_spacing_found = False #true if double spacing found
-      linecount = 0
-      for i in range(0, length):
-        m1 = NOTES_RE.match(lines[i])
-        m2 = MARGINNOTE_RE.match(lines[i])
-        m3 = FOOTNOTE_RE.match(lines[i])
-        #m4 = LINE_RE.match(lines[i])
-        m7 = MARGINLINELIST_RE.match(lines[i])
-        m8 = MARGINLINERANGE_RE.match(lines[i])
-        m10 = VERSION_RE.match(lines[i])
-        #print(str(switch), file=sys.stderr)
-        #if m2:
-          #print("marginnote found", file = sys.stderr)
-        #if m1:
-          #print("note: found", file = sys.stderr)
-        if m7 or m8:
-          self.errors.append(errors(self.num, i, lines[i], 4))
-        elif not switch:
-          if m10: #how make sure it is at the beginning of first page?
-            continue
-          elif m1 or m2 or m3:
-            h.append(lines[i].rstrip())
-          elif lines[i].strip() == "":
-            switch = True
-          else:
-            self.errors.append(errors(self.num, i, lines[i], 1))
-        else: #in body
-          #do we need this linecount? I don't think so...
-          linecount = linecount + 1
-          if double_spacing == 3 and double_spacing_found == False:
-            logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
-            double_spacing_found = True
-          elif double_spacing < 3:
-            if lines[i].strip() == "":
-              empty = True
-            elif empty == True:
-              double_spacing += 1
-              empty = False
-            elif empty == False:
-              double_spacing = 0    
-          #if not m4:
-              #self.errors.append(errors(self.num, i, lines[i], 3))
-          m5 = SECTION_RE.match(lines[i])
-          m6 = SUBSECTION_RE.match(lines[i])
-          m9 = SUBSECTIONNUMBER_RE.match(lines[i])
-          if m5 or m6 or m9:      
-            if m9:
-              logging.warning(" There may be an incorrectly formatted DivLine on page " +
-                               self.num + ". Make sure the line number is not included.")
-            b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-          elif m1 or m2 or m3: #or m4:
-            self.errors.append(errors(self.num, i, lines[i], 2))
-          else:
-            b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
+    length = len(lines)
+    empty = False #true if previous line in body was empty
+    double_spacing = 0 #number of double spaced lines found in body
+    double_spacing_found = False #true if double spacing found
+    linecount = 0
+    for i in range(0, length):
+      m1 = NOTES_RE.match(lines[i])
+      m2 = MARGINNOTE_RE.match(lines[i])
+      m3 = FOOTNOTE_RE.match(lines[i])
+      #m4 = LINE_RE.match(lines[i])
+      m7 = MARGINLINELIST_RE.match(lines[i])
+      m8 = MARGINLINERANGE_RE.match(lines[i])
+      m10 = VERSION_RE.match(lines[i])
+      #print(str(switch), file=sys.stderr)
+      #if m2:
+        #print("marginnote found", file = sys.stderr)
+      #if m1:
+        #print("note: found", file = sys.stderr)
+      if m7 or m8:
+        self.errors.append(errors(self.num, i, lines[i], 4))
+      elif not switch:
+        if m10: #how make sure it is at the beginning of first page?
+          continue
+        elif m1 or m2 or m3:
+          h.append(lines[i].rstrip())
+        elif lines[i].strip() == "":
+          switch = True
+        else:
+          self.errors.append(errors(self.num, i, lines[i], 1))
+      else: #in body
+        #do we need this linecount? I don't think so...
+        linecount = linecount + 1
+        if double_spacing == 3 and double_spacing_found == False:
+          logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
+          double_spacing_found = True
+        elif double_spacing < 3:
+          if lines[i].strip() == "":
+            empty = True
+          elif empty == True:
+            double_spacing += 1
+            empty = False
+          elif empty == False:
+            double_spacing = 0    
+        #if not m4:
+          #self.errors.append(errors(self.num, i, lines[i], 3))
+        m5 = SECTION_RE.match(lines[i])
+        m6 = SUBSECTION_RE.match(lines[i])
+        m9 = SUBSECTIONNUMBER_RE.match(lines[i])
+        if m5 or m6 or m9:      
+          if m9:
+            logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                             self.num + ". Make sure the line number is not included.")
+          b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
+        elif m1 or m2 or m3: #or m4:
+          self.errors.append(errors(self.num, i, lines[i], 2))
+        else:
+          b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
             
-      self.head = h
-      self.body = b
-      #self.printAfter()
+    self.head = h
+    self.body = b
+    #self.printAfter()
 
 
-  def print(self, lines):
-    if self.num == '1': # what if different starting number? Account for that with a variable? 
-      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
-    print('Page ' + self.num + ':', file=sys.stderr)
-    for l in lines:
-      print(l, file=sys.stderr)
-   
-  def printAfter(self):
-    if self.num == '1': # what if different starting number? Account for that with a variable? 
-      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
-    print('Page ' + self.num + ':', file=sys.stderr)
-    for l in self.head:
-      print(l, file=sys.stderr)
-    print('', file=sys.stderr)
-    for l in self.body:
-      print(l, file=sys.stderr)
-            
-  def uprev(self, lines):
-    #print("entered uprev", file = sys.stderr)
-    #why does this introduce tons of double spaces (new lines) to the file?
-    #self.print(lines)
-    self.bump(lines)
-    self.printAfter()
 
-  def bump(self, lines):
-    #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
-    #print("entered bump", file = sys.stderr)
-    if self.version == 0:
-      #print("entered version==0", file = sys.stderr)
-      temp_div_headers = [] 
-      h = []
-      b = []
-      switch = False #false means we're still in head
-                 #true means we've switched to body    length = len(lines)
-      length = len(lines)
-      text = False #true if previous line was Text:
-      multi_headers = False #true if multiple "Lines" are allowed
-      divlines = 0
-      empty = False #true if previous line in body was empty
-      double_spacing = 0 #number of double spaced lines found in body
-      double_spacing_found = False #true if double spacing found
-      linecount = 0
-      for i in range(0, length):
-        m1 = MARGINS_RE.match(lines[i])
-        m2 = DIVLINE_RE.match(lines[i])
-        m3 = LINE_RE.match(lines[i])
-        m5 = MARGINLINELIST_RE.match(lines[i])
-        m6 = MARGINLINERANGE_RE.match(lines[i])
-        m8 = DIVLINENUMBER_RE.match(lines[i])
-        if m5 or m6:
-          self.errors.append(errors(self.num, i, lines[i], 4))
-        elif not switch: #in head
-          if m1 or m3:
-            if m1:
-              #lines[i] = re.sub('\s*Margins?:?','\tNotes:',lines[i])
-              lines[i] = '\tNotes:'
-              #print("Margin to Note" + lines[i], file=sys.stderr)
-            elif m3:
-              #print(lines[i])
-              lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
-              #adds a new \n character in for some reason...why?
-              #print(lines[i])
-              #print("Margin added to Line#" + lines[i], file=sys.stderr)
-            h.append(lines[i].rstrip())
-          elif m2 or m8:
-            if m8:
-              #self.errors.append(errors(self.num, i, lines[i], 6))
-              logging.warning(" There may be an incorrectly formatted DivLine on page " +
-                              self.num + ". Make sure the line number is not included.")
-            
-            #print("m2.group(1) = " + m2.group(1), file = sys.stderr)
-            temp_div_headers.append(m2.group(1))
-            #lines[i] = ""
-            divlines += 1
-          elif lines[i].strip() == "":
-            switch = True
-          else:
-            self.errors.append(errors(self.num, i, lines[i], 1))
-        else: #in body
-          linecount = linecount + 1
-          #if linecount == 1:
-           # b.append('version = 1')
-          if double_spacing == 3 and double_spacing_found == False:
-            logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
-            double_spacing_found = True
-          elif double_spacing < 3:
-            if lines[i].strip() == "":
-              empty = True
-            elif empty == True:
-              double_spacing += 1
-              empty = False
-            elif empty == False:
-              double_spacing = 0   
-               
-          if text:
-            if m3:
-              b.append('\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip()))
-              multi_headers = True
-            else:
-              self.errors.append(errors(self.num, i, lines[i], 3))
-            text = False
-          else:
-            m4 = TEXT_RE.match(lines[i])
-            m7 = STAR_RE.match(lines[i])
-            if m4:
-              text = True
-              #lines[i] = '\tSection'
-              linecount = linecount - 1 # do we need line count?
-            elif m7:
-              divlines -= 1
-              #print(temp_div_headers[0], file=sys.stderr)
-              if len(temp_div_headers) >= 1:
-                b.append('\tSubsection: ' + temp_div_headers[0].rstrip())
-                temp_div_headers.pop(0)
-              else: 
-                self.errors.append(incorrect_stars_error(self.num)) 
-              lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
-              b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-            elif multi_headers and m3:
-              b.append('\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip()))
-            elif m1 or m2 or m3:
-              self.errors.append(errors(self.num, i, lines[i], 2))
-            else:
-              b.append(lines[i].rstrip())
-              multi_headers = False
-              
-      if divlines != 0:
-        self.errors.append(incorrect_stars_error(self.num))
-      self.head = h
-      #print("appended h", file = sys.stderr)
-      self.body = b
-      #print("appended b", file = sys.stderr)
-
+    
 def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
   asterisks. Contains the page number."""
