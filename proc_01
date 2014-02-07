@@ -1,7 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <!DOCTYPE TEI PUBLIC "-//OTAP//DTD TEI Transitional//EN" "http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd">
 <TEI>
+  <teiHeader><?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE TEI PUBLIC "-//OTAP//DTD TEI Transitional//EN" "http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd">
+<?xml-stylesheet type="text/xsl" href="try2.2.xlslt"?>
+<TEI>
   <teiHeader>
+		<!-- [ TEI Header information ] -->
+ <fileDesc>
+  <titleStmt>
+   <title>NDTH Sample Document</title>
+   <author>NDTH Tech Team</author>
+
+   <respStmt>
+    <resp>NDTH</resp>
+    <name>Walter Andrews</name>
+   </respStmt>
+  </titleStmt>
+  <publicationStmt>
+   <distributor>Newbook Digital Texts in the Humanities (NDTH)</distributor>
+   <address>
+    <addrLine>newbook@uw.edu</addrLine>
+   </address>
+   <idno type="DTCG">2013-Individual Identifier</idno>
+
+   <availability>
+    <p>Copyright 2013 NDTH. All Rights Reserved.</p>
+	<p>[FOR PRINT: Get standard wording] NDTH grants non-profit academic users a limited, non-exclusive right to copy and print this work with attribution. This right does not include use of this material in derivative works.</p>
+	<p>[NOT FOR PRINT: Get standard wording]This work is not available for print-on-demand.</p>
+   </availability>
+   <date when="2013">2013</date>
+  </publicationStmt>
+  <sourceDesc>
+   <bibl>Various</bibl>
+  </sourceDesc>
+ </fileDesc>
+ <encodingDesc>
+  <projectDesc>
+   <p>The purpose of NDTH is to make available, on the internet, presentations of literary and scholarly works.</p>
+  </projectDesc>
+<!--
+  <editorialDecl>
+   <correction>
+    <p>NO CORRECTIONS.</p>
+   </correction>
+   <normalization>
+    <p>Original spelling and typography is retained.</p>
+   </normalization>
+  </editorialDecl>
+-->
+ </encodingDesc>
+ <revisionDesc>
+
+  <list>
+   <item><date when="2013-07-22">22 July 13</date> Last checked</item>
+   <item><date when="2013-07-22">22 July 13</date> Updated TEI Header</item>
+  </list>
+ </revisionDesc>
+</teiHeader>
+
+	<text>
+		<front>
+      <titlePage>
+        <titlePart type="main">Newbook Electronic Publication</titlePart>
+        <titlePart type="alt">supported structure and formatting rules</titlePart>
+        <titlePart type="alt">a technical report and example document</titlePart>
+        <byline>Joshua Crowgey and Stacy Waters</byline>
+        <!-- a few other things are possible in here (table of contents?, preface?, introduction?)
+             TODO: nail these down 
+             also, add an example note-->
+      </titlePage>
+    </front>
+	
+	<body>
+      <div1>
+        <head>Rendering TEI Documents for Traditional Consumption</head>
+        <div2>
+          <head>Simplfying Structure</head>
+          <p>Humanities documents that are marked up with TEI can
+          contain explicit information about many features of texts
+          in many domains.  Much of this analytical structure is not
+          immediately relevant in the context of rendering the text
+          for a reader.   Consider a TEI text with annotations indicating
+          the grammatical part of speech of each word.  These annotations,
+          while relevant in the context of a linguistic discussion of the
+          text, would be distracting to a general reader who wants to 
+          interact with the narrative, unconcerned with syntax.</p>
+
+          <p>There are other aspects of TEI structure which are relevant
+          for printing even in the general context, but which we currently
+          set aside in the interest of producing a working product this 
+          summer.  For example, some TEI texts contain rich indexical  
+          information about cannonical names of entities.  This sort of
+          information can be leveraged to create an appendicies for a
+          printed text which allow a reader to look up the page numbers
+          where certain words or topics are discussed.</p>
+
+          <p>Finally, printed media bring their own set of constraints
+          on what can be represented.  For example, traditional typesetting
+          in Latin based alphabets provides alternative glyph shapes 
+          (for example, <emph rend="italics">italics</emph>) which
+          an author can use to indicate distinctions in the text.  But
+          there are only a only a small number of alternative 
+          glyph shapes<ref target="#n0" /> and we can imagine a TEI
+          document which encodes a large set of distinct information
+          types.  While the particular constraints of a rendered medium
+          differ from instance to instance (consider HTML in a browser
+          vs ink on a page), the point here is that all cases require
+          a simplification of the structures available in TEI.</p>
+
+          <p>To sum up, printing a TEI document for a general reader
+          requires a simplification of structure.  The complete TEI
+          provides more information than can be squeezed onto a page
+          designed to emphasize the orginal narrative.  For these reasons, 
+          the electronic publication group within NDTH has selected a  
+          subset of TEI structures to support in our work for summer 2013.
+          The rest of this document illustrates those structures and
+          presents the formatting associated with each structure.</p>
+          <note xml:id="n0">Some Latin-based fonts include monospace, italic, 
+          bold, small caps, perhaps a few other variants.  However, a 
+          document which used very many of these alternatives to represent 
+          up meta-textual features runs the risk of distracting the general 
+          reader from the content of the narrative.</note>
+        </div2>
+      </div1>
+      <div1>
+        <head>The Structures</head>
+        <div2>
+          <p>The content of TEI documents is contained in an &lt;text&gt;
+          element.  This element can contain &lt;front&gt; and &lt;back&gt;
+          elements, alongside a required &lt;body&gt;.</p>
+        </div2>
+        <div2>
+          <head>&lt;front&gt;</head>
+          <p>Within the &lt;front&gt; element, the printing methods we are
+          developing will look for title page information within the 
+          &lt;titlePage&gt; element (if present).  For the moment, we
+          support &lt;titlePart&gt; and &lt;byline&gt; within 
+          &lt;titlePage&gt;.</p>
+        </div2>
+        <div2>
+          <head>&lt;body&gt;</head>
+          <p>Within the &lt;body&gt; our methods will support two 
+           levels of text structure<ref target="#n1"/>.  These are
+           &lt;div1&gt; and &lt;div2&gt;.  in the case of diaries the
+           &lt;div1&gt; will probably represent collections of 
+           diary entries ('chapters', or 'journies' or 
+           'months' for example<ref target="#n2" />).  &lt;div2&gt; will be individual
+           diary entries.</p>
+          <p>&lt;pb n="1" /&gt; is the page break element, which is a milestone marker to 
+          	show page divisions within a document. The "n" attribute identifies the page 
+          	numbers of the original document.</p>
+          	<pb n="1" />
+          	
+          	<p>&lt;lb n="1" /&gt; is the line break element, which is a milestone marker to 
+          	show line divisions within a prose document. The "n" attribute identifies the line 
+          	numbers of the original document. Line breaks and line break numbers will not 
+            be represented in the output. Prose text will be presented as flowing paragraphs.</p> 
+            <lb n="1" />
+            
+          <p>&lt;lg&gt; is used to indicate verse groups such as stanzas.
+          &lt;l&gt; is used to indicate individual lines of verse. These lines will be retained
+            in output. </p> 
+            	<lg>
+            		<l> Mary had a little lamb.</l>
+            		<l> Its fleece was white as snow </l>
+            	</lg>
+            	
+          <p>Drawings in the original documents should be indicated using the following elements.
+            &lt;figure&gt;&lt;head&gt; An old temple &lt;/head&gt;&lt;graphic url="temple.jpg"/&gt;
+            &lt;/figure&gt; The drawing, a caption, and the file name of the image are identified 
+            by the figure, head, and graphic elements. In the output, only the image file name will 
+            be displayed.</p>
+            <figure> <head> An old temple </head> <graphic url="temple.jpg" /> </figure>
+            <p> Lists may include passagers, cargo, relatives, etc.: 
+               &lt;list&gt;
+                  &lt;item&gt;Antone Marine&lt;/item&gt;
+                  &lt;item&gt;Eliza, my wife&lt;/item&gt;
+                  &lt;/list&gt;
+            </p>
+            	<list>
+            		<item>Antone Marine</item>
+            		<item>Eliza, my wife</item>
+            	</list>
+            	
+             <p> Documents may contain tables, such as train schedules:
+             	&lt;table&gt;
+             		&lt;row&gt;&lt;cell&gt;Arrive&lt;/cell&gt;&lt;cell&gt;Depart&lt;/cell&gt;&lt;/row&gt;
+             	&lt;/table&gt;</p>
+             		<table>
+             			<row><cell>Ariive</cell><cell>Depart</cell></row>
+             		</table>
+       "     <p>Commonly used content elements include &lt;name&gt;Alexander Svoboda &lt;/name&gt; and 
+               &lt;foreign&gt;??????????????????&lt;/foreign&gt; words and phrases. Our practice is to use &lt;foreign&gt;
+               to represent scripts and languages other than the source text.</p>
+               <name>Alexander Svoboda</name>
+               <foreign>Ugarit</foreign>
+          <note xml:id="n1">Note here about multilingual config: div1 (container)
+          then: div2,div3.</note>
+          <note xml:id="n2">Note that texts can still use the @type attribute to
+          further specify types of &lt;div1&gt;,&lt;div2&gt;,&lt;head&gt;,
+          etc.  It's just that for now the automatic printing processes
+          aren't going to do anything about that info if it's present.</note>
+        </div2>
+        <div2>
+          <head>&lt;back&gt;</head>
+          <p>...</p>
+        </div2>
+      </div1>
+    </body>
+  </text>
+</TEI>
+
 		<!-- [ TEI Header information ] -->
  <fileDesc>
   <titleStmt>
