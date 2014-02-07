@@ -22,15 +22,17 @@ import argparse
 from xml.dom.minidom import *
 
 ##class constants
-CURRENT_VERSION = 1.0
+CURRENT_VERSION = 1
 version = -1
+#version = -1
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
 PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
-VERSION_RE = re.compile('^version\s*==\s*(\d+.*)')
+VERSION_RE = re.compile('^Version\s*(\d+.*)')
+#VERSION_RE = re.compile('^version\s*==\s*(\d+.*)')
 #VERSION_RE = re.compile('\s*version\s+==\s+(\d*\.?d*)\s*$') #for determining if uprev is needed
 # regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
@@ -55,6 +57,10 @@ FOOTNOTE_RE = re.compile('^\s*Footnote:?\s*(.*)$')
 SECTION_RE = re.compile('^\s*Section:?\s*(.*)$')
 SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
+
+def set_version(value):
+  global version
+  version = value
 
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
@@ -167,23 +173,23 @@ class TranscriptionFile:
 
   pages = []
   errors = []
-  version = -1
+  #version = -1
 
   def __init__(self, lines):
     m4 = VERSION_RE.match(lines[0])
     if m4:
       #print("entered m4, n= " + str(n), file = sys.stderr)
-      self.version = float(m4.group(1))
+      set_version(int(m4.group(1)))
       #print("version check in tf: " + str(self.version), file=sys.stderr)
-      if self.version > CURRENT_VERSION:
-        self.version = CURRENT_VERSION
+      if version > CURRENT_VERSION:
+        set_version(CURRENT_VERSION) #should avoid passing constant?
         logging.warning("""Specified version is greater than the current version. Possibly
                            typo or an update to the autotagger is necessary before usage""")
-    elif (self.version == -1):
+    elif (version == -1):
       #print("entered else in version n= " + str(n), file = sys.stderr)
-      self.version = 0  
+      set_version(0)  
         
-    while self.version < CURRENT_VERSION:
+    while version < CURRENT_VERSION:
       lines, new_errors = self.uprev(lines)
       if len(new_errors) > 0:
         self.errors.append(new_errors)
@@ -194,7 +200,7 @@ class TranscriptionFile:
        a series of Transcription Page objects"""
     p = []
     n = -1
-    version = -1
+    #version = -1
     while len(lines) > 0:
       #print("n = " + str(n), file=sys.stderr)
       m1 = PAGE_RE.match(lines[0])
@@ -211,7 +217,7 @@ class TranscriptionFile:
         #    process the old one
         if n > -1:
           # print(m1.group(1) + " found page", file=sys.stderr)
-          self.pages.append(TranscriptionPage(str(n), p, self.version))
+          self.pages.append(TranscriptionPage(str(n), p))
           p = []
           lines.pop(0)
           n = int(m1.group(1))
@@ -220,7 +226,7 @@ class TranscriptionFile:
           lines.pop(0)
       elif m3:
         self.errors.append(errors(m3.group(1), -1, lines[0], 5))
-        self.pages.append(TranscriptionPage(str(n), p, self.version))
+        self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
         lines.pop(0)
@@ -230,7 +236,7 @@ class TranscriptionFile:
         
 
    # try:
-    tp = TranscriptionPage(str(n), p, self.version)
+    tp = TranscriptionPage(str(n), p)
     if len(tp.errors) > 0:
       self.errors.extend(tp.errors)
     self.pages.append(tp)
@@ -245,12 +251,12 @@ class TranscriptionFile:
     #why does this introduce tons of double spaces (new lines) to the file?
     #self.printAfter()
     
-    if self.version == 0:
+    if version == 0:
       logging.debug("entered version 0")
       uprev_lines, uprev_errors = self.version0to1(lines)
-      self.version = 1
+      set_version(1)
       
-    self.print(uprev_lines)
+    #self.print(uprev_lines)
     return uprev_lines, uprev_errors #or should this be a different return statement each time?
 
   def version0to1(self, lines):
@@ -261,16 +267,16 @@ class TranscriptionFile:
     
     current_page = -1  
     temp_div_headers = [] 
-    switch = False #false means we're still in head
+    #switch = False #false means we're still in head
                  #true means we've switched to body    length = len(lines)
     length = len(lines)
     text = False #true if previous line was Text:
-    multi_headers = False #true if multiple "Lines" are allowed
+    #multi_headers = False #true if multiple "Lines" are allowed
     divlines = 0
     empty = False #true if previous line in body was empty
     double_spacing = 0 #number of double spaced lines found in body
     double_spacing_found = False #true if double spacing found
-    linecount = 0
+    #linecount = 0
     #while len(lines) > 0:
     #do everything matching 0
     for i in range(0, length):
@@ -341,13 +347,13 @@ class TranscriptionFile:
     #for l in lines:
     #  print(l, file=sys.stderr)
     
-    print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+    print('Version ' + str(CURRENT_VERSION), file=sys.stderr)
     for l in lines:
       print(l, file=sys.stderr)
    
   def printAfter(self):
     if self.num == '1': # what if different starting number? Account for that with a variable? 
-      print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
+      print('Version ' + str(CURRENT_VERSION), file=sys.stderr)
     print('Page ' + self.num + ':', file=sys.stderr)
     for l in self.head:
       print(l, file=sys.stderr)
@@ -368,13 +374,13 @@ class TranscriptionPage:
   head = []
   body = []
   errors = []
-  version = -1
+  #version = -1
 
-  def __init__(self, num, lines, version):
+  def __init__(self, num, lines):
 
     # sys.stderr.write("process transcription page ... ")
     self.num = num
-    self.version = version
+    #self.version = version
     self.parse_lines(lines)
     # print(self.num + " page created", file=sys.stderr)
 
@@ -391,7 +397,7 @@ class TranscriptionPage:
     #print("version check in tfp parse lines: " + str(self.version), file=sys.stderr)
     h = []
     b = []
-    switch = False #false means we're still in head
+    in_body = False #false means we're still in head
                    #true means we've switched to body    length = len(lines)
     length = len(lines)
     empty = False #true if previous line in body was empty
@@ -413,13 +419,13 @@ class TranscriptionPage:
         #print("note: found", file = sys.stderr)
       if m7 or m8:
         self.errors.append(errors(self.num, i, lines[i], 4))
-      elif not switch:
+      elif not in_body:
         if m10: #how make sure it is at the beginning of first page?
           continue
         elif m1 or m2 or m3:
           h.append(lines[i].rstrip())
         elif lines[i].strip() == "":
-          switch = True
+          in_body = True
         else:
           self.errors.append(errors(self.num, i, lines[i], 1))
       else: #in body
