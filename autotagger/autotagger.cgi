@@ -142,8 +142,9 @@ if 'sdtf' in form_data:
   else:
    # no errors, run the tagger
     document = autotagger.setup_DOM()
-    div2s, marginheaders, margins_dict = autotagger.create_dom_nodes(document, tf)
-    autotagger.organize_nodes(document, tf, div2s, marginheaders, margins_dict)
+    marginheaders, footnotes, xml_ids_dict = autotagger.create_dom_nodes(document, tf)
+    autotagger.organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+
     try:
       outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
     except:

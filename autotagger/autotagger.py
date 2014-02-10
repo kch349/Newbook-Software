@@ -607,7 +607,7 @@ def create_dom_nodes(doc,tf):
         head.appendChild(text)
   return marginheaders, footnotes, xml_ids_dict
 
-def create_generic_div2(div2_count):
+def create_generic_div2(document, div2_count):
       part = "N"
       div2_head, div2 = create_div2(document, str(div2_count), part)
       text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
@@ -657,12 +657,12 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
       div1_head.appendChild(text)
       div1_count += 1
       if current_div2 == None:
-        current_div2, div2_count = create_generic_div2(div2_count)
+        current_div2, div2_count = create_generic_div2(document, div2_count)
       current_div1.appendChild(current_div2)# change
 
     if current_div2 == None:
         ## create first div2
-      current_div2, div2_count = create_generic_div2(div2_count)
+      current_div2, div2_count = create_generic_div2(document, div2_count)
       current_div1.appendChild(current_div2)
       #part = "N"
       #div2_head, div2 = create_div2(document, str(div2_count), part)
