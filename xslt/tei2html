@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsl:stylesheet version="1.0" 
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+
+<xsl:output method="html" />
+<!--1/23/14: added paragraph tag-->
+<!--1/23/14: added h1 tag-->
+<!--1/26/14: added italics template-->
+<!--2/4/14: added "stanza" div-class with line breaks -->
+<!--2/4/14: added "figure" element -->
+<!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
+
+<xsl:template match="/">
+	<html>
+	<head>
+		<title>New Book Digital Texts xsl 2.1.14</title>
+	</head>	
+	
+	<body><xsl:apply-templates select="//body" /></body>
+     </html>
+</xsl:template>
+
+
+<xsl:template match="body">
+	<html>	
+<xsl:apply-templates/>
+	</html>
+</xsl:template>
+
+<xsl:template match="list">
+	<ul>
+		<xsl:apply-templates/>
+	</ul>
+</xsl:template>
+
+
+<xsl:template match="item">
+	<li>
+		<xsl:apply-templates/>
+	</li>
+</xsl:template>
+
+
+		
+
+<xsl:template match="p">
+	<p>
+	   <xsl:apply-templates/>
+	</p>
+</xsl:template>
+
+
+<xsl:template match="head">
+	<h1>
+	   <xsl:apply-templates/>
+	</h1>
+</xsl:template>
+
+
+<xsl:template match="emph">
+	<i>
+	   <xsl:apply-templates/>
+	</i>
+</xsl:template>
+
+
+<xsl:template match="lg">
+	<p class="stanza">
+		<xsl:apply-templates/>
+	</p>
+</xsl:template>
+
+<xsl:template match="l">
+   <!--	<br/> -->
+<xsl:apply-templates/>
+	<br />
+</xsl:template>
+
+<xsl:template match="figure">
+   	<figure>
+		<img src="temple.jpg" alt="An Old Temple" width="304" height="228">
+<!--Note:size configured, but not necessary -->
+		<xsl:apply-templates/>
+		</img>
+	</figure>
+</xsl:template>
+
+<xsl:template match="table">
+	<table border="1">
+		<tr>
+		  <th>Arrive</th>
+		  <th>Depart</th>	
+		</tr>
+		<tr>
+		  <td>some time</td>
+		  <td>some other time</td>
+		</tr>
+<xsl:apply-templates/>
+	</table>
+</xsl:template>
+	
+
+</xsl:stylesheet>
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsl:stylesheet version="1.0" 
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+
+<xsl:output method="html" />
+<!--1/23/14: added paragraph tag-->
+<!--1/23/14: added h1 tag-->
+<!--1/26/14: added italics template-->
+<!--2/4/14: added "stanza" div-class with line breaks -->
+<!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
+<xsl:template match="/">
+	<html>
+	<head>
+		<title>New Book Digital Texts xsl 2.1.14</title>
+	</head>	
+	
+	<body><xsl:apply-templates/></body>
+     </html>
+</xsl:template>
+
+<xsl:template match="list">
+	<ul>
+		<xsl:apply-templates/>
+	</ul>
+</xsl:template>
+
+
+<xsl:template match="item">
+	<li>
+		<xsl:apply-templates/>
+	</li>
+</xsl:template>
+
+
+		
+
+<xsl:template match="p">
+	<p>
+	   <xsl:apply-templates/>
+	</p>
+</xsl:template>
+
+
+<xsl:template match="head">
+	<h1>
+	   <xsl:apply-templates/>
+	</h1>
+</xsl:template>
+
+
+<xsl:template match="emph">
+	<i>
+	   <xsl:apply-templates/>
+	</i>
+</xsl:template>
+
+<xsl:template match="lg">
+	<div class="stanza">
+		<xsl:apply-templates/>
+	</div>
+</xsl:template>
+
+<xsl:template match="l">
+   <!--	<br/> -->
+<xsl:apply-templates/>
+	<br/>
+</xsl:template>
+
+
+</xsl:stylesheet>
