@@ -62,18 +62,18 @@ def set_version(value):
   global version
   version = value
 
+#To Configure
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
   resp = document.createElement('resp')
   resp_statement.appendChild(resp)
-  resp.appendChild(document.createTextNode('OTAP'))
+  resp.appendChild(document.createTextNode('Insert Name of Project Responsible for Transcription'))
   name = document.createElement('name')
   resp_statement.appendChild(name)
-  name.appendChild(document.createTextNode('Walter Andrews'))
+  name.appendChild(document.createTextNode('Insert Name of Project Lead'))
   return resp_statement
 
-#put in basic headers/put something here.
-#configure then next
+#To Configure
 def create_teiHeader(document):
   header = document.createElement('teiHeader')
   fileDesc = document.createElement('fileDesc')
@@ -83,11 +83,11 @@ def create_teiHeader(document):
 
   title = document.createElement('title')
   title_statement.appendChild(title)
-  title.appendChild(document.createTextNode('Diary 48'))
+  title.appendChild(document.createTextNode('Insert Document Title Here'))
 
   author =  document.createElement('author')
   title_statement.appendChild(author)
-  author.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
+  author.appendChild(document.createTextNode('Insert Author Name Here'))
 
   title_statement.appendChild(create_respSt(document))
 
@@ -95,7 +95,7 @@ def create_teiHeader(document):
   fileDesc.appendChild(pubSt)
   distributor = document.createElement('distributor')
   pubSt.appendChild(distributor)
-  distributor.appendChild(document.createTextNode('OTAP'))
+  distributor.appendChild(document.createTextNode('Insert Distributor Name Here'))
 
   address = document.createElement('address')
   pubSt.appendChild(address)
@@ -104,25 +104,26 @@ def create_teiHeader(document):
 
   idno = document.createElement('idno')
   pubSt.appendChild(idno)
-  idno.setAttribute('type', 'OTAP')
-  idno.appendChild(document.createTextNode('1898-1899'))
+  idno.setAttribute('type', 'Insert Your Type Here')
+  idno.appendChild(document.createTextNode('Insert ID Number Here'))
 
   availability = document.createElement('availability')
   pubSt.appendChild(availability)
   p = document.createElement('p')
   availability.appendChild(p)
-  p.appendChild(document.createTextNode('Copyright 2012 OTAP. All Rights Reserved.'))
+  p.appendChild(document.createTextNode('Insert Copyright Data Here'))
 
   date = document.createElement('date')
   pubSt.appendChild(date)
-  date.setAttribute('when', '2007')
-  date.appendChild(document.createTextNode('2011'))
+  #why do we have a "when type" when there is already a text node containing that information?
+  date.setAttribute('when', 'Insert Date Here')
+  date.appendChild(document.createTextNode('Insert Date Here'))
 
   sourceDesc = document.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
   bibl = document.createElement('bibl')
   sourceDesc.appendChild(bibl)
-  bibl.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
+  bibl.appendChild(document.createTextNode('Enter Bibliographical Information Here'))
 
   encodingDesc = document.createElement('encodingDesc')
   header.appendChild(encodingDesc)
@@ -130,7 +131,7 @@ def create_teiHeader(document):
   encodingDesc.appendChild(projectDesc)
   p2 = document.createElement('p')
   projectDesc.appendChild(p2)
-  p2.appendChild(document.createTextNode('OTAP'))
+  p2.appendChild(document.createTextNode('Insert Project Here'))
 
   revisionDesc = document.createElement('revisionDesc')
   header.appendChild(revisionDesc)
@@ -143,11 +144,11 @@ def create_teiHeader(document):
 
   date = document.createElement('date')
   item.appendChild(date)
-  date.setAttribute('when', '2012-30-08')
-  date.appendChild(document.createTextNode('30 August 12'))
+  #Same question about "when" attribute as above.
+  date.setAttribute('when', 'Insert Date')
+  date.appendChild(document.createTextNode('Insert Date of Last Edit'))
   item.appendChild(document.createTextNode('Last checked'))
   return header
-
 
 def setup_DOM():
   impl = getDOMImplementation()
@@ -887,5 +888,4 @@ if __name__ in "__main__":
       print(e,file=sys.stderr)
   else:
     document = run()
-    #put 3 lines above into run and return document. 
     print(document.toprettyxml('\t', '\n', None))
