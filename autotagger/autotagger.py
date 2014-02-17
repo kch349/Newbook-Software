@@ -72,6 +72,8 @@ def create_respSt(document):
   name.appendChild(document.createTextNode('Walter Andrews'))
   return resp_statement
 
+#put in basic headers/put something here.
+#configure then next
 def create_teiHeader(document):
   header = document.createElement('teiHeader')
   fileDesc = document.createElement('fileDesc')
@@ -162,10 +164,10 @@ def setup_DOM():
 
   #front = newdoc.createElement('front')
   #text.appendChild(front)
-  #back = newdoc.createElement('back')
-  #text.appendChild(back)
   body = newdoc.createElement('body')
   text.appendChild(body)
+  #back = newdoc.createElement('back')
+  #text.appendChild(back)
   return newdoc
 
 class TranscriptionFile:
@@ -509,10 +511,13 @@ def errors(page_num, line_num, line, error_code):
     #           "should be introduced by \"DivLine:\" only.\n"
   return err_str
 
+#combine create div methods. Pass in div1 vs. div2
 def create_div1(document,n):
   """Creates a new div1 element, and returns that div1 and its head node"""
   div1 = document.createElement('div1')
   div1.setAttribute('type','journey')
+  #generalize type attribute, or configure. (could later change TF to include different types
+  #for letter and diaries. for now could take out type
   div1.setAttribute('n',n)
   head = document.createElement('head')
   div1.appendChild(head)
@@ -523,6 +528,7 @@ def create_div2(document,n,part):
   """Creates a new div2 element, and returns that div2 and its head node"""
   div2 = document.createElement('div2')
   div2.setAttribute('type','diaryentry')
+  #remove type
   div2.setAttribute('n',n)
   div2.setAttribute('part', part)
 
@@ -569,7 +575,7 @@ def create_dom_nodes(doc,tf):
   marginheaders = []# triples: [content,pagenum,linenum]
   footnotes = [] # doubles: [content, pagenum]
   xml_ids_dict = {}
-  margins = [] #what is this?
+ # margins = [] #what is this?
 
   #div1_count = 1
   #div2_printed_count = 1
@@ -687,10 +693,12 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
       #that doesn't take into account the other lines though...
       if len(marginheaders) > 0:
         current_lineheader = marginheaders[0]
+        #use dictionary stored inside marginheaders. then call current_lineheader["text"], ["page"], ["line"]
         if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
           current_div2.appendChild(current_lineheader[0])
           #marginheaders.pop(0)
           marginheaders.remove(current_lineheader)
+      #logging errors ---look at that
       #else:
         #print("ran out of marginheaders",file=sys.stderr)
 
@@ -713,6 +721,7 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         # want to figure out how to do in the organize_nodes method
         # later so as not to loop through the file as much.
       
+      #put set up section and subsection in create dom nodes method...
       m = SECTION_RE.match(l)
       if m:
         if not section_in_text:
@@ -874,4 +883,5 @@ if __name__ in "__main__":
     document = setup_DOM()
     marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
     organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    #put 3 lines above into run and return document. 
     print(document.toprettyxml('\t', '\n', None))
