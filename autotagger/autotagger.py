@@ -847,6 +847,12 @@ def setup_argparse():
       default=1, help='increase the verbosity (can be repeated: -vvv)') 
   return ap
 
+def run():
+  document = setup_DOM()
+  marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
+  organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+  return document
+  
 if __name__ in "__main__":
   # accept svoboda transcription format file
   # on stdin
@@ -880,8 +886,6 @@ if __name__ in "__main__":
     for e in tf.errors:
       print(e,file=sys.stderr)
   else:
-    document = setup_DOM()
-    marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
-    organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    document = run()
     #put 3 lines above into run and return document. 
     print(document.toprettyxml('\t', '\n', None))
