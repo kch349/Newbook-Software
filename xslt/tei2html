@@ -10,6 +10,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <!--1/26/14: added italics template-->
 <!--2/4/14: added "stanza" div-class with line breaks -->
 <!--2/4/14: added "figure" element -->
+<!--2/14/12: added span-class hb instruction (numbered page breaks)-->
+<!--2/17/12: added span-class lb instruction (numbered line breaks)-->
 <!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
 
 <xsl:template match="/">
@@ -44,7 +46,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 		
-
 <xsl:template match="p">
 	<p>
 	   <xsl:apply-templates/>
@@ -73,17 +74,17 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="l">
-   <!--	<br/> -->
+  
 <xsl:apply-templates/>
 	<br />
 </xsl:template>
 
 <xsl:template match="figure">
    	<figure>
-		<img src="temple.jpg" alt="An Old Temple" width="304" height="228">
+	<img src="temple.jpg" alt="An Old Temple" width="304" height="288" />
 <!--Note:size configured, but not necessary -->
 		<xsl:apply-templates/>
-		</img>
+	
 	</figure>
 </xsl:template>
 
@@ -100,78 +101,32 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:apply-templates/>
 	</table>
 </xsl:template>
+
+
+<xsl:template match="pb">
+	<hr />
+	<span class="pb">
+[pg: <xsl:value-of select="@n"/>]
+	</span>
+</xsl:template>
 	
 
-</xsl:stylesheet>
-<?xml version="1.0" encoding="utf-8"?>
-
-<xsl:stylesheet version="1.0" 
-xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-
-<xsl:output method="html" />
-<!--1/23/14: added paragraph tag-->
-<!--1/23/14: added h1 tag-->
-<!--1/26/14: added italics template-->
-<!--2/4/14: added "stanza" div-class with line breaks -->
-<!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
-<xsl:template match="/">
-	<html>
-	<head>
-		<title>New Book Digital Texts xsl 2.1.14</title>
-	</head>	
-	
-	<body><xsl:apply-templates/></body>
-     </html>
+<xsl:template match="lb"> 
+	<br />
+	<span class="lb">
+line <xsl:value-of select="@n"/>:
+	</span>
 </xsl:template>
 
-<xsl:template match="list">
-	<ul>
-		<xsl:apply-templates/>
-	</ul>
-</xsl:template>
-
-
-<xsl:template match="item">
-	<li>
-		<xsl:apply-templates/>
-	</li>
-</xsl:template>
-
-
-		
-
-<xsl:template match="p">
-	<p>
+<xsl:template match="foreign">
+	<em>
 	   <xsl:apply-templates/>
-	</p>
+	</em>
 </xsl:template>
 
-
-<xsl:template match="head">
-	<h1>
-	   <xsl:apply-templates/>
-	</h1>
+<xsl:template match="name">
+	<span class="person">
+	</span>
 </xsl:template>
-
-
-<xsl:template match="emph">
-	<i>
-	   <xsl:apply-templates/>
-	</i>
-</xsl:template>
-
-<xsl:template match="lg">
-	<div class="stanza">
-		<xsl:apply-templates/>
-	</div>
-</xsl:template>
-
-<xsl:template match="l">
-   <!--	<br/> -->
-<xsl:apply-templates/>
-	<br/>
-</xsl:template>
-
 
 </xsl:stylesheet>
