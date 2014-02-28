@@ -34,14 +34,14 @@ MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for jo
 MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
-LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 DIVLINENUMBER_RE = re.compile('\s*DivLine\s+(\d+):?\s*(.*)$', re.IGNORECASE)
 
 ## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
 STAR_RE = re.compile('^\s*\*(.*)$')
 MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
-TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
+TEXT_RE = re.compile('\s*Text:?')
+LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 
 
 ## version 1 regexes
@@ -318,7 +318,7 @@ class TranscriptionFile:
           lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
           #appending at end could pose a problem adding multiple lines.
         elif text and m3:
-          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip())
+          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
           #multi_headers = True   
         else:
           text = False
@@ -553,7 +553,8 @@ def create_dom_nodes(doc,tf):
       m = MARGINNOTE_RE.match(l)
       if m:
         head = doc.createElement('head')
-        marginheaders.append([head, page.num, m.group(1)])
+        marginheaders.append({'note' : head, 'page' : page.num, 'line' : m.group(1)})
+        #check if page.num and m.group(1) are strings... should change them here?
         head.setAttribute('type','marginnote')
         marginnote_id = "p" + page.num + '-' + m.group(1)
         marginnote_id = process_id(xml_ids_dict, marginnote_id)
@@ -616,11 +617,11 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
     for l in page.body:
       linecount += 1
       if len(marginheaders) > 0:
-        current_lineheader = marginheaders[0]
+        current_marginnote = marginheaders[0]
         #use dictionary stored inside marginheaders. then call current_lineheader["text"], ["page"], ["line"]
-        if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
-          current_div2.appendChild(current_lineheader[0])
-          marginheaders.remove(current_lineheader)
+        if linecount <= int(current_marginnote['line']) and page.num == current_marginnote['page']:
+          current_div2.appendChild(current_marginnote['note'])
+          marginheaders.remove(current_marginnote)
       #logging errors ---look at that
       #else:
         #print("ran out of marginheaders",file=sys.stderr)
