@@ -297,7 +297,6 @@ class TranscriptionFile:
         m9 = LINE_RE.match(lines[i])
         
         #Keep track of pages so as to allow for error reporting
-        #figure out why these page numbers can only be here.
         if m4 or m5 or m6:
           if current_page == -1:
             current_page = 1
@@ -505,8 +504,7 @@ def create_generic_div(document, div_count, type):
   elif type == 'div2':
     title += "subsection; "
   title += "no title given in text."
-  text = document.createTextNode(title)
-  div_head.appendChild(text)
+  div_head.appendChild(document.createTextNode(title))
   div_count +=1
   return div, div_count
 
@@ -518,12 +516,16 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   if fresh: current_prose = []
   current_prose.append(document.createElement('p'))
   if first_line != None:
-    lb = document.createElement('lb')
-    lb.setAttribute('n',str(first_line[1]))
     current_prose[-1].appendChild(document.createTextNode(first_line[0]))
-    current_prose[-1].appendChild(lb)
+    current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
   return current_prose
 
+#Creates a line break of the given number
+def create_line_break(document, linecount):
+  lb = document.createElement("lb")
+  lb.setAttribute("n", str(linecount))
+  return lb
+  
 #Processes xml-ids for notes
 def process_id(dict, id):
   """Makes sure every assigned xml-id is valid by checking for duplicates. Adds "i" 
@@ -538,11 +540,10 @@ def process_id(dict, id):
     dict[id] = 1
   return id
     
-        
 def process_header(doc,tf):
   """Translates information contained in the header of the transcription file into XML."""
 
-  marginheaders = []# triples: [content,pagenum,linenum]
+  marginheaders = [] # contains each note, its page number, and line
   footnotes = [] # doubles: [content, pagenum]
   xml_ids_dict = {}
 
@@ -562,16 +563,14 @@ def process_header(doc,tf):
         marginnote_id = "p" + page.num + '-' + m.group(1)
         marginnote_id = process_id(xml_ids_dict, marginnote_id)
         head.setAttribute('xml:id', marginnote_id) 
-        text = doc.createTextNode(m.group(2))
-        head.appendChild(text)
+        head.appendChild(doc.createTextNode(m.group(2)))
       
       m = FOOTNOTE_RE.match(l)
       if m:
         head = doc.createElement('head')
         footnotes.append([head, page.num])
         head.setAttribute('type', 'footnote')
-        text = doc.createTextNode(m.group(1))
-        head.appendChild(text)
+        head.appendChild(doc.createTextNode(m.group(1)))
   return marginheaders, footnotes, xml_ids_dict
 
   
@@ -602,8 +601,6 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
   subsection_found = False
   div1_count = 1
   div2_count = 1
-  
-  #should actually be a queue?
   margin_queue = []
   
   for page in tf.pages:
@@ -633,23 +630,18 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         continue
       elif last_empty:
         for i in range(1, empty_lines + 1):
-          lb = document.createElement('lb')
-          lb.setAttribute('n',str((linecount - empty_lines + (i - 1))))
-          current_prose[-1].appendChild(lb)
-          #current prose might not exist at this point if there is double spacing 
-          #immediately in a file
+          current_prose[-1].appendChild(create_line_break(document, str((linecount - empty_lines + (i - 1)))))
         last_empty = False
         empty_lines = 0
         
-      #Creates section if found, or a generic section if one has not yet been created.
+      # Creates section if found, or a generic section if one has not yet been created.
+      # If new section occurs in the middle of a subsection, this subsection is divided
+      # into two parts, labeled 'I' for initial, 'M' for medial, or 'F' for final as
+      # corresponding to each case.
       m = SECTION_RE.match(l)
       if m:
         if not section_found:
           body.appendChild(current_div1)
-          #creates a cloned div2 with all its nodes to serve as the medial
-          # or final part then labeled as the next number in the div2_count
-          # check and see if the last one was part F. if so make the
-          # last one part m instead.
           if current_div2 is not None:
             next_div2 = current_div2.cloneNode(False)
             next_div2.setAttribute('part', 'F')
@@ -663,18 +655,15 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             current_prose = create_p(document,current_prose, fresh=True)
             current_div1.appendChild(current_div2)
 
-            #update div2s to get rid of original one 
+            # update div2s to get rid of original one 
             div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
             current_div1 = div1
             div1_count += 1
             current_div2 = next_div2
-          
-        text = document.createTextNode(m.group(1))
-        div1_head.appendChild(text)
+
+        div1_head.appendChild(document.createTextNode(m.group(1)))
         if section_in_text:
-          lb = document.createElement("lb")
-          lb.setAttribute("n", str(linecount))
-          div1_head.appendChild(lb)
+          div1_head.appendChild(create_line_break(document, linecount))
         else:
           linecount -= 1
         section_found = True
@@ -684,7 +673,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
         section_found = False
    
-      #Creates a subsection, or a generic subsection if one has not yet been created.
+      # Creates a subsection, or a generic subsection if one has not yet been created.
       m = SUBSECTION_RE.match(l)  
       if m:
         if not subsection_found:
@@ -702,12 +691,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             div2.childNodes.extend(margin_queue)
           current_div2 = div2
           
-        text = document.createTextNode(m.group(1))
-        div2_head.appendChild(text)
+        div2_head.appendChild(document.createTextNode(m.group(1)))
         if subsection_in_text:
-          lb = document.createElement("lb")
-          lb.setAttribute("n", str(linecount)) 
-          div2_head.appendChild(lb)
+          div2_head.appendChild(create_line_break(document, linecount))
         else:
           linecount -= 1
         subsection_found = True 
@@ -719,7 +705,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           current_div1.appendChild(current_div2)
         subsection_found = False
         
-      #Creates a paragraph if found a tab in the text.  
+      # Creates a paragraph if found a tab in the text.  
       m = PARA_RE.match(l)
       if m: 
         if just_divided:
@@ -728,14 +714,12 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           #will this pose a problem if for some reason there isn't a paragraph right afterwards?
         else:
           current_prose = create_p(document, current_prose,[l,linecount])
-      #Processes plain lines of body text
+      # Processes plain lines of body text
       else:
         just_divided = False
-        lb = document.createElement('lb')
-        lb.setAttribute('n',str(linecount))
         current_prose[-1].appendChild(document.createTextNode(l))
-        current_prose[-1].appendChild(lb)
-    #maybe add in something that says to delete the last line break 
+        current_prose[-1].appendChild(create_line_break(document, str(linecount)))
+    # maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
       
     last_empty = False
@@ -764,9 +748,8 @@ def run(tf):
   return document
   
 if __name__ in "__main__":
-  # accept svoboda transcription format file
-  # on stdin
 
+  # Accept a Svoboda Transcription Format file of given version on stdin
   ap = setup_argparse()
   args = ap.parse_args()
   if args.file:
@@ -777,14 +760,14 @@ if __name__ in "__main__":
 
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
-  # to keep things clean, and check for errors in
-  # the input,
-  # before we start, parse these lines
-  # into a series of 'page objects'
 
+  # Compile a TranscriptionFile out of the inputed text.
   tf = TranscriptionFile(infilelines)
   logging.info(" found "+str(len(tf.pages))+" transcription pages")
 
+  # Any errors found must first be resolved by the user before process can continue. 
+  # If the TranscriptionFile properly follows the format, inputed text is converted
+  # to XML and printed.
   if len(tf.errors) > 0:
     print("Errors found. Please check error log and try again later.")
     for e in tf.errors:
