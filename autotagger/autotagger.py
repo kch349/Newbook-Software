@@ -270,21 +270,14 @@ class TranscriptionFile:
     double_spacing_found = False #true if double spacing found
 
     for i in range(0, length):
-      m1 = MARGINS_RE.match(lines[i])
+      #Handle Text and DivLine elements only present in version 0 transcription files
+      m1 = TEXT_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
-      m3 = LINE_RE.match(lines[i])
-      m4 = TEXT_RE.match(lines[i])
-      m7 = STAR_RE.match(lines[i])
-      m8 = DIVLINENUMBER_RE.match(lines[i])
-      m9 = PAGE_RE.match(lines[i])
-      m10 = PAGENOTES_RE.match(lines[i])
-      m11 = PAGETABBED_RE.match(lines[i])
+      m3 = DIVLINENUMBER_RE.match(lines[i])
       
-      
-      #Handle lines only present in version 0
-      if m2 or m8 or m4:
-        if m2 or m8:
-          if m8:
+      if m1 or m2 or m3:
+        if m2 or m3:
+          if m3:
             #self.errors.append(errors(self.num, i, lines[i], 6))
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                             str(current_page) + ". Make sure the line number is not included.")
@@ -296,18 +289,25 @@ class TranscriptionFile:
       
       #Process rest, updating tf syntax where necessary and recording any errors.    
       else:
+        m4 = PAGE_RE.match(lines[i])
+        m5 = PAGENOTES_RE.match(lines[i])
+        m6 = PAGETABBED_RE.match(lines[i])
+        m7 = MARGINS_RE.match(lines[i])
+        m8 = STAR_RE.match(lines[i])
+        m9 = LINE_RE.match(lines[i])
+        
         #Keep track of pages so as to allow for error reporting
         #figure out why these page numbers can only be here.
-        if m9 or m10 or m11:
+        if m4 or m5 or m6:
           if current_page == -1:
             current_page = 1
           else:
             current_page += 1
           logging.debug("Page number " + str(current_page))  
       
-        elif m1:
-          lines[i] = '\tNotes:'
         elif m7:
+          lines[i] = '\tNotes:'
+        elif m8:
           divlines -= 1
           #print(temp_div_headers[0], file=sys.stderr)
           if len(temp_div_headers) >= 1:
@@ -317,12 +317,12 @@ class TranscriptionFile:
             v1_errors.append(incorrect_stars_error(str(current_page))) 
           lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
           #appending at end could pose a problem adding multiple lines.
-        elif text and m3:
+        elif text and m9:
           lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
           #multi_headers = True   
         else:
           text = False
-          if m3:
+          if m9:
             lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
         version1_lines.append(lines[i].rstrip())          
     if divlines != 0:
@@ -382,27 +382,30 @@ class TranscriptionPage:
     double_spacing_found = False #true if double spacing found
     linecount = 0
     for i in range(0, length):
-      m1 = NOTES_RE.match(lines[i])
-      m2 = MARGINNOTE_RE.match(lines[i])
-      m3 = FOOTNOTE_RE.match(lines[i])
-      m7 = MARGINLINELIST_RE.match(lines[i])
-      m8 = MARGINLINERANGE_RE.match(lines[i])
-      m10 = VERSION_RE.match(lines[i])
-     
-      if m7 or m8:
+      #Check for initial errors
+      m1 = MARGINLINELIST_RE.match(lines[i])
+      m2 = MARGINLINERANGE_RE.match(lines[i])
+      m3 = VERSION_RE.match(lines[i])
+      m4 = NOTES_RE.match(lines[i])
+      m5 = MARGINNOTE_RE.match(lines[i])
+      m6 = FOOTNOTE_RE.match(lines[i])  
+      if m1 or m2:
         self.errors.append(errors(self.num, i, lines[i], 4))
+      #process header
       elif not in_body:
-        logging.debug("IN HEAD")
-        if m10: #How do we make sure it is at the beginning of first page?
+        logging.debug("IN HEAD") 
+        if m3: #How do we make sure it is at the beginning of first page?
           continue
-        elif m1 or m2 or m3:
+        elif m4 or m5 or m6:
           h.append(lines[i].rstrip())
         elif lines[i].strip() == "":
           in_body = True
         else:
           self.errors.append(errors(self.num, i, lines[i], 1))
-          
-      else: #in body
+      #process body
+      else:
+        logging.debug("IN BODY")
+        #Handle double spacing
         if double_spacing == 3 and double_spacing_found == False:
           logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
           double_spacing_found = True
@@ -416,15 +419,17 @@ class TranscriptionPage:
             double_spacing = 0    
         #if not m4:
           #self.errors.append(errors(self.num, i, lines[i], 3))
-        m5 = SECTION_RE.match(lines[i])
-        m6 = SUBSECTION_RE.match(lines[i])
+          
+        #Translate main structural 
+        m7 = SECTION_RE.match(lines[i])
+        m8 = SUBSECTION_RE.match(lines[i])
         m9 = SUBSECTIONNUMBER_RE.match(lines[i])
-        if m5 or m6 or m9:      
+        if m7 or m8 or m9:      
           if m9:
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                              self.num + ". Make sure the line number is not included.")
           b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-        elif m1 or m2 or m3: #or m4:
+        elif m4 or m5 or m6:
           self.errors.append(errors(self.num, i, lines[i], 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
@@ -492,18 +497,18 @@ def create_div(document, n, div_type, part):
 
 #Creates first div of given type if necessary
 def create_generic_div(document, div_count, type):
-      part = "N"
-      div_head, div = create_div(document, str(div_count), 'div2', part)
-      title = "First "
-      if type == 'div1':
-        title += "section; "
-      elif type == 'div2':
-        title += "subsection; "
-      title += "no title given in text."
-      text = document.createTextNode(title)
-      div_head.appendChild(text)
-      div_count +=1
-      return div, div_count
+  part = "N"
+  div_head, div = create_div(document, str(div_count), 'div2', part)
+  title = "First "
+  if type == 'div1':
+    title += "section; "
+  elif type == 'div2':
+    title += "subsection; "
+  title += "no title given in text."
+  text = document.createTextNode(title)
+  div_head.appendChild(text)
+  div_count +=1
+  return div, div_count
 
 #Creates a new paragraph
 def create_p(document,current_prose, first_line=None, fresh=False):
@@ -533,11 +538,9 @@ def process_id(dict, id):
     dict[id] = 1
   return id
     
-    
-#Currently processes information in header. Later could be creating main structural nodes...    
-def create_dom_nodes(doc,tf):
-  """function that sets up in a DOM form with the nodes: Document, header and body,
-  header type divlines and trip titles, margin notes and text"""
+        
+def process_header(doc,tf):
+  """Translates information contained in the header of the transcription file into XML."""
 
   marginheaders = []# triples: [content,pagenum,linenum]
   footnotes = [] # doubles: [content, pagenum]
@@ -572,11 +575,12 @@ def create_dom_nodes(doc,tf):
   return marginheaders, footnotes, xml_ids_dict
 
   
-def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
+def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
+  """Translates data contained in the body text of the transcription file into XML,
+  combining the structure indicated in the body text with the given notes from the
+  header."""
   current_prose = [] #list of paragraph nodes
   current_prose = create_p(document,current_prose)
-  div1s = [] # contains all section headers
-  div2s = [] # contains all subsection headers
   
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
@@ -592,8 +596,6 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   just_divided = False
   current_div1 = None
   current_div2 = None
-  previous_section_text = False
-  previous_subsection_text = False
   div1_head = None
   div2_head = None
   section_found = False
@@ -601,30 +603,26 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
   div1_count = 1
   div2_count = 1
   
+  #should actually be a queue?
+  margin_queue = []
+  
   for page in tf.pages:
-    if current_div1 == None:
-      current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
-      #COMBINE with following generic div2.
-      if current_div2 == None:
-        current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
-      current_div1.appendChild(current_div2)# change
-
-    if current_div2 == None:
-      current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
-      current_div1.appendChild(current_div2)
-        
     linecount = 0
     for l in page.body:
       linecount += 1
+      
+      #Insert margin notes when appropriate. Store early notes to add once first
+      #section and subsection have been created.
       if len(marginheaders) > 0:
         current_marginnote = marginheaders[0]
-        #use dictionary stored inside marginheaders. then call current_lineheader["text"], ["page"], ["line"]
         if linecount <= int(current_marginnote['line']) and page.num == current_marginnote['page']:
-          current_div2.appendChild(current_marginnote['note'])
+          if current_div2 == None:
+            margin_queue.append(current_marginnote['note'])
+          else:
+            current_div2.appendChild(current_marginnote['note'])
           marginheaders.remove(current_marginnote)
-      #logging errors ---look at that
-      #else:
-        #print("ran out of marginheaders",file=sys.stderr)
+      else:
+        logging.debug("Ran out of marginheaders.")
 
       #Account for empty lines or double spacing
       m = EMPTYLINE_RE.match(l)
@@ -638,10 +636,12 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           lb = document.createElement('lb')
           lb.setAttribute('n',str((linecount - empty_lines + (i - 1))))
           current_prose[-1].appendChild(lb)
+          #current prose might not exist at this point if there is double spacing 
+          #immediately in a file
         last_empty = False
         empty_lines = 0
-
-      #put set up section and subsection in create dom nodes method...
+        
+      #Creates section if found, or a generic section if one has not yet been created.
       m = SECTION_RE.match(l)
       if m:
         if not section_found:
@@ -650,23 +650,24 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           # or final part then labeled as the next number in the div2_count
           # check and see if the last one was part F. if so make the
           # last one part m instead.
-          next_div2 = current_div2.cloneNode(False)
-          next_div2.setAttribute('part', 'F')
-          atr = current_div2.getAttributeNode('part')
-          x = atr.nodeValue
-          if x == 'F':
-            current_div2.setAttribute('part', 'M')
-          else:
-            current_div2.setAttribute('part', 'I')
-          current_div2.childNodes.extend(current_prose)
-          current_prose = create_p(document,current_prose, fresh=True)
-          current_div1.appendChild(current_div2)
+          if current_div2 is not None:
+            next_div2 = current_div2.cloneNode(False)
+            next_div2.setAttribute('part', 'F')
+            atr = current_div2.getAttributeNode('part')
+            x = atr.nodeValue
+            if x == 'F':
+              current_div2.setAttribute('part', 'M')
+            else:
+              current_div2.setAttribute('part', 'I')
+            current_div2.childNodes.extend(current_prose)
+            current_prose = create_p(document,current_prose, fresh=True)
+            current_div1.appendChild(current_div2)
 
-          #update div2s to get rid of original one 
-          div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
-          current_div1 = div1
-          div1_count += 1
-          current_div2 = next_div2
+            #update div2s to get rid of original one 
+            div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
+            current_div1 = div1
+            div1_count += 1
+            current_div2 = next_div2
           
         text = document.createTextNode(m.group(1))
         div1_head.appendChild(text)
@@ -679,9 +680,12 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         section_found = True
         continue
       else:
+        if current_div1 == None:
+          current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
         section_found = False
-          
-      m = SUBSECTION_RE.match(l)
+   
+      #Creates a subsection, or a generic subsection if one has not yet been created.
+      m = SUBSECTION_RE.match(l)  
       if m:
         if not subsection_found:
           just_divided = True
@@ -694,6 +698,8 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           part = "N"
           div2_head, div2 = create_div(document, str(div2_count), 'div2', part)
           div2_count += 1
+          if current_div2 == None:
+            div2.childNodes.extend(margin_queue)
           current_div2 = div2
           
         text = document.createTextNode(m.group(1))
@@ -704,31 +710,34 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
           div2_head.appendChild(lb)
         else:
           linecount -= 1
-        subsection_found = True
+        subsection_found = True 
         continue
-          
-      else:
+      else: 
+        if current_div2 == None:
+          current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
+          current_div2.childNodes.extend(margin_queue)
+          current_div1.appendChild(current_div2)
         subsection_found = False
-       
+        
+      #Creates a paragraph if found a tab in the text.  
       m = PARA_RE.match(l)
       if m: 
-        ## found a paragraph starting line of text
-        # start a new paragraph
         if just_divided:
           current_prose = create_p(document, current_prose, [l, linecount], fresh=True)
           just_divided = False
           #will this pose a problem if for some reason there isn't a paragraph right afterwards?
         else:
           current_prose = create_p(document, current_prose,[l,linecount])
+      #Processes plain lines of body text
       else:
         just_divided = False
-        ## found a vanilla line of text
         lb = document.createElement('lb')
         lb.setAttribute('n',str(linecount))
         current_prose[-1].appendChild(document.createTextNode(l))
         current_prose[-1].appendChild(lb)
     #maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
+      
     last_empty = False
     empty_lines = 0
     pb = document.createElement('pb')
@@ -747,11 +756,11 @@ def setup_argparse():
       default=1, help='increase the verbosity (can be repeated: -vvv)') 
   return ap
 
-#Runs the entire set up of the xml document and translation of transcription file into XML
 def run(tf):
+  """Translates transcription file into XML. Returns the complete XML document"""
   document = setup_DOM()
-  marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
-  organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+  marginheaders, footnotes, xml_ids_dict = process_header(document, tf)
+  process_body(document, tf, marginheaders, footnotes, xml_ids_dict)
   return document
   
 if __name__ in "__main__":
