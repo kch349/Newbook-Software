@@ -11,7 +11,7 @@
 <!-- This command uses -v = verbose -nonet = no not use internet to fetch DTD, etc -->
 <!-- This file was created and maintained by Aaron Gupta-->
 <!-- Copyright 2013-2014 NDTH-UW. All Rights Reserved.-->
-<!-- This was revised on 3-6-14.-->
+<!-- This was revised on 3-7-14.-->
 
 <xsl:template match="/">
 
@@ -66,15 +66,16 @@
   <entry key="&gt;">$\rangle$</entry>
   <entry key="&amp;">\&amp;</entry>
   <entry key="_">\_</entry>
+  <entry key="%">\%</entry>
+
 </tex:replace-map>
-
-
 
 <xsl:template match = "text()" >
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &gt; &amp; _ '" />
+        <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ '" />
+		<!--         <xsl:with-param name="chars" select="'&lt; &gt; &amp; _ % '" /> -->
       </xsl:call-template>
     </xsl:variable>
     <xsl:value-of select="normalize-space($toreturn)" />
