@@ -16,10 +16,6 @@
 <xsl:template match="/">
 
 \documentclass{report}
-<<<<<<< HEAD
-=======
-
->>>>>>> Tei2LaTeX
 \begin{document}
 
 \newcommand{\mnote}[1] {\marginpar{\scriptsize \raggedright #1 }}
@@ -73,23 +69,16 @@
   <entry key="%">\%</entry>
 
 </tex:replace-map>
-<<<<<<< HEAD
-=======
 <!-- new lines ? -->
 <!-- template for lb tag -->
-
->>>>>>> Tei2LaTeX
 
 <xsl:template match = "text()" >
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ '" />
-<<<<<<< HEAD
+        <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ % '" />
 		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
-=======
 		<!--  % has to be in middle or it doesnt work -->
->>>>>>> Tei2LaTeX
       </xsl:call-template>
     </xsl:variable>
     <xsl:value-of select="normalize-space($toreturn)" />
