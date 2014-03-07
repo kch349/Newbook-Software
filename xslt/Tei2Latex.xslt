@@ -75,7 +75,7 @@
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
         <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ '" />
-		<!--         <xsl:with-param name="chars" select="'&lt; &gt; &amp; _ % '" /> -->
+		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
       </xsl:call-template>
     </xsl:variable>
     <xsl:value-of select="normalize-space($toreturn)" />
