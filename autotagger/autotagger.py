@@ -11,9 +11,6 @@
 ## justin yoon
 ## ... (add your names as you edit this file)
 
-#get rid of journey header xml ids, there will be no more line numbers.
-#only ids for margin notes now... not footnotes, correct?
-
 
 import sys
 import re
@@ -21,10 +18,9 @@ import logging
 import argparse
 from xml.dom.minidom import *
 
-##class constants
+## input document and transcription format data
 CURRENT_VERSION = 1
 version = -1
-#version = -1
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
@@ -32,22 +28,20 @@ PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
 VERSION_RE = re.compile('^Version\s*(\d+.*)')
-#VERSION_RE = re.compile('^version\s*==\s*(\d+.*)')
-#VERSION_RE = re.compile('\s*version\s+==\s+(\d*\.?d*)\s*$') #for determining if uprev is needed
-# regexes for incorrect formatting (e.g. Line #, #, #:)
+
+## regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
 MARGINLINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
 PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
-LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 DIVLINENUMBER_RE = re.compile('\s*DivLine\s+(\d+):?\s*(.*)$', re.IGNORECASE)
 
 ## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
-#MARGINLINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$') #should combine Margin and Text line regexes
 STAR_RE = re.compile('^\s*\*(.*)$')
 MARGINS_RE = re.compile('\s*Margins?:?', re.IGNORECASE)
-TEXT_RE = re.compile('\s*Text:?') #\s*\n^\s*Line\s+(\d+):?\s*(.*)$')
+TEXT_RE = re.compile('\s*Text:?')
+LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 
 
 ## version 1 regexes
@@ -58,22 +52,25 @@ SECTION_RE = re.compile('^\s*Section:?\s*(.*)$')
 SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
+#Sets version for document so it is accessible throughout program
 def set_version(value):
   global version
   version = value
 
+#Creates responsibility statement in TEI Header
+#(To Configure)
 def create_respSt(document):
   resp_statement = document.createElement('respStmt')
   resp = document.createElement('resp')
   resp_statement.appendChild(resp)
-  resp.appendChild(document.createTextNode('OTAP'))
+  resp.appendChild(document.createTextNode('Insert Name of Project Responsible for Transcription'))
   name = document.createElement('name')
   resp_statement.appendChild(name)
-  name.appendChild(document.createTextNode('Walter Andrews'))
+  name.appendChild(document.createTextNode('Insert Name of Project Lead'))
   return resp_statement
 
-#put in basic headers/put something here.
-#configure then next
+#Creates generic TEI Header. Will allow for configuration later.
+#(To Configure)
 def create_teiHeader(document):
   header = document.createElement('teiHeader')
   fileDesc = document.createElement('fileDesc')
@@ -83,11 +80,11 @@ def create_teiHeader(document):
 
   title = document.createElement('title')
   title_statement.appendChild(title)
-  title.appendChild(document.createTextNode('Diary 48'))
+  title.appendChild(document.createTextNode('Insert Document Title Here'))
 
   author =  document.createElement('author')
   title_statement.appendChild(author)
-  author.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
+  author.appendChild(document.createTextNode('Insert Author Name Here'))
 
   title_statement.appendChild(create_respSt(document))
 
@@ -95,7 +92,7 @@ def create_teiHeader(document):
   fileDesc.appendChild(pubSt)
   distributor = document.createElement('distributor')
   pubSt.appendChild(distributor)
-  distributor.appendChild(document.createTextNode('OTAP'))
+  distributor.appendChild(document.createTextNode('Insert Distributor Name Here'))
 
   address = document.createElement('address')
   pubSt.appendChild(address)
@@ -104,25 +101,26 @@ def create_teiHeader(document):
 
   idno = document.createElement('idno')
   pubSt.appendChild(idno)
-  idno.setAttribute('type', 'OTAP')
-  idno.appendChild(document.createTextNode('1898-1899'))
+  idno.setAttribute('type', 'Insert Your Type Here')
+  idno.appendChild(document.createTextNode('Insert ID Number Here'))
 
   availability = document.createElement('availability')
   pubSt.appendChild(availability)
   p = document.createElement('p')
   availability.appendChild(p)
-  p.appendChild(document.createTextNode('Copyright 2012 OTAP. All Rights Reserved.'))
+  p.appendChild(document.createTextNode('Insert Copyright Data Here'))
 
   date = document.createElement('date')
   pubSt.appendChild(date)
-  date.setAttribute('when', '2007')
-  date.appendChild(document.createTextNode('2011'))
+  #why do we have a "when type" when there is already a text node containing that information?
+  date.setAttribute('when', 'Insert Date Here')
+  date.appendChild(document.createTextNode('Insert Date Here'))
 
   sourceDesc = document.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
   bibl = document.createElement('bibl')
   sourceDesc.appendChild(bibl)
-  bibl.appendChild(document.createTextNode('Joseph Mathia Svoboda'))
+  bibl.appendChild(document.createTextNode('Enter Bibliographical Information Here'))
 
   encodingDesc = document.createElement('encodingDesc')
   header.appendChild(encodingDesc)
@@ -130,7 +128,7 @@ def create_teiHeader(document):
   encodingDesc.appendChild(projectDesc)
   p2 = document.createElement('p')
   projectDesc.appendChild(p2)
-  p2.appendChild(document.createTextNode('OTAP'))
+  p2.appendChild(document.createTextNode('Insert Project Here'))
 
   revisionDesc = document.createElement('revisionDesc')
   header.appendChild(revisionDesc)
@@ -143,12 +141,13 @@ def create_teiHeader(document):
 
   date = document.createElement('date')
   item.appendChild(date)
-  date.setAttribute('when', '2012-30-08')
-  date.appendChild(document.createTextNode('30 August 12'))
+  #Same question about "when" attribute as above.
+  date.setAttribute('when', 'Insert Date')
+  date.appendChild(document.createTextNode('Insert Date of Last Edit'))
   item.appendChild(document.createTextNode('Last checked'))
   return header
 
-
+#Sets up xml_minidom document with (front), body, and (back) material
 def setup_DOM():
   impl = getDOMImplementation()
   doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd')
@@ -177,18 +176,17 @@ class TranscriptionFile:
   errors = []
   #version = -1
 
+  #Constructs a TranscriptionFile. Determines document version and updates it to the
+  #current version. Processes document into TranscriptionFile
   def __init__(self, lines):
     m4 = VERSION_RE.match(lines[0])
     if m4:
-      #print("entered m4, n= " + str(n), file = sys.stderr)
       set_version(int(m4.group(1)))
-      #print("version check in tf: " + str(self.version), file=sys.stderr)
       if version > CURRENT_VERSION:
         set_version(CURRENT_VERSION) #should avoid passing constant?
         logging.warning("""Specified version is greater than the current version. Possibly
                            typo or an update to the autotagger is necessary before usage""")
     elif (version == -1):
-      #print("entered else in version n= " + str(n), file = sys.stderr)
       set_version(0)  
         
     while version < CURRENT_VERSION:
@@ -244,78 +242,71 @@ class TranscriptionFile:
     self.pages.append(tp)
     #except:
      # """Error with page creation. There is not another page to append."""
-     
+  
+  #Controls the update of document to current version.   
   def uprev(self, lines):
     uprev_lines = []
     uprev_errors = []
-    
     logging.debug("Entered uprev.")
-    #why does this introduce tons of double spaces (new lines) to the file?
-    #self.printAfter()
-    
     if version == 0:
-      logging.debug("entered version 0")
       uprev_lines, uprev_errors = self.version0to1(lines)
       set_version(1)
-      
     #self.print(uprev_lines)
     return uprev_lines, uprev_errors #or should this be a different return statement each time?
 
+  #Updates version 0 documents to version 1
   def version0to1(self, lines):
-    #print("version check in tfp bump lines " + str(self.version), file=sys.stderr)
     logging.debug("entered version0to1")
     version1_lines = []
     v1_errors = []
     
     current_page = -1  
     temp_div_headers = [] 
-    #switch = False #false means we're still in head
-                 #true means we've switched to body    length = len(lines)
     length = len(lines)
     text = False #true if previous line was Text:
-    #multi_headers = False #true if multiple "Lines" are allowed
     divlines = 0
     empty = False #true if previous line in body was empty
     double_spacing = 0 #number of double spaced lines found in body
     double_spacing_found = False #true if double spacing found
-    #linecount = 0
-    #while len(lines) > 0:
-    #do everything matching 0
+
     for i in range(0, length):
-      m1 = MARGINS_RE.match(lines[i])
+      #Handle Text and DivLine elements only present in version 0 transcription files
+      m1 = TEXT_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
-      m3 = LINE_RE.match(lines[i])
-      m4 = TEXT_RE.match(lines[i])
-      m7 = STAR_RE.match(lines[i])
-      m8 = DIVLINENUMBER_RE.match(lines[i])
-      m9 = PAGE_RE.match(lines[i])
-      m10 = PAGENOTES_RE.match(lines[i])
-      m11 = PAGETABBED_RE.match(lines[i])
+      m3 = DIVLINENUMBER_RE.match(lines[i])
       
-      if m2 or m8 or m4:
-        if m2 or m8:
-          if m8:
+      if m1 or m2 or m3:
+        if m2 or m3:
+          if m3:
             #self.errors.append(errors(self.num, i, lines[i], 6))
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                             str(current_page) + ". Make sure the line number is not included.")
             
-        #print("m2.group(1) = " + m2.group(1), file = sys.stderr)
           temp_div_headers.append(m2.group(1))
           divlines += 1
         else:
           text = True
+      
+      #Process rest, updating tf syntax where necessary and recording any errors.    
       else:
-        #keep track of pages so as to allow for error reporting
-        if m9 or m10 or m11:
+        m4 = PAGE_RE.match(lines[i])
+        m5 = PAGENOTES_RE.match(lines[i])
+        m6 = PAGETABBED_RE.match(lines[i])
+        m7 = MARGINS_RE.match(lines[i])
+        m8 = STAR_RE.match(lines[i])
+        m9 = LINE_RE.match(lines[i])
+        
+        #Keep track of pages so as to allow for error reporting
+        if m4 or m5 or m6:
           if current_page == -1:
             current_page = 1
           else:
             current_page += 1
           logging.debug("Page number " + str(current_page))  
-        #alter as necessary    
-        elif m1:
-          lines[i] = '\tNotes:'
+      
         elif m7:
+          lines[i] = '\tNotes:'
+        elif m8:
           divlines -= 1
           #print(temp_div_headers[0], file=sys.stderr)
           if len(temp_div_headers) >= 1:
@@ -325,34 +316,26 @@ class TranscriptionFile:
             v1_errors.append(incorrect_stars_error(str(current_page))) 
           lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
           #appending at end could pose a problem adding multiple lines.
-        elif text and m3:
-          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip())
-          #multi_headers = True
-          
+        elif text and m9:
+          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
+          #multi_headers = True   
         else:
           text = False
-          if m3:
-            #if multi_headers: #subsequent section header
-             # lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s+', '', lines[i].rstrip())
-            #else: #margin note
-             # multi_headers = False
+          if m9:
             lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
         version1_lines.append(lines[i].rstrip())          
     if divlines != 0:
       v1_errors.append(incorrect_stars_error(str(current_page)))  
     return version1_lines, v1_errors
 
+  #Prints TranscriptionFile in current transcription file format, noting the version number
   def print(self, lines):
-    #if self.num == '1': # what if different starting number? Account for that with a variable? 
-    #  print('version == ' + str(CURRENT_VERSION), file=sys.stderr)
-    #print('Page ' + self.num + ':', file=sys.stderr)
-    #for l in lines:
-    #  print(l, file=sys.stderr)
-    
     print('Version ' + str(CURRENT_VERSION), file=sys.stderr)
     for l in lines:
       print(l, file=sys.stderr)
-   
+  
+  #Prints a page after processing for debugging purposes, including Version number at
+  #first page, Page and number, and lines in head and body.
   def printAfter(self):
     if self.num == '1': # what if different starting number? Account for that with a variable? 
       print('Version ' + str(CURRENT_VERSION), file=sys.stderr)
@@ -362,7 +345,6 @@ class TranscriptionFile:
     print('', file=sys.stderr)
     for l in self.body:
       print(l, file=sys.stderr)            
-      
           
 
 class TranscriptionPage:
@@ -376,63 +358,53 @@ class TranscriptionPage:
   head = []
   body = []
   errors = []
-  #version = -1
 
+  #Constructs a new TranscriptionPage
   def __init__(self, num, lines):
-
-    # sys.stderr.write("process transcription page ... ")
     self.num = num
-    #self.version = version
     self.parse_lines(lines)
-    # print(self.num + " page created", file=sys.stderr)
+    logging.debug("[done]\npage info:")
+    logging.debug("number: " + self.num)
+    logging.debug("header: \n" + str(self.head))
+    logging.debug("body: \n" + str(self.body) + "\n")
 
-    # check
-
-    # print("[done]\npage info:",file=sys.stderr)
-    # print("number: "+self.num,file=sys.stderr)
-    # print("header: \n"+str(self.head),file=sys.stderr)
-    # print("body: \n"+str(self.body)+"\n", file=sys.stderr)
-
-
+  #Processes lines of input into a TranscriptionPage in proper format 
   def parse_lines(self, lines):
     """header is all lines up to the first empty one, rest is body"""
-    #print("version check in tfp parse lines: " + str(self.version), file=sys.stderr)
+    
     h = []
     b = []
-    in_body = False #false means we're still in head
-                   #true means we've switched to body    length = len(lines)
+    in_body = False #false if still in head
     length = len(lines)
     empty = False #true if previous line in body was empty
     double_spacing = 0 #number of double spaced lines found in body
     double_spacing_found = False #true if double spacing found
     linecount = 0
     for i in range(0, length):
-      m1 = NOTES_RE.match(lines[i])
-      m2 = MARGINNOTE_RE.match(lines[i])
-      m3 = FOOTNOTE_RE.match(lines[i])
-      #m4 = LINE_RE.match(lines[i])
-      m7 = MARGINLINELIST_RE.match(lines[i])
-      m8 = MARGINLINERANGE_RE.match(lines[i])
-      m10 = VERSION_RE.match(lines[i])
-      #print(str(switch), file=sys.stderr)
-      #if m2:
-        #print("marginnote found", file = sys.stderr)
-      #if m1:
-        #print("note: found", file = sys.stderr)
-      if m7 or m8:
+      #Check for initial errors
+      m1 = MARGINLINELIST_RE.match(lines[i])
+      m2 = MARGINLINERANGE_RE.match(lines[i])
+      m3 = VERSION_RE.match(lines[i])
+      m4 = NOTES_RE.match(lines[i])
+      m5 = MARGINNOTE_RE.match(lines[i])
+      m6 = FOOTNOTE_RE.match(lines[i])  
+      if m1 or m2:
         self.errors.append(errors(self.num, i, lines[i], 4))
+      #process header
       elif not in_body:
-        if m10: #how make sure it is at the beginning of first page?
+        logging.debug("IN HEAD") 
+        if m3: #How do we make sure it is at the beginning of first page?
           continue
-        elif m1 or m2 or m3:
+        elif m4 or m5 or m6:
           h.append(lines[i].rstrip())
         elif lines[i].strip() == "":
           in_body = True
         else:
           self.errors.append(errors(self.num, i, lines[i], 1))
-      else: #in body
-        #do we need this linecount? I don't think so...
-        linecount = linecount + 1
+      #process body
+      else:
+        logging.debug("IN BODY")
+        #Handle double spacing
         if double_spacing == 3 and double_spacing_found == False:
           logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
           double_spacing_found = True
@@ -446,15 +418,17 @@ class TranscriptionPage:
             double_spacing = 0    
         #if not m4:
           #self.errors.append(errors(self.num, i, lines[i], 3))
-        m5 = SECTION_RE.match(lines[i])
-        m6 = SUBSECTION_RE.match(lines[i])
+          
+        #Translate main structural 
+        m7 = SECTION_RE.match(lines[i])
+        m8 = SUBSECTION_RE.match(lines[i])
         m9 = SUBSECTIONNUMBER_RE.match(lines[i])
-        if m5 or m6 or m9:      
+        if m7 or m8 or m9:      
           if m9:
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                              self.num + ". Make sure the line number is not included.")
           b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-        elif m1 or m2 or m3: #or m4:
+        elif m4 or m5 or m6:
           self.errors.append(errors(self.num, i, lines[i], 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
@@ -463,9 +437,7 @@ class TranscriptionPage:
     self.body = b
     #self.printAfter()
 
-
-
-    
+#Processes error with incorrect number of stars
 def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
   asterisks. Contains the page number."""
@@ -473,6 +445,7 @@ def incorrect_stars_error(page_num):
   return "The number of asterisks in the body does not match the number"+\
          "of DivLines in the header on page "+ page_num +"."
 
+#Processes all other errors
 def errors(page_num, line_num, line, error_code):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
@@ -506,38 +479,36 @@ def errors(page_num, line_num, line, error_code):
   elif error_code == 5:
     err_str += "This line must be formatted \"Page #\". No additional "+\
                "formatting is allowed.\n"
-  #elif error_code == 6:
-   # err_str += "DivLines should not specify the line number. This line "+\
-    #           "should be introduced by \"DivLine:\" only.\n"
   return err_str
 
-#combine create div methods. Pass in div1 vs. div2
-def create_div1(document,n):
-  """Creates a new div1 element, and returns that div1 and its head node"""
-  div1 = document.createElement('div1')
-  div1.setAttribute('type','journey')
-  #generalize type attribute, or configure. (could later change TF to include different types
-  #for letter and diaries. for now could take out type
-  div1.setAttribute('n',n)
+#Creates a div of a specified number, type (1 or 2), and if applicable, part (I, M, or F)
+def create_div(document, n, div_type, part):
+  """Creates div element of specified type and returns that div and its head node"""
+  div = document.createElement(div_type)
+  #div.setAttribute('type','insert type (letter/diary, etc) here')
+  div.setAttribute('n', n)
+  if part is not None:
+    div.setAttribute('part', part)
   head = document.createElement('head')
-  div1.appendChild(head)
-  head.setAttribute('type','journey')
-  return head, div1
+  div.appendChild(head)
+  #head.setAttribute('type', 'type here') #is this necessary if the div itself has an attr?
+  return head, div
 
-def create_div2(document,n,part):
-  """Creates a new div2 element, and returns that div2 and its head node"""
-  div2 = document.createElement('div2')
-  div2.setAttribute('type','diaryentry')
-  #remove type
-  div2.setAttribute('n',n)
-  div2.setAttribute('part', part)
+#Creates first div of given type if necessary
+def create_generic_div(document, div_count, type):
+  part = "N"
+  div_head, div = create_div(document, str(div_count), 'div2', part)
+  title = "First "
+  if type == 'div1':
+    title += "section; "
+  elif type == 'div2':
+    title += "subsection; "
+  title += "no title given in text."
+  div_head.appendChild(document.createTextNode(title))
+  div_count +=1
+  return div, div_count
 
-  head = document.createElement('head')
-  div2.appendChild(head)
-  head.setAttribute('type','diaryentry')
-  
-  return head, div2
-
+#Creates a new paragraph
 def create_p(document,current_prose, first_line=None, fresh=False):
   '''method to create a paragraph, needs the list of paragraphs
      possibly also receive a first line (and it's linenum in a list of len 2).
@@ -545,13 +516,17 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   if fresh: current_prose = []
   current_prose.append(document.createElement('p'))
   if first_line != None:
-    lb = document.createElement('lb')
-    lb.setAttribute('n',str(first_line[1]))
     current_prose[-1].appendChild(document.createTextNode(first_line[0]))
-    current_prose[-1].appendChild(lb)
+    current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
   return current_prose
 
-
+#Creates a line break of the given number
+def create_line_break(document, linecount):
+  lb = document.createElement("lb")
+  lb.setAttribute("n", str(linecount))
+  return lb
+  
+#Processes xml-ids for notes
 def process_id(dict, id):
   """Makes sure every assigned xml-id is valid by checking for duplicates. Adds "i" 
   characters where necessary"""     
@@ -565,26 +540,16 @@ def process_id(dict, id):
     dict[id] = 1
   return id
     
-    
-    
-def create_dom_nodes(doc,tf):
-  """function that sets up in a DOM form with the nodes: Document, header and body,
-  header type divlines and trip titles, margin notes and text"""
+def process_header(doc,tf):
+  """Translates information contained in the header of the transcription file into XML."""
 
-  #div2s = [] # contains all diary div headers
-  marginheaders = []# triples: [content,pagenum,linenum]
+  marginheaders = [] # contains each note, its page number, and line
   footnotes = [] # doubles: [content, pagenum]
   xml_ids_dict = {}
- # margins = [] #what is this?
 
-  #div1_count = 1
-  #div2_printed_count = 1
-  #div2_count = 1
   marginline_count = 1
   for page in tf.pages:
     for l in page.head:
-       # DivLine: "..." are 'diaryentry' headers
-       # Line: "..." are 'margin_note' headers
       m = NOTES_RE.match(l)
       if m:
         continue
@@ -592,117 +557,71 @@ def create_dom_nodes(doc,tf):
       m = MARGINNOTE_RE.match(l)
       if m:
         head = doc.createElement('head')
-        marginheaders.append([head, page.num, m.group(1)])
+        marginheaders.append({'note' : head, 'page' : page.num, 'line' : m.group(1)})
+        #check if page.num and m.group(1) are strings... should change them here?
         head.setAttribute('type','marginnote')
         marginnote_id = "p" + page.num + '-' + m.group(1)
-        
         marginnote_id = process_id(xml_ids_dict, marginnote_id)
-
-        head.setAttribute('xml:id', marginnote_id) # could factor out all process of
-        # creating and assigning xml id, or creating headers in general eventually.
-        text = doc.createTextNode(m.group(2))
-        head.appendChild(text)
+        head.setAttribute('xml:id', marginnote_id) 
+        head.appendChild(doc.createTextNode(m.group(2)))
       
       m = FOOTNOTE_RE.match(l)
-      #factor out head creation code?
       if m:
         head = doc.createElement('head')
         footnotes.append([head, page.num])
         head.setAttribute('type', 'footnote')
-        text = doc.createTextNode(m.group(1))
-        head.appendChild(text)
+        head.appendChild(doc.createTextNode(m.group(1)))
   return marginheaders, footnotes, xml_ids_dict
 
-def create_generic_div2(document, div2_count):
-      part = "N"
-      div2_head, div2 = create_div2(document, str(div2_count), part)
-      text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
-      div2_head.appendChild(text)
-      div2_count += 1
-      return div2, div2_count
   
-def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
-  # this will be a list of paragraph nodes
-  current_prose = []
+def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
+  """Translates data contained in the body text of the transcription file into XML,
+  combining the structure indicated in the body text with the given notes from the
+  header."""
+  current_prose = [] #list of paragraph nodes
   current_prose = create_p(document,current_prose)
-  div1s = [] # contains all trip div headers
-  div2s = [] # contains all diary div headers
   
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
 
-  #new_trip = False
   empty_lines = 0
   last_empty = False
-
-	#line count configurations:
+  
+	#Configurations as to whether section or subsection titles are in the body text (True),
+	#or removed in margins/elsewhere on the page (False)
   section_in_text = True
   subsection_in_text = False
 	
   just_divided = False
   current_div1 = None
   current_div2 = None
-  previous_section_text = False
-  previous_subsection_text = False
   div1_head = None
   div2_head = None
   section_found = False
   subsection_found = False
   div1_count = 1
   div2_count = 1
-  # need line number stored in an attribute?
+  margin_queue = []
+  
   for page in tf.pages:
-    #if page.num == "1":
-    #if it is the first line in the file, just create a generic and
-    # arbitrary div1 to hold diary entries until the first real div1
-    # trip heading is found.
-    if current_div1 == None:
-      div1_head, div1 = create_div1(document, str(div1_count))
-      current_div1 = div1
-      text = document.createTextNode("First Journey in Diary; No Journey Title")#generalize
-      div1_head.appendChild(text)
-      div1_count += 1
-      if current_div2 == None:
-        current_div2, div2_count = create_generic_div2(document, div2_count)
-      current_div1.appendChild(current_div2)# change
-
-    if current_div2 == None:
-        ## create first div2
-      current_div2, div2_count = create_generic_div2(document, div2_count)
-      current_div1.appendChild(current_div2)
-      #part = "N"
-      #div2_head, div2 = create_div2(document, str(div2_count), part)
-      #text = document.createTextNode("First Diary entry; no title given in text.")#generalize?
-      #div2_head.appendChild(text)
-      #div2_count += 1
-      
-     # current_div2 = div2
-      #current_div1.appendChild(current_div2)
-      #print("div2s header count" + str(len(div2s)), file=sys.stderr)
-        
     linecount = 0
     for l in page.body:
-      #section or subsection headings have the line included directly after
-      #so they should now be included in the linecount
-      #linecount += 1
-      #if "Section:" matched and if "Line #:" is found right after "Text:", or it
-      #is the first line of the entire file, create a div 1 and add it to the list div1s
-      
       linecount += 1
-      #works if only have the above line count change, and no others
-      #that doesn't take into account the other lines though...
+      
+      #Insert margin notes when appropriate. Store early notes to add once first
+      #section and subsection have been created.
       if len(marginheaders) > 0:
-        current_lineheader = marginheaders[0]
-        #use dictionary stored inside marginheaders. then call current_lineheader["text"], ["page"], ["line"]
-        if linecount <= int(current_lineheader[2]) and page.num == current_lineheader[1]:
-          current_div2.appendChild(current_lineheader[0])
-          #marginheaders.pop(0)
-          marginheaders.remove(current_lineheader)
-      #logging errors ---look at that
-      #else:
-        #print("ran out of marginheaders",file=sys.stderr)
+        current_marginnote = marginheaders[0]
+        if linecount <= int(current_marginnote['line']) and page.num == current_marginnote['page']:
+          if current_div2 == None:
+            margin_queue.append(current_marginnote['note'])
+          else:
+            current_div2.appendChild(current_marginnote['note'])
+          marginheaders.remove(current_marginnote)
+      else:
+        logging.debug("Ran out of marginheaders.")
 
-      #organizing div1s
+      #Account for empty lines or double spacing
       m = EMPTYLINE_RE.match(l)
       if m:
         #found empty line
@@ -711,65 +630,52 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
         continue
       elif last_empty:
         for i in range(1, empty_lines + 1):
-          lb = document.createElement('lb')
-          lb.setAttribute('n',str((linecount - empty_lines + (i - 1))))
-          current_prose[-1].appendChild(lb)
+          current_prose[-1].appendChild(create_line_break(document, str((linecount - empty_lines + (i - 1)))))
         last_empty = False
         empty_lines = 0
-
-        # now looping through page body to find div1s, which we may
-        # want to figure out how to do in the organize_nodes method
-        # later so as not to loop through the file as much.
-      
-      #put set up section and subsection in create dom nodes method...
+        
+      # Creates section if found, or a generic section if one has not yet been created.
+      # If new section occurs in the middle of a subsection, this subsection is divided
+      # into two parts, labeled 'I' for initial, 'M' for medial, or 'F' for final as
+      # corresponding to each case.
       m = SECTION_RE.match(l)
       if m:
-        if not section_in_text:
-          linecount -= 1
         if not section_found:
-          body.appendChild(current_div1) #why was this outside?
-          #creates a cloned div2 with all its nodes to serve as the medial
-          # or final part then labeled as the next number in the div2_count
-          # check and see if the last one was part f. if so make the
-          # last one part m instead.
-          #if len(div2s) >= 1:
-          next_div2 = current_div2.cloneNode(False)
-          next_div2.setAttribute('part', 'F')
-          atr = current_div2.getAttributeNode('part')
-          x = atr.nodeValue
-          if x == 'F':
-            current_div2.setAttribute('part', 'M')
-          else:
-            current_div2.setAttribute('part', 'I')
-          current_div2.childNodes.extend(current_prose)
-          current_prose = create_p(document,current_prose, fresh=True)
-          current_div1.appendChild(current_div2)
+          body.appendChild(current_div1)
+          if current_div2 is not None:
+            next_div2 = current_div2.cloneNode(False)
+            next_div2.setAttribute('part', 'F')
+            atr = current_div2.getAttributeNode('part')
+            x = atr.nodeValue
+            if x == 'F':
+              current_div2.setAttribute('part', 'M')
+            else:
+              current_div2.setAttribute('part', 'I')
+            current_div2.childNodes.extend(current_prose)
+            current_prose = create_p(document,current_prose, fresh=True)
+            current_div1.appendChild(current_div2)
 
-          #update div2s to get rid of original one 
-          div1_head, div1 = create_div1(document, str(div1_count))
-          current_div1 = div1
-          div1_count += 1
-          current_div2 = next_div2
-          
-        text = document.createTextNode(m.group(1))
-        div1_head.appendChild(text)
+            # update div2s to get rid of original one 
+            div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
+            current_div1 = div1
+            div1_count += 1
+            current_div2 = next_div2
+
+        div1_head.appendChild(document.createTextNode(m.group(1)))
         if section_in_text:
-          lb = document.createElement("lb")
-          lb.setAttribute("n", str(linecount))
-          div1_head.appendChild(lb)
+          div1_head.appendChild(create_line_break(document, linecount))
+        else:
+          linecount -= 1
         section_found = True
         continue
       else:
+        if current_div1 == None:
+          current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
         section_found = False
-        #below only for testing purposes, shouldn't be here
-        #section_lines = 0
-          
-      m = SUBSECTION_RE.match(l)
+   
+      # Creates a subsection, or a generic subsection if one has not yet been created.
+      m = SUBSECTION_RE.match(l)  
       if m:
-        if not subsection_in_text:
-          linecount -= 1 
-        #subsections do not have linecounts, they are divlines in the margin
-        #linecount -= 1
         if not subsection_found:
           just_divided = True
           #attach previous div2
@@ -779,56 +685,43 @@ def organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict):
             
           #create new div2
           part = "N"
-          div2_head, div2 = create_div2(document, str(div2_count), part)
+          div2_head, div2 = create_div(document, str(div2_count), 'div2', part)
           div2_count += 1
+          if current_div2 == None:
+            div2.childNodes.extend(margin_queue)
           current_div2 = div2
-          #print("current div2 " + current_div2.getAttributeNode("n").nodeValue, file=sys.stderr)
           
-        text = document.createTextNode(m.group(1))
-        div2_head.appendChild(text)
+        div2_head.appendChild(document.createTextNode(m.group(1)))
         if subsection_in_text:
-          lb = document.createElement("lb")
-          lb.setAttribute("n", str(linecount))    # use linecount?
-          div2_head.appendChild(lb)
-        subsection_found = True
+          div2_head.appendChild(create_line_break(document, linecount))
+        else:
+          linecount -= 1
+        subsection_found = True 
         continue
-          
-      else:
+      else: 
+        if current_div2 == None:
+          current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
+          current_div2.childNodes.extend(margin_queue)
+          current_div1.appendChild(current_div2)
         subsection_found = False
-       
-       
-      #if section_in_text:
-     
-     #   linecount += section_lines
-      #  section_lines = 0
         
-  #    if subsection_in_text:
-   #     linecount += subsection_lines
-   #     subsection_lines = 0
-      
-
-       
-
-        
+      # Creates a paragraph if found a tab in the text.  
       m = PARA_RE.match(l)
-      if m: #and len(current_prose) == 0:
-        ## found a paragraph starting line of text
-        # start a new paragraph
+      if m: 
         if just_divided:
           current_prose = create_p(document, current_prose, [l, linecount], fresh=True)
           just_divided = False
           #will this pose a problem if for some reason there isn't a paragraph right afterwards?
         else:
           current_prose = create_p(document, current_prose,[l,linecount])
+      # Processes plain lines of body text
       else:
         just_divided = False
-        ## found a vanilla line of text
-        lb = document.createElement('lb')
-        lb.setAttribute('n',str(linecount))
         current_prose[-1].appendChild(document.createTextNode(l))
-        current_prose[-1].appendChild(lb)
-    #maybe add in something that says to delete the last line break 
+        current_prose[-1].appendChild(create_line_break(document, str(linecount)))
+    # maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
+      
     last_empty = False
     empty_lines = 0
     pb = document.createElement('pb')
@@ -847,10 +740,16 @@ def setup_argparse():
       default=1, help='increase the verbosity (can be repeated: -vvv)') 
   return ap
 
+def run(tf):
+  """Translates transcription file into XML. Returns the complete XML document"""
+  document = setup_DOM()
+  marginheaders, footnotes, xml_ids_dict = process_header(document, tf)
+  process_body(document, tf, marginheaders, footnotes, xml_ids_dict)
+  return document
+  
 if __name__ in "__main__":
-  # accept svoboda transcription format file
-  # on stdin
 
+  # Accept a Svoboda Transcription Format file of given version on stdin
   ap = setup_argparse()
   args = ap.parse_args()
   if args.file:
@@ -861,27 +760,18 @@ if __name__ in "__main__":
 
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
-  # to keep things clean, and check for errors in
-  # the input,
-  # before we start, parse these lines
-  # into a series of 'page objects'
 
+  # Compile a TranscriptionFile out of the inputed text.
   tf = TranscriptionFile(infilelines)
   logging.info(" found "+str(len(tf.pages))+" transcription pages")
 
-  #for page in tf.pages:
-   # for l in page.head:
-    #  print(l)
-    #for l in page.body:
-     # print(l)
-      
+  # Any errors found must first be resolved by the user before process can continue. 
+  # If the TranscriptionFile properly follows the format, inputed text is converted
+  # to XML and printed.
   if len(tf.errors) > 0:
     print("Errors found. Please check error log and try again later.")
     for e in tf.errors:
       print(e,file=sys.stderr)
   else:
-    document = setup_DOM()
-    marginheaders, footnotes, xml_ids_dict = create_dom_nodes(document, tf)
-    organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
-    #put 3 lines above into run and return document. 
+    document = run(tf)
     print(document.toprettyxml('\t', '\n', None))
