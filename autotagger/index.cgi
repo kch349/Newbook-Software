@@ -94,10 +94,11 @@ WELCOME_PAGE = """
 </head>
 <body>
 <div id="header">
-	<div id="logo"><a href="http://depts.washington.edu/svobodad/"><img alt="logo" src="web/images/logo.png"></img></a></div>
-<div id="top_right">
+	<div id="logo"><a href="http://depts.washington.edu/ndth/"><img alt="logo" src="web/images/nbdt_logo_216px.png"></img></a></div>
+	<div id="top_right">
   <!-- <span>Inspiration starts here.</span> -->
-  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="web/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="web/images/twitter_small.gif"></img></a></div><div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="web/images/banner2.jpg"></img></a></div>
+  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="web/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="web/images/twitter_small.gif"></img></a></div>
+	<div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="web/images/banner2.jpg"></img></a></div>
 </div>
 <h2>Newbook Autotagger Online Interface</h2>
 <div id=content><p>Submit a SDTF file (svoboda diaries transcription format);
