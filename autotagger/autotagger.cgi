@@ -207,7 +207,7 @@ elif 'tex' in form_data:
     if(os.path.exists(session_path+"/output.html")):
       # cross out and disable html creation as it's already done
       css+='#html_span,#html_but { text-decoration:line-through; }'
-      htmlout="<br />Your LaTeX is <a href="+session_path+"/output.html>here</a>."
+      htmlout="<br />Your HTML is <a href="+session_path+"/output.html>here</a>."
     print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
                           'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
                           'teioutfile': session_path+"/output.xml" })
