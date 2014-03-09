@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # autotagger web interface
-# 
+#
 
 import cgi
 import cgitb; cgitb.enable()
@@ -19,38 +19,55 @@ import datetime
 
 HTTP_HEADERS = "Content-type: text/html\nSet-cookie: session=%(cookie)s"
 ERROR_PAGE = """
+<!doctype html>
 <html>
 <head>
 </head>
 <body>
     <h3>Errors in the input, they are listed below</h3>
     <p>
- <form action="autotagger.cgi" method="post" 
+ <form action="autotagger.cgi" method="post"
           enctype="multipart/form-data">
- <input type="submit" name=""  value="Upload another transcription file"/>
+ <input type="submit" name="" value="Upload another transcription file"/>
  <input type="file" name="sdtf" /></p>
     %(errors)s
 </form>
 </html>"""
+
 SUCCESS_PAGE = """
+<!doctype html>
 <html>
 <head><title>Autotagger Success!</title></head>
+<style>
+%(css)s
+</style>
 <body>
-<h3>Your %(filetype)s is ready!</h3>
-<h4>%(timestamp)s</h4>
+<h2>Your %(filetype)s is ready!</h2>
+<h3>%(timestamp)s</h3>
 
-<p>Find the result <a href="%(outfile)s">here</a> 
+<p>Your TEI-XML result is here: <a href="%(teioutfile)s">here</a>
 (right click the link to save the file to your computer).</p>
 <ul>
   <li>
   <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
-  <input type="hidden" name="tei" value="on"/>
-  Process your TEI-XML to generate an HTML file: <input type="submit" value="Go!"/></form>
+    <input type="hidden" name="html" value="on"/>
+    <span id="html_span">Process your TEI-XML to generate an HTML file:</span> 
+    <input id="html_but" type="submit" value="Go!"/>
+    %(htmloutfile)s
+  </form>
   </li>
-  <li>Try again with another transcription format file 
+  <li>
+  <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
+    <input type="hidden" name="tex" value="on"/>
+    <span id="latex_span">Process your TEI-XML to generate a LaTeX file:</span> 
+    <input id="latex_but" type="submit" value="Go!"/>
+    %(texoutfile)s
+  </form>
+  </li>
+  <li>Try again with another transcription format file (clears your sessions 
+      directory, download any files you want to keep first!)
    <form action="autotagger.cgi" method="post" enctype="multipart/form-data">
-   <input type="file" name="sdtf" /><br />
-   <input type="submit" value="Upload transcription file"/>
+     <input type="file" name="sdtf" required/> <input type="submit" value="Upload transcription file"/>
    </form>
   </li>
 </ul>
@@ -64,17 +81,17 @@ SUCCESS_PAGE = """
 </html>"""
 
 WELCOME_PAGE = """
+<!doctype html>
 <html>
 <head><title>Newbook Autotagger Online</title>
 </head>
 <body>
-<h3>Newbook Autotagger Online Interface</h3>
+<h2>Newbook Autotagger Online Interface</h2>
 <p>Submit a SDTF file (svoboda diaries transcription format);
 we'll run the autotagger and show you to the result.</p>
-<form action="autotagger.cgi" method="post" 
+<form action="autotagger.cgi" method="post"
       enctype="multipart/form-data">
- <input type="submit" name=""  value="Upload transcription file"/>
- <input type="file" name="sdtf" /></p>
+ <input type="file" name="sdtf" required/> <input type="submit" value="Upload transcription file"/></p>
 </form>
 Our code is open-source access our repository <a href="https://github.com/kch349/Newbook-Software">here</a>.
  </body>
@@ -84,7 +101,7 @@ Our code is open-source access our repository <a href="https://github.com/kch349
 ## be sure to use UTF buffer for stdout
 sys.stdout = codecs.getwriter('utf8')(sys.stdout.buffer)
 
-# Get the cookie.  If there's not one, make one.
+# Get the cookie. If there's not one, make one.
 http_cookie = os.getenv('HTTP_COOKIE')
 browser_cookie = False
 cookie = ''
@@ -117,15 +134,20 @@ for s in sessions:
 session_path = 'sessions/' + cookie
 if cookie and not os.path.exists(session_path):
   os.mkdir(session_path)
-  # create a blank output file
-  open(os.path.join(session_path, 'output.xml'), 'w').close()
 
-print(HTTP_HEADERS % {'cookie':cookie }) 
-form_data = cgi.FieldStorage() 
+print(HTTP_HEADERS % {'cookie':cookie })
+form_data = cgi.FieldStorage()
 timestamp = datetime.datetime.now().ctime()
 
 if 'sdtf' in form_data:
   ## run autotagger on input
+
+  # step 0, clear old files out of the way
+  # and create empty output file
+  filelist = glob.glob(session_path+"/output*")
+  for f in filelist: os.remove(f)
+  open(os.path.join(session_path, 'output.xml'), 'w').close()
+
 
   # step 1, get the lines from the form
   infilelines = str(form_data['sdtf'].value, encoding="utf-8").split('\n')
@@ -141,27 +163,54 @@ if 'sdtf' in form_data:
     print(ERROR_PAGE % { 'errors':errhtml })
   else:
    # no errors, run the tagger
-    document = autotagger.setup_DOM()
-    marginheaders, footnotes, xml_ids_dict = autotagger.create_dom_nodes(document, tf)
-    autotagger.organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    #document = autotagger.setup_DOM()
+    #marginheaders, footnotes, xml_ids_dict = autotagger.create_dom_nodes(document, tf)
+    #autotagger.organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    document = autotagger.run(tf)
 
-    try:
-      outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
-    except:
-      print("error getting the outfile for writing")
+    #try:
+    outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
+    #except:
+    #  print("error getting the outfile for writing")
 
-    document.writexml(outfile, addindent="  ",newl="\n")
-    print(SUCCESS_PAGE % {'filetype': "TEI-XML", 'timestamp':timestamp, 
-                          'outfile': session_path+"/output.xml"})
+    document.writexml(outfile, addindent=" ",newl="\n")
+    print(SUCCESS_PAGE % {'filetype': "TEI-XML", 'timestamp':timestamp,
+                          'teioutfile': session_path+"/output.xml",
+                          'css':'','htmloutfile':'','texoutfile':''})
 
-elif 'tei' in form_data: 
+elif 'html' in form_data:
   import xslt
   r = xslt.tei2html(session_path+"/output.xml",session_path+"/output.html")
   if r != 0:
-    print("<p>xsltproc returned nonzero</p>")
+    print("<p>xsltproc returned " + str(r) + "</p>")
   else:
+    css='#html_span,#html_but { text-decoration:line-through; }\n'
+    texout=""
+    htmlout="<br />Your HTML is <a href="+session_path+"/output.html>here</a>."
+    if(os.path.exists(session_path+"/output.tex")):
+      # cross out and disable tex creation as it's already done
+      css+='#latex_span,#latex_but { text-decoration:line-through; }'
+      texout="<br />Your LaTeX is <a href="+session_path+"/output.tex>here</a>."
     print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
-                          'outfile': session_path+"/output.html"})
+                          'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
+                          'teioutfile': session_path+"/output.xml" })
+
+elif 'tex' in form_data:
+  import xslt
+  r = xslt.tei2latex(session_path+"/output.xml",session_path+"/output.tex")
+  if r != 0:
+    print("<p>xsltproc returned " + str(r) + "</p>")
+  else:
+    css='#latex_span,#latex_but { text-decoration:line-through; }\n'
+    texout="<br />Your LaTeX is <a href="+session_path+"/output.tex>here</a>."
+    htmlout=""
+    if(os.path.exists(session_path+"/output.html")):
+      # cross out and disable html creation as it's already done
+      css+='#html_span,#html_but { text-decoration:line-through; }'
+      htmlout="<br />Your LaTeX is <a href="+session_path+"/output.html>here</a>."
+    print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
+                          'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
+                          'teioutfile': session_path+"/output.xml" })
 
 else:
   print(WELCOME_PAGE)
