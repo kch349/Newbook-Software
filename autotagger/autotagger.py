@@ -18,9 +18,52 @@ import logging
 import argparse
 from xml.dom.minidom import *
 
+
+
 ## input document and transcription format data
 CURRENT_VERSION = 1
 version = -1
+#Information from configuration of file. 
+CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
+               'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
+               'NUMBER_OF_DIVS' : 2, # Number of divisions present
+               'TITLE' : 'Insert Document Title Here', #Beginning OF TEI header info
+               'AUTHOR' : 'Insert Author Name Here',
+               'RESP_PROJECT' : 'Insert Name of Project Responsible for Transcription',
+               'PROJECT_LEAD' : 'Insert Name of Project Lead',
+               'DISTRIBUTOR' : 'Insert Distributor Name Here',
+               'ID_TYPE' : 'Insert Your Type Here',
+               'ID_VALUE' : 'Insert ID Number Here',
+               'COPYRIGHT' : 'Insert Copyright Data Here',
+               'DATE' : 'Insert Date Here',
+               'DATE_LAST_UPDATED' : 'Insert Date of Last Edit', # will slightly change output of generics
+               'BIBL_INFO' : 'Enter Bibliographical Information Here',
+               'PROJECT_DESC' : 'Insert Project Here'}
+
+
+
+#Structural Information
+#Configurations as to whether section or subsection titles are in the body text (True),
+#or removed in margins/elsewhere on the page (False)
+
+
+SECTION_IN_TEXT = True # must be boolean
+SUBSECTION_IN_TEXT = False # must be boolean
+#NUMBER_OF_DIVS = 2 # must be greater than 1
+##TEI Header Information (all must be strings)
+#TITLE = 'Insert Document Title Here'
+#AUTHOR = 'Insert Author Name Here'
+#RESP_PROJECT = 'Insert Name of Project Responsible for Transcription'
+#PROJECT_LEAD = 'Insert Name of Project Lead'
+#DISTRIBUTOR = 'Insert Distributor Name Here'
+#ID_TYPE = 'Insert Your Type Here'
+#ID_VALUE = 'Insert ID Number Here'
+#COPYRIGHT = 'Insert Copyright Data Here'
+#DATE = 'Insert Date Here'
+#DATE_LAST_UPDATED = 'Insert Date of Last Edit' # will slightly change output of generics
+#BIBL_INFO = 'Enter Bibliographical Information Here'
+#PROJECT_DESC = 'Insert Project Here'
+
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
@@ -52,6 +95,44 @@ SECTION_RE = re.compile('^\s*Section:?\s*(.*)$')
 SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
+
+#Reads in html file with various fields.
+#has scanner over file, or reads in lines.
+#for each field, in order.
+  #if matches one of possibilities (for divs/intext or out of text, concrete things)
+    #sets corresponding variable as that 
+  #elif empty
+    #set to default
+  #else
+  	#add errors that it is wrong. would crash program (divs less than 1, not boolean for
+  	#in text, etc)
+  	
+  	#maybe have these set already, and then config options override if formatted correctly.
+
+#Set order? or have tokens for labels? With set labels
+#def import_config(insert parameters here):
+  #for each 2 lines
+    #label = read one line (need to match constant...maybe have lower case, etc.)
+    #value = read next line/field
+    #if is_valid_entry(label, value):
+      #if label == NUMBER_OF_DIVS:
+        #value = int(value)
+      #CONFIG_INFO[label] = value  #check if this is the right formatting
+    #else:
+      #report error message...
+      #'''Your input for " + label + " is not valid. Make sure in-text data is True/False
+      #and your number of divisions is an integer of 1 or more.'''
+
+#check valid number
+#def is_valid_entry(label,value):
+  #if label == 'SECTION_IN_TEXT' or label == 'SUBSECTION_IN_TEXT':
+    #return type(label) is boolean
+  #elif label == 'NUMBER_OF_DIVS':
+    #return type(label) is int and value >= 1
+  #else:
+    #return type(label) is String   #not sure if that is how you write the type   
+
+
 #Sets version for document so it is accessible throughout program
 def set_version(value):
   global version
@@ -63,10 +144,10 @@ def create_respSt(document):
   resp_statement = document.createElement('respStmt')
   resp = document.createElement('resp')
   resp_statement.appendChild(resp)
-  resp.appendChild(document.createTextNode('Insert Name of Project Responsible for Transcription'))
+  resp.appendChild(document.createTextNode(CONFIG_INFO['RESP_PROJECT']))
   name = document.createElement('name')
   resp_statement.appendChild(name)
-  name.appendChild(document.createTextNode('Insert Name of Project Lead'))
+  name.appendChild(document.createTextNode(CONFIG_INFO['PROJECT_LEAD']))
   return resp_statement
 
 #Creates generic TEI Header. Will allow for configuration later.
@@ -80,11 +161,11 @@ def create_teiHeader(document):
 
   title = document.createElement('title')
   title_statement.appendChild(title)
-  title.appendChild(document.createTextNode('Insert Document Title Here'))
+  title.appendChild(document.createTextNode(CONFIG_INFO['TITLE']))
 
   author =  document.createElement('author')
   title_statement.appendChild(author)
-  author.appendChild(document.createTextNode('Insert Author Name Here'))
+  author.appendChild(document.createTextNode(CONFIG_INFO['AUTHOR']))
 
   title_statement.appendChild(create_respSt(document))
 
@@ -92,7 +173,7 @@ def create_teiHeader(document):
   fileDesc.appendChild(pubSt)
   distributor = document.createElement('distributor')
   pubSt.appendChild(distributor)
-  distributor.appendChild(document.createTextNode('Insert Distributor Name Here'))
+  distributor.appendChild(document.createTextNode(CONFIG_INFO['DISTRIBUTOR']))
 
   address = document.createElement('address')
   pubSt.appendChild(address)
@@ -101,26 +182,26 @@ def create_teiHeader(document):
 
   idno = document.createElement('idno')
   pubSt.appendChild(idno)
-  idno.setAttribute('type', 'Insert Your Type Here')
-  idno.appendChild(document.createTextNode('Insert ID Number Here'))
+  idno.setAttribute('type', CONFIG_INFO['ID_TYPE'])
+  idno.appendChild(document.createTextNode(CONFIG_INFO['ID_VALUE']))
 
   availability = document.createElement('availability')
   pubSt.appendChild(availability)
   p = document.createElement('p')
   availability.appendChild(p)
-  p.appendChild(document.createTextNode('Insert Copyright Data Here'))
+  p.appendChild(document.createTextNode(CONFIG_INFO['COPYRIGHT']))
 
   date = document.createElement('date')
   pubSt.appendChild(date)
   #why do we have a "when type" when there is already a text node containing that information?
   date.setAttribute('when', 'Insert Date Here')
-  date.appendChild(document.createTextNode('Insert Date Here'))
+  date.appendChild(document.createTextNode(CONFIG_INFO['DATE']))
 
   sourceDesc = document.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
   bibl = document.createElement('bibl')
   sourceDesc.appendChild(bibl)
-  bibl.appendChild(document.createTextNode('Enter Bibliographical Information Here'))
+  bibl.appendChild(document.createTextNode(CONFIG_INFO['BIBL_INFO']))
 
   encodingDesc = document.createElement('encodingDesc')
   header.appendChild(encodingDesc)
@@ -128,7 +209,7 @@ def create_teiHeader(document):
   encodingDesc.appendChild(projectDesc)
   p2 = document.createElement('p')
   projectDesc.appendChild(p2)
-  p2.appendChild(document.createTextNode('Insert Project Here'))
+  p2.appendChild(document.createTextNode(CONFIG_INFO['PROJECT_DESC']))
 
   revisionDesc = document.createElement('revisionDesc')
   header.appendChild(revisionDesc)
@@ -142,8 +223,8 @@ def create_teiHeader(document):
   date = document.createElement('date')
   item.appendChild(date)
   #Same question about "when" attribute as above.
-  date.setAttribute('when', 'Insert Date')
-  date.appendChild(document.createTextNode('Insert Date of Last Edit'))
+  date.setAttribute('when', CONFIG_INFO['DATE_LAST_UPDATED'])     #Will be slightly different from existing copy
+  date.appendChild(document.createTextNode(CONFIG_INFO['DATE_LAST_UPDATED']))
   item.appendChild(document.createTextNode('Last checked'))
   return header
 
@@ -496,14 +577,15 @@ def create_div(document, n, div_type, part):
 
 #Creates first div of given type if necessary
 def create_generic_div(document, div_count, type):
-  part = "N"
-  div_head, div = create_div(document, str(div_count), 'div2', part)
   title = "First "
+  part = None
   if type == 'div1':
     title += "section; "
   elif type == 'div2':
     title += "subsection; "
+    part = "N"
   title += "no title given in text."
+  div_head, div = create_div(document, str(div_count), type, part)
   div_head.appendChild(document.createTextNode(title))
   div_count +=1
   return div, div_count
@@ -586,12 +668,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
 
   empty_lines = 0
   last_empty = False
-  
-	#Configurations as to whether section or subsection titles are in the body text (True),
-	#or removed in margins/elsewhere on the page (False)
-  section_in_text = True
-  subsection_in_text = False
-	
+
   just_divided = False
   current_div1 = None
   current_div2 = None
@@ -662,7 +739,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             current_div2 = next_div2
 
         div1_head.appendChild(document.createTextNode(m.group(1)))
-        if section_in_text:
+        if SECTION_IN_TEXT:
           div1_head.appendChild(create_line_break(document, linecount))
         else:
           linecount -= 1
@@ -671,6 +748,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
       else:
         if current_div1 == None:
           current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
+          body.appendChild(current_div1)
         section_found = False
    
       # Creates a subsection, or a generic subsection if one has not yet been created.
@@ -692,7 +770,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           current_div2 = div2
           
         div2_head.appendChild(document.createTextNode(m.group(1)))
-        if subsection_in_text:
+        if SUBSECTION_IN_TEXT:
           div2_head.appendChild(create_line_break(document, linecount))
         else:
           linecount -= 1
