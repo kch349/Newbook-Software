@@ -11,7 +11,7 @@
 <!-- This command uses -v = verbose -nonet = no not use internet to fetch DTD, etc -->
 <!-- This file was created and maintained by Aaron Gupta-->
 <!-- Copyright 2013-2014 NDTH-UW. All Rights Reserved.-->
-<!-- This was revised on 2-28-14.-->
+<!-- This was revised on 3-7-14.-->
 
 <xsl:template match="/">
 
@@ -38,9 +38,9 @@
 
 <!-- Prints out paragraphs -->
 <xsl:template match="p" >
-    $\langle$ p $\rangle$
+ 	\par{
  	<xsl:apply-templates/>
-	$"\langle /p\rangle" $
+	}
 </xsl:template>
 
 <!-- Prints margin notes with a smaller font, so they can fit in margin -->
@@ -64,17 +64,24 @@
 <tex:replace-map>
   <entry key="&lt;">$\langle$</entry>
   <entry key="&gt;">$\rangle$</entry>
-  <entry key="&#038;">\&amp;</entry>
+  <entry key="&amp;">\&amp;</entry>
+  <entry key="_">\_</entry>
+  <entry key="%">\%</entry>
+
 </tex:replace-map>
-
-
+<!-- new lines ? -->
+<!-- template for lb tag -->
 
 <xsl:template match = "text()" >
-    <xsl:call-template name="StringReplace">
-      <xsl:with-param name="text" select="." />
-      <xsl:with-param name="chars" select="'&lt; &gt; &#038; '" />
-    </xsl:call-template>
-
+    <xsl:variable name="toreturn">
+      <xsl:call-template name="StringReplace">
+        <xsl:with-param name="text" select="." />
+        <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ % '" />
+		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
+		<!--  % has to be in middle or it doesnt work -->
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="normalize-space($toreturn)" />
 </xsl:template>
 
 
@@ -111,16 +118,16 @@
                 <xsl:value-of select="concat(substring-before($text, $char), document('')/*/tex:replace-map/entry[@key=$char], $nextString)" />
               </xsl:variable>
 
-              <!-- done with the current $char, shorten $chars and run again--> 
-              <xsl:call-template name="StringReplace">
-                <xsl:with-param name="text" select="$rejoined" />
-                <xsl:with-param name="chars" select="substring-after($chars,' ')" />
-              </xsl:call-template>
+              <!-- no more instances of the char to be replaced in $text, return the text to start
+                   coming back from recursion --> 
+              <xsl:value-of select="$rejoined" />
           </xsl:when>
           <xsl:otherwise>
-          <!-- no more instances of the char to be replaced in $text, return the text to start
-               coming back from recursion --> 
-            <xsl:value-of select="$text" />
+              <!-- done with the current $char, shorten $chars and run again--> 
+              <xsl:call-template name="StringReplace">
+                <xsl:with-param name="text" select="$text" />
+                <xsl:with-param name="chars" select="substring-after($chars,' ')" />
+              </xsl:call-template>
           </xsl:otherwise> 
         </xsl:choose>
     </xsl:when>

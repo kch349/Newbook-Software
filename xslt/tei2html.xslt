@@ -10,6 +10,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <!--1/26/14: added italics template-->
 <!--2/4/14: added "stanza" div-class with line breaks -->
 <!--2/4/14: added "figure" element -->
+<!--2/14/12: added span-class hb instruction (numbered page breaks)-->
+<!--2/17/12: added span-class lb instruction (numbered line breaks)-->
 <!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
 
 <xsl:template match="/">
@@ -44,7 +46,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 		
-
 <xsl:template match="p">
 	<p>
 	   <xsl:apply-templates/>
@@ -73,17 +74,17 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="l">
-   <!--	<br/> -->
+  
 <xsl:apply-templates/>
 	<br />
 </xsl:template>
 
 <xsl:template match="figure">
    	<figure>
-		<img src="temple.jpg" alt="An Old Temple" width="304" height="228">
+	<img src="temple.jpg" alt="An Old Temple" width="304" height="288" />
 <!--Note:size configured, but not necessary -->
 		<xsl:apply-templates/>
-		</img>
+	
 	</figure>
 </xsl:template>
 
@@ -100,6 +101,47 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:apply-templates/>
 	</table>
 </xsl:template>
+
+
+<xsl:template match="pb">
+	<hr />
+	<span class="pb">
+[pg: <xsl:value-of select="@n"/>]
+	</span>
+</xsl:template>
 	
 
+<xsl:template match="lb"> 
+	<br />
+	<span class="lb">
+line <xsl:value-of select="@n"/>:
+	</span>
+</xsl:template>
+
+<xsl:template match="foreign">
+	<em>
+	   <xsl:apply-templates/>
+	</em>
+</xsl:template>
+
+<xsl:template match="name">
+	<xsl:element name="span">
+	   <xsl:attribute name="class">
+	<xsl:value-of select="@type"/>
+	   </xsl:attribute>
+	<xsl:apply-templates/>
+	</xsl:element>
+</xsl:template>
+	
+<xsl:template match="note">
+		<xsl:element name="span">
+		<xsl:attribute name="id">
+      <xsl:value-of select="@xml:id"/>
+		</xsl:attribute>
+		<xsl:attribute name="class">
+      <xsl:value-of select="note"/>
+		</xsl:attribute>
+	<xsl:apply-templates/>
+		</xsl:element>
+</xsl:template>
 </xsl:stylesheet>
