@@ -3,7 +3,7 @@ import shlex,subprocess
 
 def tei2html(infile,outfile):
   of = open(outfile,'w',encoding='utf-8')
-  args = shlex.split("xsltproc --nonet xslt/diary.xslt %(infile)s" 
+  args = shlex.split("xsltproc --nonet xslt/tei2html %(infile)s" 
                       % {'infile': infile })
   p = subprocess.Popen(args, stdout=of)
   p.wait()
