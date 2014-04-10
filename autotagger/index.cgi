@@ -26,7 +26,7 @@ ERROR_PAGE = """
 <body>
     <h3>Errors in the input, they are listed below</h3>
     <p>
- <form action="autotagger.cgi" method="post"
+ <form action="index.cgi" method="post"
           enctype="multipart/form-data">
  <input type="submit" name="" value="Upload another transcription file"/>
  <input type="file" name="sdtf" /></p>
@@ -49,7 +49,7 @@ SUCCESS_PAGE = """
 (right click the link to save the file to your computer).</p>
 <ul>
   <li>
-  <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
+  <form action="index.cgi" method="post" enctype=multipart/form-data">
     <input type="hidden" name="html" value="on"/>
     <span id="html_span">Process your TEI-XML to generate an HTML file:</span> 
     <input id="html_but" type="submit" value="Go!"/>
@@ -57,7 +57,7 @@ SUCCESS_PAGE = """
   </form>
   </li>
   <li>
-  <form action="autotagger.cgi" method="post" enctype=multipart/form-data">
+  <form action="index.cgi" method="post" enctype=multipart/form-data">
     <input type="hidden" name="tex" value="on"/>
     <span id="latex_span">Process your TEI-XML to generate a LaTeX file:</span> 
     <input id="latex_but" type="submit" value="Go!"/>
@@ -66,7 +66,7 @@ SUCCESS_PAGE = """
   </li>
   <li>Try again with another transcription format file (clears your sessions 
       directory, download any files you want to keep first!)
-   <form action="autotagger.cgi" method="post" enctype="multipart/form-data">
+   <form action="index.cgi" method="post" enctype="multipart/form-data">
      <input type="file" name="sdtf" required/> <input type="submit" value="Upload transcription file"/>
    </form>
   </li>
@@ -84,31 +84,35 @@ WELCOME_PAGE = """
 <!doctype html>
 <html>
 <head>
-	<link href="newbook4.css" type="text/css" rel="stylesheet"></link>
+	<link href="http://depts.washington.edu/ndth/newbook4.css" type="text/css" rel="stylesheet"></link>
 	<title>Svoboda Diaries Project Autotagger</title>
-	<link type="image/x-icon" href="images/favicon.ico" rel="shortcut icon"></link>
-	<link type="image/x-icon" href="images/favicon.ico" rel="icon"></link>
+	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="shortcut icon"></link>
+	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="icon"></link>
 	<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"></link>
-  <!-- <script src="svoboda.js" type="text/javascript"></script> -->
+  <!-- <script src="http://depts.washington.edu/ndth/svoboda.js" type="text/javascript"></script> -->
   <meta charset="UTF-8"></meta>
 </head>
 <body>
 <div id="header">
-	<div id="logo"><a href="http://depts.washington.edu/ndth/"><img alt="logo" src="web/images/nbdt_logo_216px.png"></img></a></div>
+	<div id="logo"><a href="http://depts.washington.edu/ndth/"><img alt="logo" src="http://depts.washington.edu/ndth/images/nbdt_logo_216px.png"></img></a></div>
 	<div id="top_right">
   <span>Inspiration starts here.</span>
-  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="web/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="web/images/twitter_small.gif"></img></a></div>
-	<div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="web/images/banner2.jpg"></img></a></div>
+  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="http://depts.washington.edu/ndth/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="http://depts.washington.edu/ndth/images/twitter_small.gif"></img></a></div>
+	<div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="http://depts.washington.edu/ndth/images/banner2.jpg"></img></a></div>
 </div>
 <h2>Newbook Autotagger Online Interface</h2>
 <div id=content><p>Submit a SDTF file (svoboda diaries transcription format);
 we'll run the autotagger and show you to the result.</p>
-<form action="autotagger.cgi" method="post"
+<form action="index.cgi" method="post"
       enctype="multipart/form-data">
  <input type="file" name="sdtf" required/> <input type="submit" value="Upload transcription file"/></p>
 </form>
 Our code is open-source access our repository <a href="https://github.com/kch349/Newbook-Software">here</a>.
 </div>
+<div id=content> <h3> The Autotagger </h3>
+	<p> This autotagger assumes that that the file passed into it is properly marked up according to the Svoboda Diaries Transcription Format. You may transcribe anything using this unique transcription format to generate XML, HTML, LaTeX or PDF documents.</p>
+  <h3> About The Transcription Format </h3>
+  <p>
 <div id="footer"><hr></hr>  
 		Copyright © 2013 Newbook Digital Text in the Humanities. All Rights Reserved.
     <br></br><a href="http://www.washington.edu/online/privacy"><strong>PRIVACY</strong></a>
