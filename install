@@ -12,7 +12,7 @@ else
   rsync -a web $tempdir
 
   # Redirect directory index to cgi script (rather than index.html)
-  echo "DirectoryIndex index.cgi" >> $tempdir/.htaccess
+  echo "DirectoryIndex indexpg.cgi" >> $tempdir/.htaccess
   
   # do the copy
   rsync -Kvzrlt $tempdir/ $dest

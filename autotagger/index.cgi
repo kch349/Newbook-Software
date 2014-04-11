@@ -16,14 +16,33 @@ from distutils.dir_util import remove_tree
 import datetime
 
 
-
+WEBPAGES = [] #list of all webpages, start h2+
 HTTP_HEADERS = "Content-type: text/html\nSet-cookie: session=%(cookie)s"
-ERROR_PAGE = """
+#leaves html and body tags open
+TEMPLATE = """
 <!doctype html>
 <html>
 <head>
+	<link href="http://depts.washington.edu/ndth/newbook4.css" type="text/css" rel="stylesheet"></link>
+	<title>Svoboda Diaries Project Autotagger</title>
+	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="shortcut icon"></link>
+	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="icon"></link>
+	<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"></link>
+  <!-- <script src="http://depts.washington.edu/ndth/svoboda.js" type="text/javascript"></script> -->
+  <meta charset="UTF-8"></meta>
 </head>
 <body>
+<div id="header">
+	<div id="logo"><a href="http://depts.washington.edu/ndth/"><img alt="logo" src="http://depts.washington.edu/ndth/images/nbdt_logo_216px.png"></img></a></div>
+	<div id="top_right">
+  <span>Inspiration starts here.</span>
+  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="http://depts.washington.edu/ndth/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="http://depts.washington.edu/ndth/images/twitter_small.gif"></img></a></div>
+	<div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="http://depts.washington.edu/ndth/images/banner2.jpg"></img></a></div>
+</div>  
+"""
+
+
+ERROR_PAGE = """
     <h3>Errors in the input, they are listed below</h3>
     <p>
  <form action="index.cgi" method="post"
@@ -32,18 +51,19 @@ ERROR_PAGE = """
  <input type="file" name="sdtf" /></p>
     %(errors)s
 </form>
+</body>
 </html>"""
+WEBPAGES.append(ERROR_PAGE)
+
 
 SUCCESS_PAGE = """
-<!doctype html>
-<html>
-<head><title>Autotagger Success!</title></head>
+<h2>Autotagger Success!</h2>
 <style>
 %(css)s
 </style>
 <body>
-<h2>Your %(filetype)s is ready!</h2>
-<h3>%(timestamp)s</h3>
+<h3>Your %(filetype)s is ready!</h3>
+<h4>%(timestamp)s</h4>
 
 <p>Your TEI-XML result is here: <a href="%(teioutfile)s">here</a>
 (right click the link to save the file to your computer).</p>
@@ -79,27 +99,9 @@ SUCCESS_PAGE = """
 </ul>
 </body>
 </html>"""
+WEBPAGES.append(SUCCESS_PAGE)
 
 WELCOME_PAGE = """
-<!doctype html>
-<html>
-<head>
-	<link href="http://depts.washington.edu/ndth/newbook4.css" type="text/css" rel="stylesheet"></link>
-	<title>Svoboda Diaries Project Autotagger</title>
-	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="shortcut icon"></link>
-	<link type="image/x-icon" href="http://depts.washington.edu/ndth/images/favicon.ico" rel="icon"></link>
-	<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"></link>
-  <!-- <script src="http://depts.washington.edu/ndth/svoboda.js" type="text/javascript"></script> -->
-  <meta charset="UTF-8"></meta>
-</head>
-<body>
-<div id="header">
-	<div id="logo"><a href="http://depts.washington.edu/ndth/"><img alt="logo" src="http://depts.washington.edu/ndth/images/nbdt_logo_216px.png"></img></a></div>
-	<div id="top_right">
-  <span>Inspiration starts here.</span>
-  <a href="http://facebook.com/pages/Svoboda-Diary-Project/381133915236500"><img alt="Facebook" src="http://depts.washington.edu/ndth/images/facebook_small.gif"></img></a><a href="http://twitter.com/SvobodaDiaries"><img alt="Twitter" src="http://depts.washington.edu/ndth/images/twitter_small.gif"></img></a></div>
-	<div id="panel"><hr></hr><a href="http://depts.washington.edu/svobodad/"><img alt="" src="http://depts.washington.edu/ndth/images/banner2.jpg"></img></a></div>
-</div>
 <h2>Newbook Autotagger Online Interface</h2>
 <div id=content><p>Submit a SDTF file (svoboda diaries transcription format);
 we'll run the autotagger and show you to the result.</p>
@@ -112,7 +114,9 @@ Our code is open-source access our repository <a href="https://github.com/kch349
 <div id=content> <h3> The Autotagger </h3>
 	<p> This autotagger assumes that that the file passed into it is properly marked up according to the Svoboda Diaries Transcription Format. You may transcribe anything using this unique transcription format to generate XML, HTML, LaTeX or PDF documents.</p>
   <h3> About The Transcription Format </h3>
-  <p>
+  <p> Stuff about transcribing.  Maybe examples.  Make new page? </p>
+  <h3> Coming Soon.... </h3>
+  <p> Stay tuned for configuration and customization options. </p>
 <div id="footer"><hr></hr>  
 		Copyright © 2013 Newbook Digital Text in the Humanities. All Rights Reserved.
     <br></br><a href="http://www.washington.edu/online/privacy"><strong>PRIVACY</strong></a>
@@ -122,6 +126,8 @@ Our code is open-source access our repository <a href="https://github.com/kch349
 </body>
 </html>
 """
+WEBPAGES.append(WELCOME_PAGE)
+
 
 ## be sure to use UTF buffer for stdout
 sys.stdout = codecs.getwriter('utf8')(sys.stdout.buffer)
@@ -185,7 +191,7 @@ if 'sdtf' in form_data:
     for e in tf.errors:
       errhtml+=e
     errhtml+="</pre>"
-    print(ERROR_PAGE % { 'errors':errhtml })
+    print(TEMPATE+WEBPAGES[0] % { 'errors':errhtml })
   else:
    # no errors, run the tagger
     #document = autotagger.setup_DOM()
@@ -199,7 +205,7 @@ if 'sdtf' in form_data:
     #  print("error getting the outfile for writing")
 
     document.writexml(outfile, addindent=" ",newl="\n")
-    print(SUCCESS_PAGE % {'filetype': "TEI-XML", 'timestamp':timestamp,
+    print(TEMPLATE + WEBPAGES[1] % {'filetype': "TEI-XML", 'timestamp':timestamp,
                           'teioutfile': session_path+"/output.xml",
                           'css':'','htmloutfile':'','texoutfile':''})
 
@@ -216,7 +222,7 @@ elif 'html' in form_data:
       # cross out and disable tex creation as it's already done
       css+='#latex_span,#latex_but { text-decoration:line-through; }'
       texout="<br />Your LaTeX is <a href="+session_path+"/output.tex>here</a>."
-    print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
+    print(TEMPLATE+WEBPAGES[1] % {'filetype': "HTML", 'timestamp':timestamp,
                           'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
                           'teioutfile': session_path+"/output.xml" })
 
@@ -233,9 +239,9 @@ elif 'tex' in form_data:
       # cross out and disable html creation as it's already done
       css+='#html_span,#html_but { text-decoration:line-through; }'
       htmlout="<br />Your HTML is <a href="+session_path+"/output.html>here</a>."
-    print(SUCCESS_PAGE % {'filetype': "HTML", 'timestamp':timestamp,
+    print(TEMPLATE+WEBPAGES[1] % {'filetype': "HTML", 'timestamp':timestamp,
                           'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
                           'teioutfile': session_path+"/output.xml" })
 
 else:
-  print(WELCOME_PAGE)
+  print(TEMPLATE+WEBPAGES[2])
