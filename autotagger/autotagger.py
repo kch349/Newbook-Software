@@ -16,6 +16,7 @@ import sys
 import re
 import logging
 import argparse
+import json
 from xml.dom.minidom import *
 
 
@@ -24,6 +25,9 @@ from xml.dom.minidom import *
 CURRENT_VERSION = 1
 version = -1
 #Information from configuration of file. 
+
+# CONFIG_INFO = json.load('file name here?')
+
 CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
                'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
                'NUMBER_OF_DIVS' : 2, # Number of divisions present
@@ -718,7 +722,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
       m = SECTION_RE.match(l)
       if m:
         if not section_found:
-          body.appendChild(current_div1)
+          if current_div1 is not None:
+            body.appendChild(current_div1)
+          #Tab this current_div2 moves in?  
           if current_div2 is not None:
             next_div2 = current_div2.cloneNode(False)
             next_div2.setAttribute('part', 'F')
@@ -731,12 +737,13 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             current_div2.childNodes.extend(current_prose)
             current_prose = create_p(document,current_prose, fresh=True)
             current_div1.appendChild(current_div2)
+            current_div2 = next_div2
 
             # update div2s to get rid of original one 
-            div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
-            current_div1 = div1
-            div1_count += 1
-            current_div2 = next_div2
+          div1_head, div1 = create_div(document, str(div1_count), 'div1', None)
+          current_div1 = div1
+          div1_count += 1
+            
 
         div1_head.appendChild(document.createTextNode(m.group(1)))
         if SECTION_IN_TEXT:
@@ -833,6 +840,10 @@ if __name__ in "__main__":
   if args.file:
     infile = open(args.file, encoding="utf-8")
     infilelines = infile.readlines()
+  #elif args.json??
+  	#config_file = open(args.json??, encoding =???)
+    #CONFIG_OPTIONS = json.load(config_file)
+    #how fit on a universal variable?
   else:
     infilelines = sys.stdin.readlines()
 
