@@ -823,6 +823,7 @@ def setup_argparse():
   ap.add_argument('--file', '-f', help='choose a file for the autotagger')
   ap.add_argument('--verbose', '-v', action='count', dest='verbosity', 
       default=1, help='increase the verbosity (can be repeated: -vvv)') 
+  ap.add_argument('--config', '-c', help = 'choose a configuration file (JSON) for specific document')
   return ap
 
 def run(tf):
@@ -840,12 +841,19 @@ if __name__ in "__main__":
   if args.file:
     infile = open(args.file, encoding="utf-8")
     infilelines = infile.readlines()
-  #elif args.json??
-  	#config_file = open(args.json??, encoding =???)
-    #CONFIG_OPTIONS = json.load(config_file)
-    #how fit on a universal variable?
   else:
     infilelines = sys.stdin.readlines()
+    
+  if args.config:
+    config_file = open(args.config, encoding ="utf-8")
+    #Sets version for document so it is accessible throughout program
+    global CONFIG_INFO
+    CONFIG_INFO = json.load(config_file)
+    for i in CONFIG_INFO:
+  	  print(str(i), file = sys.stderr)
+  	  print(CONFIG_INFO[i], file = sys.stderr)
+  	#logging.debug("config-info: " + str(CONFIG_INFO))
+    #how fit on a universal variable?  
 
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
