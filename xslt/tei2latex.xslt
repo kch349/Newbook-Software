@@ -11,12 +11,14 @@
 <!-- This command uses -v = verbose -nonet = no not use internet to fetch DTD, etc -->
 <!-- This file was created and maintained by Aaron Gupta-->
 <!-- Copyright 2013-2014 NDTH-UW. All Rights Reserved.-->
-<!-- This was revised on 3-7-14.-->
+<!-- This was revised on 4-23-14.-->
+<!-- added support for %,#,\,^,{,},~ -->
+<!-- added support for pb, lb, verse , and l tags -->
+<!-- 4/23/13 - added support for emph, ref, note,  fixed lg, l and lb-->
 
 <xsl:template match="/">
 
 \documentclass{report}
-
 \begin{document}
 
 \newcommand{\mnote}[1] {\marginpar{\scriptsize \raggedright #1 }}
@@ -38,16 +40,71 @@
 </xsl:template>
 
 <!-- Prints out paragraphs -->
-<xsl:template match="p" >
- 	\par{
+<xsl:template match="p">
+	\par{
  	<xsl:apply-templates/>
 	}
 </xsl:template>
 
-<!-- Prints margin notes with a smaller font, so they can fit in margin -->
+
+
+<!-- Does not work because prints linebreak before line  1, causes error -->
+<!--Adds linebreaks into document-->
+<xsl:template match="lb">\\</xsl:template>
+
+
+<!-- stripspace , normalize white space-->
+
+
+
+
+<!-- adds page breaks into document -->
+<xsl:template match="pb">
+	\pagebreak
+<!--	<xsl:apply-templates/> -->
+</xsl:template>
+
+<!--adds linegroups into document using minipage 
+<xsl:template match="lg">
+	\par{	
+		\framebox{
+		\begin{minipage}[c]{\textwidth}
+		<xsl:value-of select="."/>
+		\end{minipage}
+		}
+	}
+</xsl:template>-->
+
+<!-- adds arabic environment that surrounds arabic text 
+<xsl:template match="foreign">
+	\begin{arabtext}
+	<xsl:value-of select="."/>
+	\end{arabtext}
+</xsl:template>
+-->
+
+<!-- inserts linegroup into document-->
+<xsl:template match="lg">
+	\begin{verse}
+	<xsl:value-of select="."/>
+	<xsl:apply-templates/>
+	\end{verse}
+</xsl:template>
+
+<!-- inserts a line within the linegroup into document -->
+<xsl:template match="l">
+	<xsl:value-of select="."/>
+</xsl:template>
+
+<!--
+<!-Prints margin notes with a smaller font, so they can fit in margin ->
  <xsl:template match= "note">
 \mnote{<xsl:value-of select="."/> }
+</xsl:template>
+-->
 
+<xsl:template match="note">
+\footnote{<xsl:value-of select="."/>}
 </xsl:template>
 
 <!--Prints lists with bullets -->
@@ -61,25 +118,66 @@
 	\item <xsl:value-of select="."/>
 </xsl:template>
 
+<xsl:template match="emph">
+	\textit{<xsl:value-of select="."/>}
+</xsl:template>
 
+<xsl:template match="ref">
+	\textsuperscript{<xsl:value-of select="."/>}
+</xsl:template>
+
+<!-- finish later, figure out how to grab url value 
+<xsl:template match="figure">
+	\begin{figure}
+	<xsl:apply-templates/>
+	\end{figure}
+</xsl:template>
+
+<xsl:template match="head">
+	\caption{<xsl:value-of select="."/>}
+}
+
+<xsl:template match="url">
+-->
+<!--
+<xsl:template match="table">
+	\begin{tabular}{c|c|c|c}
+	<xsl:apply-templates/>
+	\end{tabular}
+</xsl:template>
+
+<xsl:template match="row">
+	<xsl:apply-templates/>
+	\\
+</xsl:template>
+
+<xsl:template match="cell">
+	<xsl:value-of select="."/>
+	&amp;
+</xsl:template>
+-->
 <tex:replace-map>
   <entry key="&lt;">$\langle$</entry>
   <entry key="&gt;">$\rangle$</entry>
   <entry key="&amp;">\&amp;</entry>
   <entry key="_">\_</entry>
   <entry key="%">\%</entry>
+  <entry key="#">\#</entry>
+  <entry key="$">\$</entry>
+  <entry key="\">\textbackslash</entry>
+  <entry key="^">\^{}</entry>
+  <entry key="{">\{</entry>
+  <entry key="}">\}</entry>
+  <entry key="~">\~{}</entry>
 
 </tex:replace-map>
-<!-- new lines ? -->
-<!-- template for lb tag -->
-
 
 <xsl:template match = "text()" >
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &gt; % &amp; _ '" />
-		<!--  % has to be in middle or it doesnt work -->
+        <xsl:with-param name="chars" select="'&lt; &gt; &amp; % # $ \ ^ { ~ } _ '" />
+		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
       </xsl:call-template>
     </xsl:variable>
     <xsl:value-of select="normalize-space($toreturn)" />
