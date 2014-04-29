@@ -28,6 +28,7 @@ version = -1
 
 # CONFIG_INFO = json.load('file name here?')
 
+global CONFIG_INFO
 CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
                'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
                'NUMBER_OF_DIVS' : 2, # Number of divisions present
@@ -165,6 +166,7 @@ def create_teiHeader(document):
 
   title = document.createElement('title')
   title_statement.appendChild(title)
+  #print(CONFIG_INFO['DATE'])
   title.appendChild(document.createTextNode(CONFIG_INFO['TITLE']))
 
   author =  document.createElement('author')
@@ -846,14 +848,20 @@ if __name__ in "__main__":
     
   if args.config:
     config_file = open(args.config, encoding ="utf-8")
-    #Sets version for document so it is accessible throughout program
-    global CONFIG_INFO
-    CONFIG_INFO = json.load(config_file)
-    for i in CONFIG_INFO:
-  	  print(str(i), file = sys.stderr)
-  	  print(CONFIG_INFO[i], file = sys.stderr)
-  	#logging.debug("config-info: " + str(CONFIG_INFO))
-    #how fit on a universal variable?  
+    #Sets CONFIG_INFO for document so it is accessible throughout program
+    # CONFIG_INFO = json.load(config_file)['config_options']
+    json_data = json.load(config_file)
+    CONFIG_INFO = json_data['config_options']
+    #config_upload = json_data['config_options']
+    #for key in config_upload:
+  	 # if key in CONFIG_INFO:
+  	  #  CONFIG_INFO[key] = config_upload[key]
+  	
+  #	for i in CONFIG_INFO:
+  	#  print(i, file=sys.stderr)
+  	
+  	      	#logging.debug("config-info: " + str(CONFIG_INFO))
+    #how fit on a universal variable?   
 
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
