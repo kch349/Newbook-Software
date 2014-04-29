@@ -583,16 +583,16 @@ def create_div(document, n, div_type, part):
 
 #Creates first div of given type if necessary
 def create_generic_div(document, div_count, type):
-  title = "First "
+  #title = "First "
   part = None
-  if type == 'div1':
-    title += "section; "
-  elif type == 'div2':
-    title += "subsection; "
+  #if type == 'div1':
+   # title += "section; "
+  if type == 'div2':
+    #title += "subsection; "
     part = "N"
-  title += "no title given in text."
+  #title += "no title given in text."
   div_head, div = create_div(document, str(div_count), type, part)
-  div_head.appendChild(document.createTextNode(title))
+  #div_head.appendChild(document.createTextNode(title))
   div_count +=1
   return div, div_count
 

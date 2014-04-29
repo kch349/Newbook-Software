@@ -1,6 +1,6 @@
 {
-	"config_options": {
-		"SECTION_IN_TEXT" : true,
+    "config_options": {
+        "SECTION_IN_TEXT" : true,
         "SUBSECTION_IN_TEXT" : false,
         "NUMBER_OF_DIVS" : 2,
         "TITLE" : "Diary 48",
