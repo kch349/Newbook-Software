@@ -851,11 +851,11 @@ if __name__ in "__main__":
     #Sets CONFIG_INFO for document so it is accessible throughout program
     # CONFIG_INFO = json.load(config_file)['config_options']
     json_data = json.load(config_file)
-    CONFIG_INFO = json_data['config_options']
-    #config_upload = json_data['config_options']
-    #for key in config_upload:
-  	 # if key in CONFIG_INFO:
-  	  #  CONFIG_INFO[key] = config_upload[key]
+    #CONFIG_INFO = json_data['config_options']
+    config_upload = json_data['config_options']
+    for key in config_upload:
+      if key in CONFIG_INFO:
+  	    CONFIG_INFO[key] = config_upload[key]
   	
   #	for i in CONFIG_INFO:
   	#  print(i, file=sys.stderr)
