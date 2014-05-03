@@ -32,6 +32,7 @@ global CONFIG_INFO
 CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
                'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
                'NUMBER_OF_DIVS' : 2, # Number of divisions present
+               'LINE_BREAKS' : True,
                'TITLE' : 'Insert Document Title Here', #Beginning OF TEI header info
                'AUTHOR' : 'Insert Author Name Here',
                'RESP_PROJECT' : 'Insert Name of Project Responsible for Transcription',
@@ -605,11 +606,14 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   current_prose.append(document.createElement('p'))
   if first_line != None:
     current_prose[-1].appendChild(document.createTextNode(first_line[0]))
-    current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
+    if CONFIG_INFO['LINE_BREAKS']:
+      current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
+      logging.debug("called line break from create_p at page " + str(page.num) + " and line " + linecount)
   return current_prose
 
 #Creates a line break of the given number
 def create_line_break(document, linecount):
+  logging.debug("ENTERED line break at page " + str(page.num) + " and line " + linecount)
   lb = document.createElement("lb")
   lb.setAttribute("n", str(linecount))
   return lb
@@ -705,17 +709,19 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         logging.debug("Ran out of marginheaders.")
 
       #Account for empty lines or double spacing
-      m = EMPTYLINE_RE.match(l)
-      if m:
-        #found empty line
-        last_empty = True
-        empty_lines += 1
-        continue
-      elif last_empty:
-        for i in range(1, empty_lines + 1):
-          current_prose[-1].appendChild(create_line_break(document, str((linecount - empty_lines + (i - 1)))))
-        last_empty = False
-        empty_lines = 0
+      if CONFIG_INFO['LINE_BREAKS']:
+        m = EMPTYLINE_RE.match(l)
+        if m:
+          #found empty line
+          last_empty = True
+          empty_lines += 1
+          continue
+        elif last_empty:
+          for i in range(1, empty_lines + 1):
+            current_prose[-1].appendChild(create_line_break(document, str((linecount - empty_lines + (i - 1)))))
+            logging.debug("called line break from empty line handler line 710 at page " + str(page.num) + " and line " + linecount)
+          last_empty = False
+          empty_lines = 0
         
       # Creates section if found, or a generic section if one has not yet been created.
       # If new section occurs in the middle of a subsection, this subsection is divided
@@ -748,8 +754,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             
 
         div1_head.appendChild(document.createTextNode(m.group(1)))
-        if SECTION_IN_TEXT:
+        if SECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
           div1_head.appendChild(create_line_break(document, linecount))
+          logging.debug("called line break from Section in Text line 756 at page " + str(page.num) + " and line " + linecount)
         else:
           linecount -= 1
         section_found = True
@@ -779,8 +786,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           current_div2 = div2
           
         div2_head.appendChild(document.createTextNode(m.group(1)))
-        if SUBSECTION_IN_TEXT:
+        if SUBSECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
           div2_head.appendChild(create_line_break(document, linecount))
+          logging.debug("called line break from Subsection in Text line 788 at page " + str(page.num) + " and line " + linecount)
         else:
           linecount -= 1
         subsection_found = True 
@@ -805,7 +813,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
       else:
         just_divided = False
         current_prose[-1].appendChild(document.createTextNode(l))
-        current_prose[-1].appendChild(create_line_break(document, str(linecount)))
+        if CONFIG_INFO['LINE_BREAKS']:
+          current_prose[-1].appendChild(create_line_break(document, str(linecount)))
+          logging.debug("called line break from else after paragraph creation (regular prose) line 817 at page " + str(page.num) + " and line " + linecount)
     # maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
       
