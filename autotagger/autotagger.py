@@ -608,12 +608,12 @@ def create_p(document,current_prose, first_line=None, fresh=False):
     current_prose[-1].appendChild(document.createTextNode(first_line[0]))
     if CONFIG_INFO['LINE_BREAKS']:
       current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
-      logging.debug("called line break from create_p at page " + str(page.num) + " and line " + linecount)
+      #logging.debug("called line break from create_p at page " + str(page.num) + " and line " + linecount)
   return current_prose
 
 #Creates a line break of the given number
 def create_line_break(document, linecount):
-  logging.debug("ENTERED line break at page " + str(page.num) + " and line " + linecount)
+  #logging.debug("ENTERED line break at page " + str(page.num) + " and line " + linecount)
   lb = document.createElement("lb")
   lb.setAttribute("n", str(linecount))
   return lb
@@ -719,7 +719,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         elif last_empty:
           for i in range(1, empty_lines + 1):
             current_prose[-1].appendChild(create_line_break(document, str((linecount - empty_lines + (i - 1)))))
-            logging.debug("called line break from empty line handler line 710 at page " + str(page.num) + " and line " + linecount)
+            #logging.debug("called line break from empty line handler line 710 at page " + str(page.num) + " and line " + linecount)
           last_empty = False
           empty_lines = 0
         
@@ -756,7 +756,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         div1_head.appendChild(document.createTextNode(m.group(1)))
         if SECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
           div1_head.appendChild(create_line_break(document, linecount))
-          logging.debug("called line break from Section in Text line 756 at page " + str(page.num) + " and line " + linecount)
+          #logging.debug("called line break from Section in Text line 756 at page " + str(page.num) + " and line " + linecount)
         else:
           linecount -= 1
         section_found = True
@@ -788,7 +788,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         div2_head.appendChild(document.createTextNode(m.group(1)))
         if SUBSECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
           div2_head.appendChild(create_line_break(document, linecount))
-          logging.debug("called line break from Subsection in Text line 788 at page " + str(page.num) + " and line " + linecount)
+          #logging.debug("called line break from Subsection in Text line 788 at page " + str(page.num) + " and line " + linecount)
         else:
           linecount -= 1
         subsection_found = True 
@@ -815,7 +815,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         current_prose[-1].appendChild(document.createTextNode(l))
         if CONFIG_INFO['LINE_BREAKS']:
           current_prose[-1].appendChild(create_line_break(document, str(linecount)))
-          logging.debug("called line break from else after paragraph creation (regular prose) line 817 at page " + str(page.num) + " and line " + linecount)
+          #logging.debug("called line break from else after paragraph creation (regular prose) line 817 at page " + str(page.num) + " and line " + linecount)
     # maybe add in something that says to delete the last line break 
     # before creating the next page to fix that bug?
       
