@@ -9,9 +9,10 @@ else
   tempdir=/tmp/autotagger.$$
   rsync -a --include=".htaccess" --exclude={outputs/,docs/,README.md,Issues} autotagger/* $tempdir
   rsync -a --exclude={README.md} xslt $tempdir
+  rsync -a web $tempdir
 
   # Redirect directory index to cgi script (rather than index.html)
-  echo "DirectoryIndex autotagger.cgi" >> $tempdir/.htaccess
+  echo "DirectoryIndex index.cgi" >> $tempdir/.htaccess
   
   # do the copy
   rsync -Kvzrlt $tempdir/ $dest
