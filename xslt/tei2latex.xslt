@@ -14,7 +14,9 @@
 <!-- This was revised on 4-23-14.-->
 <!-- added support for %,#,\,^,{,},~ -->
 <!-- added support for pb, lb, verse , and l tags -->
-<!-- 4/23/13 - added support for emph, ref, note,  fixed lg, l and lb-->
+<!-- 4/23/14 - added support for emph, ref, note,  fixed lg, l and lb-->
+<!-- 5/1/14 - fixed string replace (hopefully) -->
+<!-- 5/8/14 Fixed Cell template and escaping of \ -->
 
 <xsl:template match="/">
 
@@ -48,14 +50,8 @@
 
 
 
-<!-- Does not work because prints linebreak before line  1, causes error -->
 <!--Adds linebreaks into document-->
 <xsl:template match="lb">\\</xsl:template>
-
-
-<!-- stripspace , normalize white space-->
-
-
 
 
 <!-- adds page breaks into document -->
@@ -103,8 +99,10 @@
 </xsl:template>
 -->
 
+<!-- Prints all Note tags as foot notes -->
 <xsl:template match="note">
 \footnote{<xsl:value-of select="."/>}
+<xsl:apply-templates/>
 </xsl:template>
 
 <!--Prints lists with bullets -->
@@ -139,7 +137,7 @@
 
 <xsl:template match="url">
 -->
-<!--
+
 <xsl:template match="table">
 	\begin{tabular}{c|c|c|c}
 	<xsl:apply-templates/>
@@ -152,19 +150,22 @@
 </xsl:template>
 
 <xsl:template match="cell">
-	<xsl:value-of select="."/>
+	<xsl:apply-templates/>
+	<!--<xsl:value-of select='normalize-space()'/>-->
+
 	&amp;
 </xsl:template>
--->
+
+
 <tex:replace-map>
-  <entry key="&lt;">$\langle$</entry>
   <entry key="&gt;">$\rangle$</entry>
+  <entry key="&lt;">$\langle$</entry> 
   <entry key="&amp;">\&amp;</entry>
   <entry key="_">\_</entry>
   <entry key="%">\%</entry>
   <entry key="#">\#</entry>
   <entry key="$">\$</entry>
-  <entry key="\">\textbackslash</entry>
+  <entry key="\">\textbackslash{}</entry>
   <entry key="^">\^{}</entry>
   <entry key="{">\{</entry>
   <entry key="}">\}</entry>
@@ -176,7 +177,7 @@
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &gt; &amp; % # $ \ ^ { ~ } _ '" />
+        <xsl:with-param name="chars" select="'&lt; &amp; % # $ \ * ^ { ~ } _ &gt; '" />
 		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
       </xsl:call-template>
     </xsl:variable>
@@ -192,7 +193,6 @@
   <xsl:choose>
     <!-- when $chars still has spaces, we're not done replacing stuff -->
     <xsl:when test="contains($chars, ' ')">
-
       <!-- compute the current char to work on, it's the first one in $chars
            * chars is delimited by spaces -->
       <xsl:variable name="char" select="substring-before($chars,' ')" />
@@ -205,16 +205,23 @@
                   **** 
                   * recursively call this template on that text, will do replacement
                   * as we come back up from recursion-->
-             <xsl:variable name="nextString">                                      
+             <xsl:variable name="rightString">                                      
                   <xsl:call-template name="StringReplace">                                       
                       <xsl:with-param name="text" select="substring-after($text, $char)" />
                       <xsl:with-param name="chars" select="$chars" />
                   </xsl:call-template>                                
-              </xsl:variable>                                
+              </xsl:variable>     
+                           
+             <xsl:variable name="leftString">                                      
+                  <xsl:call-template name="StringReplace">                                       
+                      <xsl:with-param name="text" select="substring-before($text, $char)" />
+                      <xsl:with-param name="chars" select="$chars" />
+                  </xsl:call-template>                                
+              </xsl:variable>     
 
               <!--  $rejoined contains the text to the left, the replacement char, and the reply from recursion -->
               <xsl:variable name="rejoined">
-                <xsl:value-of select="concat(substring-before($text, $char), document('')/*/tex:replace-map/entry[@key=$char], $nextString)" />
+                <xsl:value-of select="concat($leftString, document('')/*/tex:replace-map/entry[@key=$char], $rightString)" />
               </xsl:variable>
 
               <!-- no more instances of the char to be replaced in $text, return the text to start
@@ -238,5 +245,5 @@
   </xsl:choose>
 </xsl:template> 
 
-
 </xsl:stylesheet>
+
