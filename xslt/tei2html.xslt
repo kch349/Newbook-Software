@@ -5,6 +5,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 <xsl:output method="html" />
+<!--This script produces output with flowing text, no line-breaks within paragraphs -->
 <!--1/23/14: added paragraph tag-->
 <!--1/23/14: added h1 tag-->
 <!--1/26/14: added italics template-->
@@ -12,9 +13,14 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <!--2/4/14: added "figure" element -->
 <!--2/14/12: added span-class hb instruction (numbered page breaks)-->
 <!--2/17/12: added span-class lb instruction (numbered line breaks)-->
+<!--5/15/14: edited "pb" removed "hb" (hard break) instruction -->
+<!--5/15/14: added html doctype declartion; validated at w3schools -->
+<!--5/15/14: edited "table" instruction to conform to html5-->
 <!--xsltproc -v -nonet try2safety.xsl proc_03.xml >proc_03.html-->
 
-<xsl:template match="/">
+<xsl:template match= "/">
+<xsl:text disable-output-escaping="yes">&lt;</xsl:text>!DOCTYPE html<xsl:text disable-output-escaping="yes">&gt;</xsl:text>
+
 	<html>
 	<head>
 		<title>New Book Digital Texts xsl 2.1.14</title>
@@ -24,19 +30,11 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
      </html>
 </xsl:template>
 
-
-<xsl:template match="body">
-	<html>	
-<xsl:apply-templates/>
-	</html>
-</xsl:template>
-
 <xsl:template match="list">
 	<ul>
 		<xsl:apply-templates/>
 	</ul>
 </xsl:template>
-
 
 <xsl:template match="item">
 	<li>
@@ -44,28 +42,29 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	</li>
 </xsl:template>
 
-
-		
 <xsl:template match="p">
 	<p>
 	   <xsl:apply-templates/>
 	</p>
 </xsl:template>
 
-
-<xsl:template match="head">
+<xsl:template match="div1/head">
 	<h1>
 	   <xsl:apply-templates/>
 	</h1>
 </xsl:template>
 
+<xsl:template match="div2/head">
+	<h2>
+	<xsl:apply-templates/>
+	</h2>
+</xsl:template>
 
 <xsl:template match="emph">
 	<i>
 	   <xsl:apply-templates/>
 	</i>
 </xsl:template>
-
 
 <xsl:template match="lg">
 	<p class="stanza">
@@ -74,8 +73,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="l">
-  
-<xsl:apply-templates/>
+<!--This is one of the instructions that makes this script different from tei2html_nolb. it creates line breaks in the output-->
+  <xsl:apply-templates/>
 	<br />
 </xsl:template>
 
@@ -84,27 +83,23 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<img src="temple.jpg" alt="An Old Temple" width="304" height="288" />
 <!--Note:size configured, but not necessary -->
 		<xsl:apply-templates/>
-	
 	</figure>
 </xsl:template>
 
 <xsl:template match="table">
-	<table border="1">
+	<table style="border:1px solid black;">
+	<xsl:for-each select="./row">
 		<tr>
-		  <th>Arrive</th>
-		  <th>Depart</th>	
+			<xsl:for-each select="./cell">
+		<td style="border:1px solid black;"><xsl:value-of select="."/></td>
+			</xsl:for-each>
 		</tr>
-		<tr>
-		  <td>some time</td>
-		  <td>some other time</td>
-		</tr>
-<xsl:apply-templates/>
+	</xsl:for-each>	
 	</table>
 </xsl:template>
 
 
 <xsl:template match="pb">
-	<hr />
 	<span class="pb">
 [pg: <xsl:value-of select="@n"/>]
 	</span>
@@ -112,10 +107,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	
 
 <xsl:template match="lb"> 
-	<br />
-	<span class="lb">
-line <xsl:value-of select="@n"/>:
-	</span>
+<br /><span class="lb"><xsl:value-of select="@n"/>:</span>
 </xsl:template>
 
 <xsl:template match="foreign">
@@ -135,13 +127,13 @@ line <xsl:value-of select="@n"/>:
 	
 <xsl:template match="note">
 		<xsl:element name="span">
-		<xsl:attribute name="id">
-      <xsl:value-of select="@xml:id"/>
-		</xsl:attribute>
 		<xsl:attribute name="class">
-      <xsl:value-of select="note"/>
+	<xsl:value-of select="@xml:id"/>
 		</xsl:attribute>
 	<xsl:apply-templates/>
 		</xsl:element>
 </xsl:template>
+
+
+
 </xsl:stylesheet>
