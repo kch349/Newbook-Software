@@ -17,6 +17,8 @@
 <!-- 4/23/14 - added support for emph, ref, note,  fixed lg, l and lb-->
 <!-- 5/1/14 - fixed string replace (hopefully) -->
 <!-- 5/8/14 Fixed Cell template and escaping of \ -->
+<!--5/14/14 Added support for [ and ] -->
+<!--added recursion for notes and fixed repeating <l> and <lb> issue-->
 
 <xsl:template match="/">
 
@@ -51,13 +53,12 @@
 
 
 <!--Adds linebreaks into document-->
-<xsl:template match="lb">\\</xsl:template>
+<xsl:template match="lb">\ \\</xsl:template>
 
 
 <!-- adds page breaks into document -->
 <xsl:template match="pb">
 	\pagebreak
-<!--	<xsl:apply-templates/> -->
 </xsl:template>
 
 <!--adds linegroups into document using minipage 
@@ -82,14 +83,13 @@
 <!-- inserts linegroup into document-->
 <xsl:template match="lg">
 	\begin{verse}
-	<xsl:value-of select="."/>
 	<xsl:apply-templates/>
 	\end{verse}
 </xsl:template>
 
 <!-- inserts a line within the linegroup into document -->
 <xsl:template match="l">
-	<xsl:value-of select="."/>
+	<xsl:apply-templates/>
 </xsl:template>
 
 <!--
@@ -101,8 +101,7 @@
 
 <!-- Prints all Note tags as foot notes -->
 <xsl:template match="note">
-\footnote{<xsl:value-of select="."/>}
-<xsl:apply-templates/>
+\footnote{<xsl:apply-templates/>}
 </xsl:template>
 
 <!--Prints lists with bullets -->
@@ -170,6 +169,8 @@
   <entry key="{">\{</entry>
   <entry key="}">\}</entry>
   <entry key="~">\~{}</entry>
+  <entry key="[">\lbrack </entry>
+  <entry key="]">\rbrack </entry>
 
 </tex:replace-map>
 
@@ -177,7 +178,7 @@
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &amp; % # $ \ * ^ { ~ } _ &gt; '" />
+        <xsl:with-param name="chars" select="'&lt; &amp; % # $ \ * ^ { ~ } _ &gt; ] [ '" />
 		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
       </xsl:call-template>
     </xsl:variable>
