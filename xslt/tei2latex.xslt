@@ -120,7 +120,7 @@
 </xsl:template>
 
 <xsl:template match="ref">
-	\textsuperscript{<xsl:value-of select="."/>}
+	\textsuperscript{<xsl:apply-templates />}
 </xsl:template>
 
 <!-- finish later, figure out how to grab url value 
