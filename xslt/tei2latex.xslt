@@ -19,6 +19,7 @@
 <!-- 5/8/14 Fixed Cell template and escaping of \ -->
 <!--5/14/14 Added support for [ and ] -->
 <!--5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
+<!-- 5/21/14 Fixed char replacement in ref environment-->
 
 <xsl:template match="/">
 
