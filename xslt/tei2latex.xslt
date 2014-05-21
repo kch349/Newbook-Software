@@ -18,7 +18,7 @@
 <!-- 5/1/14 - fixed string replace (hopefully) -->
 <!-- 5/8/14 Fixed Cell template and escaping of \ -->
 <!--5/14/14 Added support for [ and ] -->
-<!--added recursion for notes and fixed repeating <l> and <lb> issue-->
+<!--5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
 
 <xsl:template match="/">
 
