@@ -856,6 +856,17 @@ if __name__ in "__main__":
   else:
     infilelines = sys.stdin.readlines()
     
+#take out the actual code to replace the config. instead just create dictionary
+#config = config(config_file)  
+#info dictionary created in __init__ method that happens as a constructor
+#then in later instances refer to config.info to access the field/state of the object
+#if no config file, just create:
+#config = config() and have a different constructor with no parameters to create the 
+#dictionary containing the default config options
+
+#later could possibly have default files created for each project, and have a constructor
+#with the type of document, and it would run a constructor specific to that project. but 
+#may be way too complicated.     
   if args.config:
     config_file = open(args.config, encoding ="utf-8")
     #Sets CONFIG_INFO for document so it is accessible throughout program
