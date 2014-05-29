@@ -16,7 +16,7 @@ import sys
 import re
 import logging
 import argparse
-import json
+from config import AutotaggerConfiguration
 from xml.dom.minidom import *
 
 
@@ -24,52 +24,6 @@ from xml.dom.minidom import *
 ## input document and transcription format data
 CURRENT_VERSION = 1
 version = -1
-#Information from configuration of file. 
-
-# CONFIG_INFO = json.load('file name here?')
-
-global CONFIG_INFO
-CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
-               'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
-               'NUMBER_OF_DIVS' : 2, # Number of divisions present
-               'LINE_BREAKS' : True,
-               'TITLE' : 'Insert Document Title Here', #Beginning OF TEI header info
-               'AUTHOR' : 'Insert Author Name Here',
-               'RESP_PROJECT' : 'Insert Name of Project Responsible for Transcription',
-               'PROJECT_LEAD' : 'Insert Name of Project Lead',
-               'DISTRIBUTOR' : 'Insert Distributor Name Here',
-               'ID_TYPE' : 'Insert Your Type Here',
-               'ID_VALUE' : 'Insert ID Number Here',
-               'COPYRIGHT' : 'Insert Copyright Data Here',
-               'DATE' : 'Insert Date Here',
-               'DATE_LAST_UPDATED' : 'Insert Date of Last Edit', # will slightly change output of generics
-               'BIBL_INFO' : 'Enter Bibliographical Information Here',
-               'PROJECT_DESC' : 'Insert Project Here'}
-
-
-
-#Structural Information
-#Configurations as to whether section or subsection titles are in the body text (True),
-#or removed in margins/elsewhere on the page (False)
-
-
-SECTION_IN_TEXT = True # must be boolean
-SUBSECTION_IN_TEXT = False # must be boolean
-#NUMBER_OF_DIVS = 2 # must be greater than 1
-##TEI Header Information (all must be strings)
-#TITLE = 'Insert Document Title Here'
-#AUTHOR = 'Insert Author Name Here'
-#RESP_PROJECT = 'Insert Name of Project Responsible for Transcription'
-#PROJECT_LEAD = 'Insert Name of Project Lead'
-#DISTRIBUTOR = 'Insert Distributor Name Here'
-#ID_TYPE = 'Insert Your Type Here'
-#ID_VALUE = 'Insert ID Number Here'
-#COPYRIGHT = 'Insert Copyright Data Here'
-#DATE = 'Insert Date Here'
-#DATE_LAST_UPDATED = 'Insert Date of Last Edit' # will slightly change output of generics
-#BIBL_INFO = 'Enter Bibliographical Information Here'
-#PROJECT_DESC = 'Insert Project Here'
-
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
@@ -146,19 +100,19 @@ def set_version(value):
 
 #Creates responsibility statement in TEI Header
 #(To Configure)
-def create_respSt(document):
+def create_respSt(document, cfg):
   resp_statement = document.createElement('respStmt')
   resp = document.createElement('resp')
   resp_statement.appendChild(resp)
-  resp.appendChild(document.createTextNode(CONFIG_INFO['RESP_PROJECT']))
+  resp.appendChild(document.createTextNode(cfg.get('RESP_PROJECT')))
   name = document.createElement('name')
   resp_statement.appendChild(name)
-  name.appendChild(document.createTextNode(CONFIG_INFO['PROJECT_LEAD']))
+  name.appendChild(document.createTextNode(cfg.get('PROJECT_LEAD')))
   return resp_statement
 
 #Creates generic TEI Header. Will allow for configuration later.
 #(To Configure)
-def create_teiHeader(document):
+def create_teiHeader(document,cfg):
   header = document.createElement('teiHeader')
   fileDesc = document.createElement('fileDesc')
   header.appendChild(fileDesc)
@@ -167,20 +121,19 @@ def create_teiHeader(document):
 
   title = document.createElement('title')
   title_statement.appendChild(title)
-  #print(CONFIG_INFO['DATE'])
-  title.appendChild(document.createTextNode(CONFIG_INFO['TITLE']))
+  title.appendChild(document.createTextNode(cfg.get('TITLE')))
 
   author =  document.createElement('author')
   title_statement.appendChild(author)
-  author.appendChild(document.createTextNode(CONFIG_INFO['AUTHOR']))
+  author.appendChild(document.createTextNode(cfg.get('AUTHOR')))
 
-  title_statement.appendChild(create_respSt(document))
+  title_statement.appendChild(create_respSt(document,cfg))
 
   pubSt = document.createElement('publicationStmt')
   fileDesc.appendChild(pubSt)
   distributor = document.createElement('distributor')
   pubSt.appendChild(distributor)
-  distributor.appendChild(document.createTextNode(CONFIG_INFO['DISTRIBUTOR']))
+  distributor.appendChild(document.createTextNode(cfg.get('DISTRIBUTOR')))
 
   address = document.createElement('address')
   pubSt.appendChild(address)
@@ -189,26 +142,26 @@ def create_teiHeader(document):
 
   idno = document.createElement('idno')
   pubSt.appendChild(idno)
-  idno.setAttribute('type', CONFIG_INFO['ID_TYPE'])
-  idno.appendChild(document.createTextNode(CONFIG_INFO['ID_VALUE']))
+  idno.setAttribute('type', cfg.get('ID_TYPE'))
+  idno.appendChild(document.createTextNode(cfg.get('ID_VALUE')))
 
   availability = document.createElement('availability')
   pubSt.appendChild(availability)
   p = document.createElement('p')
   availability.appendChild(p)
-  p.appendChild(document.createTextNode(CONFIG_INFO['COPYRIGHT']))
+  p.appendChild(document.createTextNode(cfg.get('COPYRIGHT')))
 
   date = document.createElement('date')
   pubSt.appendChild(date)
   #why do we have a "when type" when there is already a text node containing that information?
   date.setAttribute('when', 'Insert Date Here')
-  date.appendChild(document.createTextNode(CONFIG_INFO['DATE']))
+  date.appendChild(document.createTextNode(cfg.get('DATE')))
 
   sourceDesc = document.createElement('sourceDesc')
   fileDesc.appendChild(sourceDesc)
   bibl = document.createElement('bibl')
   sourceDesc.appendChild(bibl)
-  bibl.appendChild(document.createTextNode(CONFIG_INFO['BIBL_INFO']))
+  bibl.appendChild(document.createTextNode(cfg.get('BIBL_INFO')))
 
   encodingDesc = document.createElement('encodingDesc')
   header.appendChild(encodingDesc)
@@ -216,7 +169,7 @@ def create_teiHeader(document):
   encodingDesc.appendChild(projectDesc)
   p2 = document.createElement('p')
   projectDesc.appendChild(p2)
-  p2.appendChild(document.createTextNode(CONFIG_INFO['PROJECT_DESC']))
+  p2.appendChild(document.createTextNode(cfg.get('PROJECT_DESC')))
 
   revisionDesc = document.createElement('revisionDesc')
   header.appendChild(revisionDesc)
@@ -230,20 +183,20 @@ def create_teiHeader(document):
   date = document.createElement('date')
   item.appendChild(date)
   #Same question about "when" attribute as above.
-  date.setAttribute('when', CONFIG_INFO['DATE_LAST_UPDATED'])     #Will be slightly different from existing copy
-  date.appendChild(document.createTextNode(CONFIG_INFO['DATE_LAST_UPDATED']))
+  date.setAttribute('when', cfg.get('DATE_LAST_UPDATED'))     #Will be slightly different from existing copy
+  date.appendChild(document.createTextNode(cfg.get('DATE_LAST_UPDATED')))
   item.appendChild(document.createTextNode('Last checked'))
   return header
 
 #Sets up xml_minidom document with (front), body, and (back) material
-def setup_DOM():
+def setup_DOM(cfg):
   impl = getDOMImplementation()
   doctype = impl.createDocumentType('TEI',None,'http://www.tei-c.org/release/xml/tei/custom/schema/dtd/tei_all.dtd')
 
   newdoc = impl.createDocument(None, "TEI", doctype)
   document = newdoc.documentElement
   newdoc.appendChild(document)
-  teiHeader = create_teiHeader(newdoc)
+  teiHeader = create_teiHeader(newdoc,cfg)
   document.appendChild(teiHeader)
 
   text = newdoc.createElement('text')
@@ -606,7 +559,7 @@ def create_p(document,current_prose, first_line=None, fresh=False):
   current_prose.append(document.createElement('p'))
   if first_line != None:
     current_prose[-1].appendChild(document.createTextNode(first_line[0]))
-    if CONFIG_INFO['LINE_BREAKS']:
+    if cfg.get('LINE_BREAKS'):
       current_prose[-1].appendChild(create_line_break(document, str(first_line[1])))
       #logging.debug("called line break from create_p at page " + str(page.num) + " and line " + linecount)
   return current_prose
@@ -709,7 +662,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
         logging.debug("Ran out of marginheaders.")
 
       #Account for empty lines or double spacing
-      if CONFIG_INFO['LINE_BREAKS']:
+      if cfg.get('LINE_BREAKS'):
         m = EMPTYLINE_RE.match(l)
         if m:
           #found empty line
@@ -754,7 +707,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             
 
         div1_head.appendChild(document.createTextNode(m.group(1)))
-        if SECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
+        if cfg.get('SECTION_IN_TEXT') and cfg.get('LINE_BREAKS'):
           div1_head.appendChild(create_line_break(document, linecount))
           #logging.debug("called line break from Section in Text line 756 at page " + str(page.num) + " and line " + linecount)
         else:
@@ -786,7 +739,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           current_div2 = div2
           
         div2_head.appendChild(document.createTextNode(m.group(1)))
-        if SUBSECTION_IN_TEXT and CONFIG_INFO['LINE_BREAKS']:
+        if cfg.get('SUBSECTION_IN_TEXT') and cfg.get('LINE_BREAKS'):
           div2_head.appendChild(create_line_break(document, linecount))
           #logging.debug("called line break from Subsection in Text line 788 at page " + str(page.num) + " and line " + linecount)
         else:
@@ -813,7 +766,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
       else:
         just_divided = False
         current_prose[-1].appendChild(document.createTextNode(l))
-        if CONFIG_INFO['LINE_BREAKS']:
+        if cfg.get('LINE_BREAKS'):
           current_prose[-1].appendChild(create_line_break(document, str(linecount)))
           #logging.debug("called line break from else after paragraph creation (regular prose) line 817 at page " + str(page.num) + " and line " + linecount)
     # maybe add in something that says to delete the last line break 
@@ -838,9 +791,9 @@ def setup_argparse():
   ap.add_argument('--config', '-c', help = 'choose a configuration file (JSON) for specific document')
   return ap
 
-def run(tf):
+def run(tf,cfg):
   """Translates transcription file into XML. Returns the complete XML document"""
-  document = setup_DOM()
+  document = setup_DOM(cfg)
   marginheaders, footnotes, xml_ids_dict = process_header(document, tf)
   process_body(document, tf, marginheaders, footnotes, xml_ids_dict)
   return document
@@ -856,22 +809,13 @@ if __name__ in "__main__":
   else:
     infilelines = sys.stdin.readlines()
     
+  
+  # if we got a user config file on the path, use that, otherwise
+  # create a default config object
   if args.config:
-    config_file = open(args.config, encoding ="utf-8")
-    #Sets CONFIG_INFO for document so it is accessible throughout program
-    # CONFIG_INFO = json.load(config_file)['config_options']
-    json_data = json.load(config_file)
-    #CONFIG_INFO = json_data['config_options']
-    config_upload = json_data['config_options']
-    for key in config_upload:
-      if key in CONFIG_INFO:
-  	    CONFIG_INFO[key] = config_upload[key]
-  	
-  #	for i in CONFIG_INFO:
-  	#  print(i, file=sys.stderr)
-  	
-  	      	#logging.debug("config-info: " + str(CONFIG_INFO))
-    #how fit on a universal variable?   
+    cfg = AutotaggerConfiguration(filepath=args.config)
+  else:
+    cfg = AutotaggerConfiguration()
 
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
@@ -888,5 +832,5 @@ if __name__ in "__main__":
     for e in tf.errors:
       print(e,file=sys.stderr)
   else:
-    document = run(tf)
+    document = run(tf, cfg)
     print(document.toprettyxml('\t', '\n', None))
