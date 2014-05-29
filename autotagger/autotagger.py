@@ -17,6 +17,7 @@ import re
 import logging
 import argparse
 import json
+from config import AutotaggerConfiguration
 from xml.dom.minidom import *
 
 
@@ -29,22 +30,22 @@ version = -1
 # CONFIG_INFO = json.load('file name here?')
 
 global CONFIG_INFO
-CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
-               'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
-               'NUMBER_OF_DIVS' : 2, # Number of divisions present
-               'LINE_BREAKS' : True,
-               'TITLE' : 'Insert Document Title Here', #Beginning OF TEI header info
-               'AUTHOR' : 'Insert Author Name Here',
-               'RESP_PROJECT' : 'Insert Name of Project Responsible for Transcription',
-               'PROJECT_LEAD' : 'Insert Name of Project Lead',
-               'DISTRIBUTOR' : 'Insert Distributor Name Here',
-               'ID_TYPE' : 'Insert Your Type Here',
-               'ID_VALUE' : 'Insert ID Number Here',
-               'COPYRIGHT' : 'Insert Copyright Data Here',
-               'DATE' : 'Insert Date Here',
-               'DATE_LAST_UPDATED' : 'Insert Date of Last Edit', # will slightly change output of generics
-               'BIBL_INFO' : 'Enter Bibliographical Information Here',
-               'PROJECT_DESC' : 'Insert Project Here'}
+#CONFIG_INFO = {'SECTION_IN_TEXT' : True, #True if title in body text
+ #              'SUBSECTION_IN_TEXT' : False, #False if title in margin or elsewhere
+  #             'NUMBER_OF_DIVS' : 2, # Number of divisions present
+   #            'LINE_BREAKS' : True,
+    #           'TITLE' : 'Insert Document Title Here', #Beginning OF TEI header info
+     #          'AUTHOR' : 'Insert Author Name Here',
+      #         'RESP_PROJECT' : 'Insert Name of Project Responsible for Transcription',
+       #        'PROJECT_LEAD' : 'Insert Name of Project Lead',
+        #       'DISTRIBUTOR' : 'Insert Distributor Name Here',
+         #      'ID_TYPE' : 'Insert Your Type Here',
+          #     'ID_VALUE' : 'Insert ID Number Here',
+           #    'COPYRIGHT' : 'Insert Copyright Data Here',
+            #   'DATE' : 'Insert Date Here',
+             #  'DATE_LAST_UPDATED' : 'Insert Date of Last Edit', # will slightly change output of generics
+              # 'BIBL_INFO' : 'Enter Bibliographical Information Here',
+               #'PROJECT_DESC' : 'Insert Project Here'}
 
 
 
@@ -866,17 +867,21 @@ if __name__ in "__main__":
 
 #later could possibly have default files created for each project, and have a constructor
 #with the type of document, and it would run a constructor specific to that project. but 
-#may be way too complicated.     
+#may be way too complicated.    
+
+ 
   if args.config:
-    config_file = open(args.config, encoding ="utf-8")
+    json_data = AutotaggerConfiguration.read_from_file(args.config)
+    CONFIG_INFO = json_data.CONFIG_INFO
+    #config_file = open(args.config, encoding ="utf-8")
     #Sets CONFIG_INFO for document so it is accessible throughout program
     # CONFIG_INFO = json.load(config_file)['config_options']
-    json_data = json.load(config_file)
+    #json_data = json.load(config_file)
     #CONFIG_INFO = json_data['config_options']
-    config_upload = json_data['config_options']
-    for key in config_upload:
-      if key in CONFIG_INFO:
-  	    CONFIG_INFO[key] = config_upload[key]
+    #config_upload = json_data['config_options']
+    #for key in config_upload:
+      #if key in CONFIG_INFO:
+  	    #CONFIG_INFO[key] = config_upload[key]
   	
   #	for i in CONFIG_INFO:
   	#  print(i, file=sys.stderr)
