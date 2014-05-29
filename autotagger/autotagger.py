@@ -808,7 +808,6 @@ if __name__ in "__main__":
     infilelines = infile.readlines()
   else:
     infilelines = sys.stdin.readlines()
-    
   
   # if we got a user config file on the path, use that, otherwise
   # create a default config object
