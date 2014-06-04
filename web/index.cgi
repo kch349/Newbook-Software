@@ -83,7 +83,15 @@ SUCCESS_PAGE = """
 WELCOME_PAGE = """
 <!doctype html>
 <html>
-<head><title>Newbook Autotagger Online</title>
+<head>
+		<link href="newbook4.css" type="text/css" rel="stylesheet"></link>
+		<title>Svoboda Diaries Project </title>
+		<link type="image/x-icon" href="images/favicon.ico" rel="shortcut icon"></link>
+		<link type="image/x-icon" href="images/favicon.ico" rel="icon"></link>
+		<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open	+Sans"></link>
+    <!-- <script src="svoboda.js" type="text/javascript"></script> -->
+    <meta charset="UTF-8"></meta>
+    <!--- <title>Newbook Autotagger On-line</title> -->
 </head>
 <body>
 <h2>Newbook Autotagger Online Interface</h2>
