@@ -17,16 +17,21 @@
 <!-- 4/23/14 - added support for emph, ref, note,  fixed lg, l and lb-->
 <!-- 5/1/14 - fixed string replace (hopefully) -->
 <!-- 5/8/14 Fixed Cell template and escaping of \ -->
-<!--5/14/14 Added support for [ and ] -->
-<!--5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
+<!-- 5/14/14 Added support for [ and ] -->
+<!-- 5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
 <!-- 5/21/14 Fixed char replacement in ref environment-->
-
+<!-- 5/22/14 changed pb template, prints out [p: #] rather then adding a new tag-->
+<!-- 6/5/14 Working on Foreign Tag/ Picture grabbing templates. -->
 <xsl:template match="/">
 
 \documentclass{report}
+<!--
+\usepackage{arabtext}
+\usepackage{utf8}
+-->
 \begin{document}
 
-\newcommand{\mnote}[1] {\marginpar{\scriptsize \raggedright #1 }}
+<!--\newcommand{\mnote}[1] {\marginpar{\scriptsize \raggedright #1 }} -->
 
 <xsl:apply-templates select = "/TEI/text/body" />
  
@@ -51,17 +56,27 @@
 	}
 </xsl:template>
 
+<!-- [[Figure-CAPTION =- [URL]]]
+<xsl:template match="figure">\lbrack \lbrack </xsl:template>
+
+<xsl:template match="figure/head"><xsl:apply-templates/>Caption:</xsl:template>
+
+<xsl:template match="graphic"><xsl:value-of select="@url"/>\rbrack \rbrack </xsl:template>-->
 
 
 <!--Adds linebreaks into document-->
 <xsl:template match="lb">\ \\</xsl:template>
 
 
-<!-- adds page breaks into document -->
+<xsl:template match="pb">
+  \[p: <xsl:value-of select="@n"/> \]
+</xsl:template>
+
+<!-- adds page breaks into document 
 <xsl:template match="pb">
 	\pagebreak
 </xsl:template>
-
+-->
 <!--adds linegroups into document using minipage 
 <xsl:template match="lg">
 	\par{	
@@ -71,15 +86,12 @@
 		\end{minipage}
 		}
 	}
-</xsl:template>-->
-
-<!-- adds arabic environment that surrounds arabic text 
-<xsl:template match="foreign">
-	\begin{arabtext}
-	<xsl:value-of select="."/>
-	\end{arabtext}
 </xsl:template>
--->
+<foreign xml:lang="*-Latn", -Arab, -
+<!--adds arabic environment that surrounds arabic text 
+<xsl:template match="foreign">
+	\begin{quote} <xsl:value-of select="."/> \end{quote}
+</xsl:template> -->
 
 <!-- inserts linegroup into document-->
 <xsl:template match="lg">
@@ -135,7 +147,6 @@
 	\caption{<xsl:value-of select="."/>}
 }
 
-<xsl:template match="url">
 -->
 
 <xsl:template match="table">
@@ -152,7 +163,6 @@
 <xsl:template match="cell">
 	<xsl:apply-templates/>
 	<!--<xsl:value-of select='normalize-space()'/>-->
-
 	&amp;
 </xsl:template>
 
@@ -246,6 +256,5 @@
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template> 
-
 </xsl:stylesheet>
 
