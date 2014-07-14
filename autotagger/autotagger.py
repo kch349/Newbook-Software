@@ -551,7 +551,7 @@ def create_generic_div(document, div_count, type):
   return div, div_count
 
 #Creates a new paragraph
-def create_p(document,current_prose, first_line=None, fresh=False):
+def create_p(document,current_prose, cfg,first_line=None, fresh=False):
   '''method to create a paragraph, needs the list of paragraphs
      possibly also receive a first line (and it's linenum in a list of len 2).
      fresh tells us whether to empty the list before we start'''
@@ -619,12 +619,12 @@ def process_header(doc,tf):
   return marginheaders, footnotes, xml_ids_dict
 
   
-def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
+def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
   """Translates data contained in the body text of the transcription file into XML,
   combining the structure indicated in the body text with the given notes from the
   header."""
   current_prose = [] #list of paragraph nodes
-  current_prose = create_p(document,current_prose)
+  current_prose = create_p(document,current_prose,cfg)
   
   # get document body to appending below
   body = document.getElementsByTagName('body')[0]
@@ -696,7 +696,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
             else:
               current_div2.setAttribute('part', 'I')
             current_div2.childNodes.extend(current_prose)
-            current_prose = create_p(document,current_prose, fresh=True)
+            current_prose = create_p(document,current_prose,cfg, fresh=True)
             current_div1.appendChild(current_div2)
             current_div2 = next_div2
 
@@ -728,7 +728,7 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict):
           #attach previous div2
           current_div2.childNodes.extend(current_prose)
           current_div1.appendChild(current_div2)
-          current_prose = create_p(document,current_prose, fresh=True)
+          current_prose = create_p(document,current_prose,cfg, fresh=True)
             
           #create new div2
           part = "N"
@@ -795,7 +795,7 @@ def run(tf,cfg):
   """Translates transcription file into XML. Returns the complete XML document"""
   document = setup_DOM(cfg)
   marginheaders, footnotes, xml_ids_dict = process_header(document, tf)
-  process_body(document, tf, marginheaders, footnotes, xml_ids_dict)
+  process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg)
   return document
   
 if __name__ in "__main__":
