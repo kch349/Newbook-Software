@@ -116,6 +116,10 @@ Our code is open-source access our repository <a href="https://github.com/kch349
   <h3> About The Transcription Format </h3>
   <p> Stuff about transcribing.  Maybe examples.  Make new page? </p>
   <h3> Coming Soon.... </h3>
+  <h3> Download some files </h3>
+  <ul>
+    <li><a href="download.html">Download page</a></li>
+  </ul>
   <p> Stay tuned for configuration and customization options. </p>
 <div id="footer"><hr></hr>  
 		Copyright © 2013 Newbook Digital Text in the Humanities. All Rights Reserved.
