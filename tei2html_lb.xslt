@@ -53,10 +53,16 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 
-<xsl:template match="head">
+<xsl:template match="div1/head">
 	<h1>
 	   <xsl:apply-templates/>
 	</h1>
+</xsl:template>
+
+<xsl:template match="div2/head">
+	<h2>
+	<xsl:apply-templates/>
+	</h2>
 </xsl:template>
 
 
@@ -90,15 +96,15 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template match="table">
 	<table border="1">
+		
+	<xsl:for-each select="./row">
 		<tr>
-		  <th>Arrive</th>
-		  <th>Depart</th>	
-		</tr>
-		<tr>
-		  <td>some time</td>
-		  <td>some other time</td>
-		</tr>
-<xsl:apply-templates/>
+			<xsl:for-each select="./cell">
+		<td><xsl:value-of select="."/></td>
+			</xsl:for-each>
+		 </tr>
+	</xsl:for-each>
+		 
 	</table>
 </xsl:template>
 
@@ -114,7 +120,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:template match="lb"> 
 	<br />
 	<span class="lb">
-line <xsl:value-of select="@n"/>:
+<xsl:value-of select="@n"/>:
 	</span>
 </xsl:template>
 
@@ -135,13 +141,13 @@ line <xsl:value-of select="@n"/>:
 	
 <xsl:template match="note">
 		<xsl:element name="span">
-		<xsl:attribute name="id">
-      <xsl:value-of select="@xml:id"/>
-		</xsl:attribute>
 		<xsl:attribute name="class">
-      <xsl:value-of select="note"/>
+	<xsl:value-of select="@xml:id"/>
 		</xsl:attribute>
 	<xsl:apply-templates/>
 		</xsl:element>
 </xsl:template>
+
+
+
 </xsl:stylesheet>

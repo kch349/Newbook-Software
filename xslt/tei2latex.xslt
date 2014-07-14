@@ -16,7 +16,12 @@
 <!-- added support for pb, lb, verse , and l tags -->
 <!-- 4/23/14 - added support for emph, ref, note,  fixed lg, l and lb-->
 <!-- 5/1/14 - fixed string replace (hopefully) -->
-<!-- 5/8/14 - Fixed Cells -->
+<!-- 5/8/14 Fixed Cell template and escaping of \ -->
+<!-- 5/14/14 Added support for [ and ] -->
+<!-- 5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
+<!-- 5/21/14 Fixed char replacement in ref environment-->
+<!-- 5/22/14 changed pb template, prints out [p: #] rather then adding a new tag-->
+<!-- adds quote environment too foreign elements -->
 
 <xsl:template match="/">
 
@@ -48,18 +53,25 @@
 	}
 </xsl:template>
 
-
+<!-- [[Figure-CAPTION =- [URL]]]-->
 
 <!--Adds linebreaks into document-->
-<xsl:template match="lb">\\</xsl:template>
+<xsl:template match="lb">\ \\</xsl:template>
 
 
-<!-- adds page breaks into document -->
 <xsl:template match="pb">
-	\pagebreak
-<!--	<xsl:apply-templates/> -->
+  \[p: <xsl:value-of select="@n"/> \]
 </xsl:template>
 
+<xsl:template match="foreign">
+  \begin{quote}<xsl:value-of select="."/>\end{quote}
+</xsl:template>
+
+<!-- adds page breaks into document 
+<xsl:template match="pb">
+	\pagebreak
+</xsl:template>
+-->
 <!--adds linegroups into document using minipage 
 <xsl:template match="lg">
 	\par{	
@@ -82,14 +94,13 @@
 <!-- inserts linegroup into document-->
 <xsl:template match="lg">
 	\begin{verse}
-	<xsl:value-of select="."/>
 	<xsl:apply-templates/>
 	\end{verse}
 </xsl:template>
 
 <!-- inserts a line within the linegroup into document -->
 <xsl:template match="l">
-	<xsl:value-of select="."/>
+	<xsl:apply-templates/>
 </xsl:template>
 
 <!--
@@ -101,8 +112,7 @@
 
 <!-- Prints all Note tags as foot notes -->
 <xsl:template match="note">
-\footnote{<xsl:value-of select="."/>}
-<xsl:apply-templates/>
+\footnote{<xsl:apply-templates/>}
 </xsl:template>
 
 <!--Prints lists with bullets -->
@@ -121,7 +131,7 @@
 </xsl:template>
 
 <xsl:template match="ref">
-	\textsuperscript{<xsl:value-of select="."/>}
+	\textsuperscript{<xsl:apply-templates />}
 </xsl:template>
 
 <!-- finish later, figure out how to grab url value 
@@ -152,7 +162,6 @@
 <xsl:template match="cell">
 	<xsl:apply-templates/>
 	<!--<xsl:value-of select='normalize-space()'/>-->
-
 	&amp;
 </xsl:template>
 
@@ -170,6 +179,8 @@
   <entry key="{">\{</entry>
   <entry key="}">\}</entry>
   <entry key="~">\~{}</entry>
+  <entry key="[">\lbrack </entry>
+  <entry key="]">\rbrack </entry>
 
 </tex:replace-map>
 
@@ -177,7 +188,7 @@
     <xsl:variable name="toreturn">
       <xsl:call-template name="StringReplace">
         <xsl:with-param name="text" select="." />
-        <xsl:with-param name="chars" select="'&lt; &amp; % # $ \ * ^ { ~ } _ &gt; '" />
+        <xsl:with-param name="chars" select="'&lt; &amp; % # $ \ * ^ { ~ } _ &gt; ] [ '" />
 		<!-- % has to be added anywhere but the end or some cases dont get escaped -->
       </xsl:call-template>
     </xsl:variable>
@@ -246,3 +257,4 @@
 </xsl:template> 
 
 </xsl:stylesheet>
+
