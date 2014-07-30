@@ -56,43 +56,6 @@ SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
 
-#Reads in html file with various fields.
-#has scanner over file, or reads in lines.
-#for each field, in order.
-  #if matches one of possibilities (for divs/intext or out of text, concrete things)
-    #sets corresponding variable as that 
-  #elif empty
-    #set to default
-  #else
-  	#add errors that it is wrong. would crash program (divs less than 1, not boolean for
-  	#in text, etc)
-  	
-  	#maybe have these set already, and then config options override if formatted correctly.
-
-#Set order? or have tokens for labels? With set labels
-#def import_config(insert parameters here):
-  #for each 2 lines
-    #label = read one line (need to match constant...maybe have lower case, etc.)
-    #value = read next line/field
-    #if is_valid_entry(label, value):
-      #if label == NUMBER_OF_DIVS:
-        #value = int(value)
-      #CONFIG_INFO[label] = value  #check if this is the right formatting
-    #else:
-      #report error message...
-      #'''Your input for " + label + " is not valid. Make sure in-text data is True/False
-      #and your number of divisions is an integer of 1 or more.'''
-
-#check valid number
-#def is_valid_entry(label,value):
-  #if label == 'SECTION_IN_TEXT' or label == 'SUBSECTION_IN_TEXT':
-    #return type(label) is boolean
-  #elif label == 'NUMBER_OF_DIVS':
-    #return type(label) is int and value >= 1
-  #else:
-    #return type(label) is String   #not sure if that is how you write the type   
-
-
 #Sets version for document so it is accessible throughout program
 def set_version(value):
   global version
@@ -725,9 +688,10 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
       if m:
         if not subsection_found:
           just_divided = True
-          #attach previous div2
-          current_div2.childNodes.extend(current_prose)
-          current_div1.appendChild(current_div2)
+          if current_div2 is not None:
+            #attach previous div2 and prose, clear already attached prose
+            current_div2.childNodes.extend(current_prose)
+            current_div1.appendChild(current_div2)
           current_prose = create_p(document,current_prose,cfg, fresh=True)
             
           #create new div2
