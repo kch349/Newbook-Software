@@ -721,11 +721,11 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
       m = PARA_RE.match(l)
       if m: 
         if just_divided:
-          current_prose = create_p(document, current_prose, [l, linecount], fresh=True)
+          current_prose = create_p(document, current_prose, cfg, [l, linecount], fresh=True)
           just_divided = False
           #will this pose a problem if for some reason there isn't a paragraph right afterwards?
         else:
-          current_prose = create_p(document, current_prose,[l,linecount])
+          current_prose = create_p(document, current_prose, cfg, [l,linecount])
       # Processes plain lines of body text
       else:
         just_divided = False
