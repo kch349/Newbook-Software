@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 base_link = 'http://digitalcollections.lib.washington.edu/cdm/ref/collection/iraqdiaries/id/'
 
 # map of [diary_no]=>start page for url
-start_nums = {47: 427, 48: 820, 49: 1223, 50:0, 51: 1659, 52: 3844, 53: 9680, 55: 2523, 56: 2520, 59: 2914, 60: 3307}
+start_nums = {47: 427, 48: 820, 49: 1223, 50:0, 51: 1658, 52: 3843, 53: 9679, 55: 2522, 56: 2519, 59: 2913, 60: 3306}
 
 # function goes through all spans with class 'pb' and adds a tags with link
 def add_links(soup, start_num):
