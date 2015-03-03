@@ -3,6 +3,7 @@
 #
 
 import cgi
+from config import AutotaggerConfiguration
 import cgitb; cgitb.enable()
 import autotagger
 import codecs
@@ -286,26 +287,53 @@ if 'sdtf' in form_data or 'sample' in form_data:
     infilelines = str(form_data['sdtf'].value, encoding="utf-8").split('\n')
   # get json file and save in form_data
   
+  
+  #could store keys in a list, and if the form data key is one of them, import everything
+  config_keys = {'SECTION_IN_TEXT', 'SUBSECTION_IN_TEXT', 'NUMBER_OF_DIVS',
+      'TITLE', 'AUTHOR', 'RESP_PROJECT', 'PROJECT_LEAD', 'DISTRIBUTOR', 'ID_TYPE',
+      'ID_VALUE', 'COPYRIGHT', 'DATE', 'DATE_LAST_UPDATED', 'BIBL_INFO', 'PROJECT_DESC'}
+  
   #deals with config info
+  #if form_data['config'].value != null:
+   #   dict={
+    #    'SECTION_IN_TEXT':form_data['SECTION_IN_TEXT'].value,
+     #   'SUBSECTION_IN_TEXT':form_data['SUBSECTION_IN_TEXT'].value,
+      #  'NUMBER_OF_DIVS':form_data['NUMBER_OF_DIVS'].value,
+       # 'TITLE':form_data['TITLE'].value,
+    #    'AUTHOR':form_data['AUTHOR'].value,
+     #   'RESP_PROJECT':form_data['RESP_PROJECT'].value,
+      #  'PROJECT_LEAD':form_data['PROJECT_LEAD'].value,
+       # 'DISTRIBUTOR':form_data['DISTRIBUTOR'].value,
+#        'ID_TYPE':form_data['ID_TYPE'].value,
+ #       'ID_VALUE':form_data['ID_VALUE'].value,
+  #      'COPYRIGHT':form_data['COPYRIGHT'].value,
+   #     'DATE':form_data['DATE'].value,
+    #    'DATE_LAST_UPDATED':form_data['DATE_LAST_UPDATED'].value,
+     #   'BIBL_INFO':form_data['BIBL_INFO'].value,
+      #  'PROJECT_DESC':form_data['PROJECT_DESC'].value
+      #}
+      #json.dump(dict, open(session_path+'/config.json','w'))
+      
+      ##Never putting this info anywhere
+      
+  # step 1.5, read any config info from form_data and
+  # create config object to pass to autotagger.py
+  # if there are more than one non-config key, then make a list
+  config_info = {}
+  cfg = null
   if form_data['config'].value != null:
-      dict={
-        'SECTION_IN_TEXT':form_data['SECTION_IN_TEXT'].value,
-        'SUBSECTION_IN_TEXT':form_data['SUBSECTION_IN_TEXT'].value,
-        'NUMBER_OF_DIVS':form_data['NUMBER_OF_DIVS'].value,
-        'TITLE':form_data['TITLE'].value,
-        'AUTHOR':form_data['AUTHOR'].value,
-        'RESP_PROJECT':form_data['RESP_PROJECT'].value,
-        'PROJECT_LEAD':form_data['PROJECT_LEAD'].value,
-        'DISTRIBUTOR':form_data['DISTRIBUTOR'].value,
-        'ID_TYPE':form_data['ID_TYPE'].value,
-        'ID_VALUE':form_data['ID_VALUE'].value,
-        'COPYRIGHT':form_data['COPYRIGHT'].value,
-        'DATE':form_data['DATE'].value,
-        'DATE_LAST_UPDATED':form_data['DATE_LAST_UPDATED'].value,
-        'BIBL_INFO':form_data['BIBL_INFO'].value,
-        'PROJECT_DESC':form_data['PROJECT_DESC'].value
-      }
-      json.dump(dict, open(session_path+'/config.json','w'))
+    for key in config_keys: 
+      if form_data[key].value != null:
+        config_info[key] = form_data[key].value
+    cfg = AutotaggerConfiguration(options_dict = config_info)
+    json.dump(config_info, open(session_path+'/config.json','w'))
+  #else if json file exists:
+   # cfg = AutotaggerConfiguration(filepath=<FILEPATHFROMONLINEGOESHERE>)
+  else:
+    cfg = AutotaggerConfiguration()
+
+  
+
 
   # step 2 make a TranscriptionFile from the lines
   tf = autotagger.TranscriptionFile(infilelines)
@@ -321,7 +349,7 @@ if 'sdtf' in form_data or 'sample' in form_data:
     #document = autotagger.setup_DOM()
     #marginheaders, footnotes, xml_ids_dict = autotagger.create_dom_nodes(document, tf)
     #autotagger.organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
-    document = autotagger.run(tf)
+    document = autotagger.run(tf, cfg) 
 
     #try:
     outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
