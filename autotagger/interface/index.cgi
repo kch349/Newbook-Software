@@ -3,7 +3,9 @@
 #
 
 import cgi
+
 from config import AutotaggerConfiguration
+
 import cgitb; cgitb.enable()
 import autotagger
 import codecs
@@ -332,8 +334,6 @@ if 'sdtf' in form_data or 'sample' in form_data:
   else:
     cfg = AutotaggerConfiguration()
 
-  
-
 
   # step 2 make a TranscriptionFile from the lines
   tf = autotagger.TranscriptionFile(infilelines)
@@ -349,7 +349,9 @@ if 'sdtf' in form_data or 'sample' in form_data:
     #document = autotagger.setup_DOM()
     #marginheaders, footnotes, xml_ids_dict = autotagger.create_dom_nodes(document, tf)
     #autotagger.organize_nodes(document, tf, marginheaders, footnotes, xml_ids_dict)
+    
     document = autotagger.run(tf, cfg) 
+
 
     #try:
     outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
