@@ -285,7 +285,7 @@ if 'sdtf' in form_data or 'sample' in form_data:
   # step 1, get the lines from the form
   if 'sample' in form_data:
     infilelines = open(form_data['sample'].value,encoding="utf-8").readlines()
-  else if 'sdtf' in form_data:
+  elif 'sdtf' in form_data:
     infilelines = str(form_data['sdtf'].value, encoding="utf-8").split('\n')
   # get json file and save in form_data
   
@@ -322,13 +322,14 @@ if 'sdtf' in form_data or 'sample' in form_data:
   # create config object to pass to autotagger.py
   # if there are more than one non-config key, then make a list
   config_info = {}
-  cfg = null
-  if form_data['config'].value != null:
-    for key in config_keys: 
-      if form_data[key].value != null:
-        config_info[key] = form_data[key].value
+  cfg = None
+  if form_data['config'].value != None:
+    for key in config_keys:
+      if key in form_data:
+        if form_data[key].value != None and form_data[key].value != "": ####################
+          config_info[key] = form_data[key].value
     cfg = AutotaggerConfiguration(options_dict = config_info)
-    json.dump(config_info, open(session_path+'/config.json','w'))
+    json.dump(cfg.CONFIG_INFO, open(session_path+'/config.json','w'))
   #else if json file exists:
    # cfg = AutotaggerConfiguration(filepath=<FILEPATHFROMONLINEGOESHERE>)
   else:
