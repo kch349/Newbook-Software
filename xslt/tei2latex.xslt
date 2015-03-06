@@ -20,8 +20,7 @@
 <!-- 5/14/14 Added support for [ and ] -->
 <!-- 5/18/14 added recursion for notes and fixed repeating <l> and <lb> issue-->
 <!-- 5/21/14 Fixed char replacement in ref environment-->
-<!-- 5/22/14 changed pb template, prints out [p: #] rather then adding a new tag-->
-<!-- adds quote environment too foreign elements -->
+<!-- 5/22/14 changed pb template, prints out [p: #] rather then adding a new tag MISSING CLOSE COMMENT LINE 23-->
 
 <xsl:template match="/">
 
@@ -127,7 +126,9 @@
 </xsl:template>
 
 <xsl:template match="emph">
-	\textit{<xsl:value-of select="."/>}
+	\begin{verbatim}
+         <xsl:value-of select="."/>
+         \end{verbatim}
 </xsl:template>
 
 <xsl:template match="ref">
@@ -149,8 +150,10 @@
 -->
 
 <xsl:template match="table">
-	\begin{tabular}{c|c|c|c}
+	\begin{tabular}{|c|c|c|c|c|}
+	\hline
 	<xsl:apply-templates/>
+	\hline
 	\end{tabular}
 </xsl:template>
 
