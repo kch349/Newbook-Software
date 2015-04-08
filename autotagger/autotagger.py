@@ -165,10 +165,13 @@ def setup_DOM(cfg):
   text = newdoc.createElement('text')
   document.appendChild(text)
 
+  #Commented out code for processing front and back material if ever necessary
   #front = newdoc.createElement('front')
   #text.appendChild(front)
+  
   body = newdoc.createElement('body')
   text.appendChild(body)
+  
   #back = newdoc.createElement('back')
   #text.appendChild(back)
   return newdoc
@@ -178,7 +181,6 @@ class TranscriptionFile:
 
   pages = []
   errors = []
-  #version = -1
 
   #Constructs a TranscriptionFile. Determines document version and updates it to the
   #current version. Processes document into TranscriptionFile
@@ -204,9 +206,7 @@ class TranscriptionFile:
        a series of Transcription Page objects"""
     p = []
     n = -1
-    #version = -1
     while len(lines) > 0:
-      #print("n = " + str(n), file=sys.stderr)
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
@@ -220,7 +220,6 @@ class TranscriptionFile:
         # if n is already defined, we've found a new page, so
         #    process the old one
         if n > -1:
-          # print(m1.group(1) + " found page", file=sys.stderr)
           self.pages.append(TranscriptionPage(str(n), p))
           p = []
           lines.pop(0)
@@ -255,6 +254,9 @@ class TranscriptionFile:
     if version == 0:
       uprev_lines, uprev_errors = self.version0to1(lines)
       set_version(1)
+      
+    #Uncomment line below to print out the file in the most current transcription format
+    #to stderr
     #self.print(uprev_lines)
     return uprev_lines, uprev_errors #or should this be a different return statement each time?
 
@@ -312,7 +314,6 @@ class TranscriptionFile:
           lines[i] = '\tNotes:'
         elif m8:
           divlines -= 1
-          #print(temp_div_headers[0], file=sys.stderr)
           if len(temp_div_headers) >= 1:
             version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
             temp_div_headers.pop(0)
@@ -485,33 +486,26 @@ def errors(page_num, line_num, line, error_code):
                "formatting is allowed.\n"
   return err_str
 
+#WHEN IS THE RETURN HEAD EVER USED?	
 #Creates a div of a specified number, type (1 or 2), and if applicable, part (I, M, or F)
 def create_div(document, n, div_type, part):
   """Creates div element of specified type and returns that div and its head node"""
   div = document.createElement(div_type)
-  #div.setAttribute('type','insert type (letter/diary, etc) here')
   div.setAttribute('n', n)
   if part is not None:
     div.setAttribute('part', part)
   head = document.createElement('head')
   div.appendChild(head)
-  #head.setAttribute('type', 'type here') #is this necessary if the div itself has an attr?
   return head, div
 
 #Creates first div of given type if necessary
-def create_generic_div(document, div_count, type):
-  #title = "First "
-  part = None
-  #if type == 'div1':
-   # title += "section; "
-  if type == 'div2':
-    #title += "subsection; "
-    part = "N"
-  #title += "no title given in text."
-  div_head, div = create_div(document, str(div_count), type, part)
-  #div_head.appendChild(document.createTextNode(title))
-  div_count +=1
-  return div, div_count
+#def create_generic_div(document, div_count, type):
+ # part = None
+  #if type == 'div2':
+   # part = "N"
+  #div_head, div = create_div(document, str(div_count), type, part)
+  #div_count +=1
+  #return div, div_count
 
 #Creates a new paragraph
 def create_p(document,current_prose, cfg,first_line=None, fresh=False):
@@ -679,7 +673,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
         continue
       else:
         if current_div1 == None:
-          current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
+          current_div1_head, current_div1 = create_div(document, str(div1_count), 'div1', None)
+          div1_count += 1
+          #current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
           body.appendChild(current_div1)
         section_found = False
    
@@ -712,7 +708,10 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
         continue
       else: 
         if current_div2 == None:
-          current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
+          current_div2_head, current_div2 = create_div(document, str(div2_count), 'div2',
+          part = "N")
+          div2_count += 1
+          #current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
           current_div2.childNodes.extend(margin_queue)
           current_div1.appendChild(current_div2)
         subsection_found = False

@@ -357,7 +357,7 @@ if 'sdtf' in form_data or 'sample' in form_data:
     #try:
     outfile = open(session_path+"/output.xml", "w",encoding="utf-8")
     #except:
-    #  print("error getting the outfile for writing")
+     # print("error getting the outfile for writing")
 
     document.writexml(outfile, addindent=" ",newl="\n")
     page_strings_dict = {'filetype': "TEI-XML", 'timestamp':timestamp,
@@ -383,9 +383,14 @@ elif 'html' in form_data:
       # cross out and disable tex creation as it's already done
       css+='#latex_span,#latex_but { text-decoration:line-through; }'
       texout="<br />Your LaTeX is <a href="+session_path+"/output.tex>here</a>."
-    print(TEMPLATE+WEBPAGES[1] % {'filetype': "HTML", 'timestamp':timestamp,
-                          'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
-                          'teioutfile': session_path+"/output.xml" })
+    html_page_strings_dict = {'filetype': "HTML", 'timestamp':timestamp,
+                          'teioutfile': session_path+"/output.xml", 
+                          'jsonfile':'', 'css':css, 'htmloutfile': htmlout,
+                          'texoutfile':texout}
+
+    print(TEMPLATE+WEBPAGES[1] % html_page_strings_dict) #{'filetype': "HTML", 'timestamp':timestamp,
+                          #'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
+                          #'teioutfile': session_path+"/output.xml", 'jsonfile':'' })
 
 elif 'tex' in form_data:
   import xslt
