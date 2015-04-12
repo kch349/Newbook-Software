@@ -7,7 +7,7 @@
 # actual page numbers themselves to appear formatted as [pg: ##]. This script uses the BeautifulSoup4
 # library to crawl, parse, and edit the HTML. Documentation can be found at
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/ . To install bs4 on UW servers use
-# easy_install bs4 --prefix=[your_local_python_library_directory]. On the newbook account,
+# easy_install beautifulsoup4 --prefix=[your_local_python_library_directory]. On the newbook account,
 # local python library is $HOME/.local. On the ndthtech account, it is at $HOME/local.
 
 import sys, getopt
