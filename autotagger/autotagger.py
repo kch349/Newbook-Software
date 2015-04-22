@@ -75,6 +75,9 @@ LINE_RE = re.compile('\s*Line\s+(\d+):?\s*(.*)$')
 
 
 ## version 1 regexes
+V1_MARGINLINELIST_RE = re.compile('^\s*Margin\s+Line\s+(\d+),')
+V1_MARGINLINERANGE_RE = re.compile('^\s*Margin\s+Line\s+(\d+)-')
+##include divline number##
 NOTES_RE = re.compile('^\s*Notes:?', re.IGNORECASE)
 MARGINNOTE_RE = re.compile('^\s*Margin\s+Line\s+(\d+):?\s*(.*)$')
 FOOTNOTE_RE = re.compile('^\s*Footnote:?\s*(.*)$')
@@ -414,8 +417,8 @@ class TranscriptionPage:
     linecount = 0
     for i in range(0, length):
       #Check for initial errors
-      m1 = MARGINLINELIST_RE.match(lines[i])
-      m2 = MARGINLINERANGE_RE.match(lines[i])
+      m1 = V1_MARGINLINELIST_RE.match(lines[i])
+      m2 = V1_MARGINLINERANGE_RE.match(lines[i])
       m3 = VERSION_RE.match(lines[i])
       m4 = NOTES_RE.match(lines[i])
       m5 = MARGINNOTE_RE.match(lines[i])
@@ -482,35 +485,56 @@ def errors(page_num, line_num, line, error_code):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
 
-  err_str = "An error was found on page " + str(page_num) +\
-            ", line " +  str(line_num + 1) + ": " + line.strip()
-
-  if error_code == 1:
-    err_str += "Error with head section. Please add either \"Line #\" "+\
+  v0_errors = {1 : "Error with head section. Please add either \"Line #\" "+\
                "or \"DivLine\" to the indicated line.\nPlease make sure"+\
                " to format these exactly as shown.\n" +\
                "If this line belongs in the body, please remember to put"+\
-               " a space before it.\n"
-  elif error_code == 2:
-    err_str += "This line belongs in the head. If you meant for this to "+\
+               " a space before it.\n",
+             2 : "This line belongs in the head. If you meant for this to "+\
                "be in the head," +\
                " there may be an issue with the spacing.\nMake sure there "+\
                "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
                " and that you don't use double spacing.\n"+\
                "If this is a diary entry header, make sure to use \"*\" " +\
                "rather than \"DivLine\".\nIf this is a journey header, add "+\
-               " the line \"Text:\" before it.\n"
-  elif error_code == 3:
-    err_str += "This line should be a journey header. If it is, please make "+\
+               " the line \"Text:\" before it.\n",
+             3 : "This line should be a journey header. If it is, please make "+\
                "sure to begin it with \"Line #\". If not, please put in a "+\
-               "journey header before this line."
-  elif error_code == 4:
-    err_str += "Lines cannot be formatted like \"Line #, #, #:\" or "+\
+               "journey header before this line.",
+             4 : "Lines cannot be formatted like \"Line #, #, #:\" or "+\
                "\"Lines #-#\" or any similar format.\nEach part of the"+\
-               "line must get its own line and must begin with \"Line #:\".\n"
-  elif error_code == 5:
-    err_str += "This line must be formatted \"Page #\". No additional "+\
-               "formatting is allowed.\n"
+               "line must get its own line and must begin with \"Line #:\".\n",
+             5 : "This line must be formatted \"Page #\". No additional "+\
+               "formatting is allowed.\n"}
+               
+  v1_errors = {1 : "Error with head section. Please add \"Margin Line #\" "+\
+               "to the indicated line.\nPlease make sure"+\
+               " to format these exactly as shown.\n" +\
+               "If this line belongs in the body, please remember to put"+\
+               " a space before it.\n",
+             2 : "This line belongs in the head. If you meant for this to "+\
+               "be in the head," +\
+               " there may be an issue with the spacing.\nMake sure there "+\
+               "are no spaces between the lines \"Page #:\" and \"Notes:\""+\
+               " and that you don't use double spacing.\n"+\
+               "If this is a diary entry header, make sure to use \"Subsection:\"."+\
+               "\nIf this is a journey header, add \"Section:\" before it.\n",
+             3 : "This line should be a journey header. If it is, please make "+\
+               "sure to begin it with \"Section:\". If not, please put in a "+\
+               "journey header before this line.",
+             4 : "Lines cannot be formatted like \"Margin Line #, #, #:\" or "+\
+               "\"Margin Lines #-#\" or any similar format.\nEach part of the"+\
+               "line must get its own line and must begin with \"Margin Line #:\".\n",
+             5 : "This line must be formatted \"Page #\". No additional "+\
+               "formatting is allowed.\n"}
+
+
+  err_str = "An error was found on page " + str(page_num) +\
+            ", line " +  str(line_num + 1) + ": " + line.strip()
+  if CURRENT_VERSION == 0:
+    err_str += v0_errors[error_code]
+  elif CURRENT_VERSION == 1:
+    err_str += v1_errors[error_code]
   return err_str
 
 #WHEN IS THE RETURN HEAD EVER USED?	
