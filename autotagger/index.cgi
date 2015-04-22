@@ -351,8 +351,11 @@ if 'sdtf' in form_data or 'sample' in form_data:
 
 elif 'html' in form_data:
   import xslt
+  
+  with open(session_path+"/config.json") as cfg_file:
+    cfg_info = json.load(cfg_file)
   xslt_file = "nolb"
-  if LINE_BREAKS:
+  if cfg_info['LINE_BREAKS'] == 'Yes':
     xslt_file = "lb"
   r = xslt.tei2html(session_path+"/output.xml",session_path+"/output.html", xslt_file)
   if r != 0:
