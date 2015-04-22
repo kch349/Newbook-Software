@@ -18,6 +18,7 @@ from distutils.dir_util import remove_tree
 
 import datetime
 
+LINE_BREAKS = None
 
 WEBPAGES = [] #list of all webpages, start h2+
 HTTP_HEADERS = "Content-type: text/html\nSet-cookie: session=%(cookie)s"
@@ -293,30 +294,8 @@ if 'sdtf' in form_data or 'sample' in form_data:
   #could store keys in a list, and if the form data key is one of them, import everything
   config_keys = {'SECTION_IN_TEXT', 'SUBSECTION_IN_TEXT', 'NUMBER_OF_DIVS',
       'TITLE', 'AUTHOR', 'RESP_PROJECT', 'PROJECT_LEAD', 'DISTRIBUTOR', 'ID_TYPE',
-      'ID_VALUE', 'COPYRIGHT', 'DATE', 'DATE_LAST_UPDATED', 'BIBL_INFO', 'PROJECT_DESC'}
+      'ID_VALUE', 'COPYRIGHT', 'DATE', 'DATE_LAST_UPDATED', 'BIBL_INFO', 'PROJECT_DESC', 'LINE_BREAKS'}
   
-  #deals with config info
-  #if form_data['config'].value != null:
-   #   dict={
-    #    'SECTION_IN_TEXT':form_data['SECTION_IN_TEXT'].value,
-     #   'SUBSECTION_IN_TEXT':form_data['SUBSECTION_IN_TEXT'].value,
-      #  'NUMBER_OF_DIVS':form_data['NUMBER_OF_DIVS'].value,
-       # 'TITLE':form_data['TITLE'].value,
-    #    'AUTHOR':form_data['AUTHOR'].value,
-     #   'RESP_PROJECT':form_data['RESP_PROJECT'].value,
-      #  'PROJECT_LEAD':form_data['PROJECT_LEAD'].value,
-       # 'DISTRIBUTOR':form_data['DISTRIBUTOR'].value,
-#        'ID_TYPE':form_data['ID_TYPE'].value,
- #       'ID_VALUE':form_data['ID_VALUE'].value,
-  #      'COPYRIGHT':form_data['COPYRIGHT'].value,
-   #     'DATE':form_data['DATE'].value,
-    #    'DATE_LAST_UPDATED':form_data['DATE_LAST_UPDATED'].value,
-     #   'BIBL_INFO':form_data['BIBL_INFO'].value,
-      #  'PROJECT_DESC':form_data['PROJECT_DESC'].value
-      #}
-      #json.dump(dict, open(session_path+'/config.json','w'))
-      
-      ##Never putting this info anywhere
       
   # step 1.5, read any config info from form_data and
   # create config object to pass to autotagger.py
@@ -334,7 +313,7 @@ if 'sdtf' in form_data or 'sample' in form_data:
    # cfg = AutotaggerConfiguration(filepath=<FILEPATHFROMONLINEGOESHERE>)
   else:
     cfg = AutotaggerConfiguration()
-
+  LINE_BREAKS = cfg.CONFIG_INFO['LINE_BREAKS']
 
   # step 2 make a TranscriptionFile from the lines
   tf = autotagger.TranscriptionFile(infilelines)
@@ -372,9 +351,12 @@ if 'sdtf' in form_data or 'sample' in form_data:
 
 elif 'html' in form_data:
   import xslt
-  r = xslt.tei2html(session_path+"/output.xml",session_path+"/output.html")
+  xslt_file = "nolb"
+  if LINE_BREAKS:
+    xslt_file = "lb"
+  r = xslt.tei2html(session_path+"/output.xml",session_path+"/output.html", xslt_file)
   if r != 0:
-    print("<p>xsltproc returned " + str(r) + "</p>")
+    print("xsltproc returned " + str(r))
   else:
     css='#html_span,#html_but { text-decoration:line-through; }\n'
     texout=""
@@ -383,14 +365,12 @@ elif 'html' in form_data:
       # cross out and disable tex creation as it's already done
       css+='#latex_span,#latex_but { text-decoration:line-through; }'
       texout="<br />Your LaTeX is <a href="+session_path+"/output.tex>here</a>."
-    html_page_strings_dict = {'filetype': "HTML", 'timestamp':timestamp,
-                          'teioutfile': session_path+"/output.xml", 
-                          'jsonfile':'', 'css':css, 'htmloutfile': htmlout,
-                          'texoutfile':texout}
+   
 
-    print(TEMPLATE+WEBPAGES[1] % html_page_strings_dict) #{'filetype': "HTML", 'timestamp':timestamp,
-                          #'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
-                          #'teioutfile': session_path+"/output.xml", 'jsonfile':'' })
+    print(TEMPLATE+WEBPAGES[1] % {'filetype': "HTML", 'timestamp':timestamp,
+                          'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
+                          'teioutfile': session_path+"/output.xml", 
+                          'jsonfile': session_path+"/config.json" })
 
 elif 'tex' in form_data:
   import xslt
@@ -407,7 +387,8 @@ elif 'tex' in form_data:
       htmlout="<br />Your HTML is <a href="+session_path+"/output.html>here</a>."
     print(TEMPLATE+WEBPAGES[1] % {'filetype': "HTML", 'timestamp':timestamp,
                           'htmloutfile': htmlout, 'css':css, 'texoutfile':texout, 
-                          'teioutfile': session_path+"/output.xml" })
+                          'teioutfile': session_path+"/output.xml", 
+                          'jsonfile': session_path+"/config.json" })
 
 else:
   print(TEMPLATE+WEBPAGES[2])

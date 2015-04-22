@@ -11,6 +11,34 @@
 ## justin yoon
 ## ... (add your names as you edit this file)
 
+# Currently supported transcription formats:
+# Version 0.0
+# Version 1.0
+
+# The autotagger converts plain text documents written the Svoboda Diaries Transcription
+# Format (STDF) into valid TEI-XML documents by completing rudimentary structural
+# tagging. XML tagging supports the following structural elements:
+#			- Sections
+#			- Subsections
+# 		- Pages
+# 		- Marginal notes
+#			- Line breaks
+
+# Is backwards compatible with earlier versions of the STDF format (listed above). 
+# Encoding is in UTF-8. Any text in non-latin alphabets (such as Arabic) is left untouched
+# by this program, and is only placed in its proper location within the text.
+
+# To run this program in the command line from the same directory as the autotagger, enter:
+#    cat <transcriptionFile.txt> | ./autotagger.py 1>err.txt 0>out.xml
+
+#### ADD INFO ON CONFIGURATION USAGE ###
+# TEI Header information either is filled with default placeholders, or with custom 
+# metadata provided through a separate config.json file supplied by the user.
+
+
+# The autotagger can also be accessed online at ________. This interface further includes
+# conversions to HTML and LaTeX.
+
 
 import sys
 import re
@@ -18,7 +46,6 @@ import logging
 import argparse
 from config import AutotaggerConfiguration
 from xml.dom.minidom import *
-
 
 
 ## input document and transcription format data
