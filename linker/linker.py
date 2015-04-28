@@ -7,9 +7,11 @@
 # actual page numbers themselves to appear formatted as [pg: ##]. This script uses the BeautifulSoup4
 # library to crawl, parse, and edit the HTML. Documentation can be found at
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/ . To install bs4 on UW servers use
-# easy_install beautifulsoup4 --prefix=[your_local_python_library_directory]. On the newbook account,
+# "easy_install beautifulsoup4 --prefix=[your_local_python_library_directory]". On the newbook account,
 # local python library is $HOME/.local. On the ndthtech account, it is at $HOME/local.
-
+# To create valid html5, BeautifulSoup also requires installation of a non-default html parser. To
+# do this, use the command "easy_install html5lib --prefix=[your_local_python_library_directory]". If
+# you don't install html5lib, this script WILL NOT function.
 import sys, getopt
 import re
 from bs4 import BeautifulSoup
@@ -75,7 +77,7 @@ def main():
 
     # open infile and construct BeautifulSoup object
     try:
-        soup = BeautifulSoup(open(inputfile))
+        soup = BeautifulSoup(open(inputfile), "html5lib")
     except IOError:
         print("ERROR: Could not open file or read data from input file " + inputfile)
         sys.exit(2)
