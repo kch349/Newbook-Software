@@ -321,7 +321,8 @@ if 'sdtf' in form_data or 'sample' in form_data:
   if len(tf.errors) > 0:
     errhtml="<pre>"
     for e in tf.errors:
-      errhtml+=e
+      errhtml+=str(e)
+      errhtml+="\n"
     errhtml+="</pre>"
     print(TEMPLATE+WEBPAGES[0] % { 'errors':errhtml })
   else:

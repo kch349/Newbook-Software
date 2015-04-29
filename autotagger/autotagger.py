@@ -229,8 +229,13 @@ class TranscriptionFile:
       lines, new_errors = self.uprev(lines)
       if len(new_errors) > 0:
         self.errors.append(new_errors)
-    self.parse_lines(lines)
-
+        #print("Errors found. Please check error log and try again later.")
+        #for e in self.errors:
+         # print(e,file=sys.stderr)
+     # else:
+    if len(self.errors) == 0:
+      self.parse_lines(lines)
+     
   def parse_lines(self, lines):
     """method to parse the lines from the transcription file into
        a series of Transcription Page objects"""
@@ -242,7 +247,7 @@ class TranscriptionFile:
       m3 = PAGETABBED_RE.match(lines[0])
       
       if m2:
-        self.errors.append(errors(m2.group(1), -1, lines[0], 5))
+        self.errors.append(errors(m2.group(1), -1, lines[0], CURRENT_VERSION, 5))
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
@@ -258,7 +263,7 @@ class TranscriptionFile:
           n = int(m1.group(1))
           lines.pop(0)
       elif m3:
-        self.errors.append(errors(m3.group(1), -1, lines[0], 5))
+        self.errors.append(errors(m3.group(1), -1, lines[0], CURRENT_VERSION, 5))
         self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
@@ -306,6 +311,7 @@ class TranscriptionFile:
     double_spacing_found = False #true if double spacing found
 
     for i in range(0, length):
+      in_body_uprev = False
       #Handle Text and DivLine elements only present in version 0 transcription files
       m1 = TEXT_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
@@ -314,7 +320,7 @@ class TranscriptionFile:
       if m1 or m2 or m3:
         if m2 or m3:
           if m3:
-            #self.errors.append(errors(self.num, i, lines[i], 6))
+            self.errors.append(errors(str(current_page), i, lines[i], version, 6))
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                             str(current_page) + ". Make sure the line number is not included.")
             
@@ -325,6 +331,10 @@ class TranscriptionFile:
       
       #Process rest, updating tf syntax where necessary and recording any errors.    
       else:
+        mA = MARGINLINELIST_RE.match(lines[i])
+        mB = MARGINLINERANGE_RE.match(lines[i])
+        mC = VERSION_RE.match(lines[i])
+        
         m4 = PAGE_RE.match(lines[i])
         m5 = PAGENOTES_RE.match(lines[i])
         m6 = PAGETABBED_RE.match(lines[i])
@@ -338,26 +348,39 @@ class TranscriptionFile:
             current_page = 1
           else:
             current_page += 1
+          in_body_uprev = False
           logging.debug("Page number " + str(current_page))  
-      
-        elif m7:
-          lines[i] = '\tNotes:'
-        elif m8:
-          divlines -= 1
-          if len(temp_div_headers) >= 1:
-            version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
-            temp_div_headers.pop(0)
-          else: 
-            v1_errors.append(incorrect_stars_error(str(current_page))) 
-          lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
-          #appending at end could pose a problem adding multiple lines.
-        elif text and m9:
-          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
-          #multi_headers = True   
-        else:
-          text = False
-          if m9:
+        elif mA or mB:
+          self.errors.append(errors(str(current_page), i, lines[i], version, 4))
+        elif not in_body_uprev:
+          if mC: #find version line and skip it
+            continue
+          elif m7:
+            lines[i] = '\tNotes:'
+            # margin note, if not error in head
+          elif lines[i].strip() == "":
+            in_body_uprev = True
+          if m9 and not text:
             lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
+          else:
+            self.errors.append(errors(str(current_page), i, lines[i], version, 1))
+        else: # process body
+          if m8:
+            divlines -= 1
+            if len(temp_div_headers) >= 1:
+              version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
+              temp_div_headers.pop(0)
+            else: 
+              v1_errors.append(incorrect_stars_error(str(current_page))) 
+            lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
+            #appending at end could pose a problem adding multiple lines.
+          elif text and m9:
+            lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
+            #multi_headers = True   
+          else:
+            text = False
+            #if m9:
+             # lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
         version1_lines.append(lines[i].rstrip())          
     if divlines != 0:
       v1_errors.append(incorrect_stars_error(str(current_page)))  
@@ -424,7 +447,7 @@ class TranscriptionPage:
       m5 = MARGINNOTE_RE.match(lines[i])
       m6 = FOOTNOTE_RE.match(lines[i])  
       if m1 or m2:
-        self.errors.append(errors(self.num, i, lines[i], 4))
+        self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 4))
       #process header
       elif not in_body:
         logging.debug("IN HEAD") 
@@ -435,7 +458,7 @@ class TranscriptionPage:
         elif lines[i].strip() == "":
           in_body = True
         else:
-          self.errors.append(errors(self.num, i, lines[i], 1))
+          self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 1))
       #process body
       else:
         logging.debug("IN BODY")
@@ -464,7 +487,7 @@ class TranscriptionPage:
                              self.num + ". Make sure the line number is not included.")
           b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
         elif m4 or m5 or m6:
-          self.errors.append(errors(self.num, i, lines[i], 2))
+          self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
             
@@ -481,59 +504,59 @@ def incorrect_stars_error(page_num):
          "of DivLines in the header on page "+ page_num +"."
 
 #Processes all other errors
-def errors(page_num, line_num, line, error_code):
+def errors(page_num, line_num, line, version, error_code):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
 
   v0_errors = {1 : "Error with head section. Please add either \"Line #\" "+\
-               "or \"DivLine\" to the indicated line.\nPlease make sure"+\
-               " to format these exactly as shown.\n" +\
+               "or \"DivLine\" to the indicated line.\n" +\
                "If this line belongs in the body, please remember to put"+\
                " a space before it.\n",
-             2 : "This line belongs in the head. If you meant for this to "+\
-               "be in the head," +\
-               " there may be an issue with the spacing.\nMake sure there "+\
+             2 : "Based on its formatting, this line belongs in the head. " +\
+               "\t-If you meant for this to be in the head," +\
+               " there may be an issue with the spacing. \n\t Make sure there "+\
                "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
                " and that you don't use double spacing.\n"+\
-               "If this is a diary entry header, make sure to use \"*\" " +\
-               "rather than \"DivLine\".\nIf this is a journey header, add "+\
-               " the line \"Text:\" before it.\n",
+               "\t-If this is a diary entry header, make sure to use \"*\" " +\
+               "rather than \"DivLine\".\n " +\
+               "\t-If this is a journey header, add the line \"Text:\" before it.\n",
              3 : "This line should be a journey header. If it is, please make "+\
                "sure to begin it with \"Line #\". If not, please put in a "+\
                "journey header before this line.",
              4 : "Lines cannot be formatted like \"Line #, #, #:\" or "+\
                "\"Lines #-#\" or any similar format.\nEach part of the"+\
-               "line must get its own line and must begin with \"Line #:\".\n",
+               " line must get its own line and must begin with \"Line #:\".\n",
              5 : "This line must be formatted \"Page #\". No additional "+\
-               "formatting is allowed.\n"}
+               "formatting is allowed.\n",
+             6 : "DivLines cannot be formatted like \"Divline #: or in any similar format.\n" +\
+               "This should be formatted without a line number, simply as \"Divline: <text>\"\n"}
                
   v1_errors = {1 : "Error with head section. Please add \"Margin Line #\" "+\
-               "to the indicated line.\nPlease make sure"+\
-               " to format these exactly as shown.\n" +\
+               "to the indicated line.\n" +\
                "If this line belongs in the body, please remember to put"+\
                " a space before it.\n",
-             2 : "This line belongs in the head. If you meant for this to "+\
-               "be in the head," +\
-               " there may be an issue with the spacing.\nMake sure there "+\
+             2 : "Based on its formatting, this line belongs in the head. \n" +\
+               "\t-If you meant for this to be in the head," +\
+               " there may be an issue with the spacing. \n\t Make sure there "+\
                "are no spaces between the lines \"Page #:\" and \"Notes:\""+\
                " and that you don't use double spacing.\n"+\
-               "If this is a diary entry header, make sure to use \"Subsection:\"."+\
-               "\nIf this is a journey header, add \"Section:\" before it.\n",
+               "\t-If this is a diary entry header, make sure to use \"Subsection:\". \n" +\
+               "\t-If this is a journey header, add \"Section:\" before it.\n",
              3 : "This line should be a journey header. If it is, please make "+\
                "sure to begin it with \"Section:\". If not, please put in a "+\
                "journey header before this line.",
              4 : "Lines cannot be formatted like \"Margin Line #, #, #:\" or "+\
                "\"Margin Lines #-#\" or any similar format.\nEach part of the"+\
-               "line must get its own line and must begin with \"Margin Line #:\".\n",
-             5 : "This line must be formatted \"Page #\". No additional "+\
-               "formatting is allowed.\n"}
+               " line must get its own line and must begin with \"Margin Line #:\".\n",
+             5 : "This line must be formatted \"Page #\" with no additional "+\
+               "formatting. \n"}
 
 
   err_str = "An error was found on page " + str(page_num) +\
-            ", line " +  str(line_num + 1) + ": " + line.strip()
-  if CURRENT_VERSION == 0:
+            ", line " +  str(line_num + 1) + ", displayed below: \n\t\t" + line.strip() + "\n"
+  if version == 0:
     err_str += v0_errors[error_code]
-  elif CURRENT_VERSION == 1:
+  elif version == 1:
     err_str += v1_errors[error_code]
   return err_str
 
