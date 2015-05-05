@@ -7,7 +7,7 @@
 if [ "2" -eq $# ]
 then
     # AN_DD_PPP_LLL:XXX
-    sed -i.bak 's/\(AN_[0-9]\{2\}_[0-9]\{3\}_[0-9]\{3\}\)\(:[0-9]\{3\}\)/<a href=\"$2:\2\">\1\2<\/a>/g' $1
+    sed -i.bak "s@\(AN_[0-9]\{2\}_[0-9]\{3\}_[0-9]\{3\}\)\:([0-9]\{3\}\)@<a href=\"$2:\2\">\1:\2<\/a>@g" $1
 else
     echo 'Usage: arabicdiarylinker.sh <input_file> <table_url>'
 fi
