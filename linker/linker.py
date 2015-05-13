@@ -82,9 +82,9 @@ def main():
         print("ERROR: Could not open file or read data from input file " + inputfile)
         sys.exit(2)
 
-    # add links to file and output in ascii format to output file
+    # add links to file and output in utf-8 format to output file
     add_links(soup, start_nums[diary_no])
-    out = soup.prettify('ascii')
+    out = soup.prettify('utf-8')
 
     try:
         outfile = open(outputfile, "w")
