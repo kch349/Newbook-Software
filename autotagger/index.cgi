@@ -149,16 +149,21 @@ TEMPLATE = """
 </div>  
 """
 
-
 ERROR_PAGE = """
-    <h3>Errors in the input, they are listed below</h3>
+    <h3>Errors in the input - File could not be processed</h3>
     <p>
+    <p>If you would like to upload a different file, do so here:</p>
+  <div id=content style="margin-left: 0px">
+  """ + CONFIG_CONTENT + """
  <form action="index.cgi" method="post"
           enctype="multipart/form-data">
- <input type="submit" name="" value="Upload another transcription file"/>
- <input type="file" name="sdtf" /></p>
+ <!--<input type="submit" name="" value="Upload another transcription file"/>
+ <input type="file" name="sdtf" /></p>-->
+ <!--<input type="button" onclick="window.location.href='http://depts.washington.edu/ndthtech/kelsies_tests/'" value="Upload another transcription file">-->
+ <p> See below for errors. Please fix these in your original transcription file and upload again. </p>
     %(errors)s
 </form>
+
 """ + COPYRIGHT_CONTENT
 WEBPAGES.append(ERROR_PAGE)
 
@@ -171,7 +176,7 @@ SUCCESS_PAGE = """
 <h3>Your %(filetype)s is ready!</h3>
 <h4>%(timestamp)s</h4>
 
-<p>Your TEI-XML result is here: <a href="%(teioutfile)s">here</a>
+<p>Your TEI-XML result is <a href="%(teioutfile)s">here</a>
 (right click the link to save the file to your computer).</p>
 <a href="%(jsonfile)s">download JSON file</a>
 <ul>
@@ -228,6 +233,7 @@ WELCOME_PAGE = """
 <h3>Upload Files</h3>
 """ + CONFIG_CONTENT + WELCOME_PAGE_BOT + COPYRIGHT_CONTENT
 WEBPAGES.append(WELCOME_PAGE)
+
 
 
 ## be sure to use UTF buffer for stdout

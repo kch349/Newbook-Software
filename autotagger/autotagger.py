@@ -51,6 +51,7 @@ from xml.dom.minidom import *
 ## input document and transcription format data
 CURRENT_VERSION = 1
 version = -1
+original_version = -1
 
 ## overall regexes
 PAGE_RE = re.compile('^Page\s+(\d+)')
@@ -86,8 +87,12 @@ SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
 
-#Sets version for document so it is accessible throughout program
-def set_version(value):
+#Sets version for document so it is accessible throughout program. If specified,
+#will also set the original version as passed in (only done once at the beginning)
+def set_version(value, original=False):
+  if original:
+    global original_version
+    original_version = value
   global version
   version = value
 
@@ -217,14 +222,16 @@ class TranscriptionFile:
   def __init__(self, lines):
     m4 = VERSION_RE.match(lines[0])
     if m4:
-      set_version(int(m4.group(1)))
+      set_version(int(m4.group(1)), True)
+      
       if version > CURRENT_VERSION:
         set_version(CURRENT_VERSION) #should avoid passing constant?
         logging.warning("""Specified version is greater than the current version. Possibly
                            typo or an update to the autotagger is necessary before usage""")
     elif (version == -1):
-      set_version(0)  
-        
+      set_version(0, True)  
+    
+    
     while version < CURRENT_VERSION:
       lines, new_errors = self.uprev(lines)
       if len(new_errors) > 0:
@@ -233,8 +240,8 @@ class TranscriptionFile:
         #for e in self.errors:
          # print(e,file=sys.stderr)
      # else:
-    if len(self.errors) == 0:
-      self.parse_lines(lines)
+    #if len(self.errors) == 0:
+    self.parse_lines(lines)
      
   def parse_lines(self, lines):
     """method to parse the lines from the transcription file into
@@ -311,8 +318,7 @@ class TranscriptionFile:
     double_spacing_found = False #true if double spacing found
 
     for i in range(0, length):
-      in_body_uprev = False
-      #Handle Text and DivLine elements only present in version 0 transcription files
+       #Handle Text and DivLine elements only present in version 0 transcription files
       m1 = TEXT_RE.match(lines[i])
       m2 = DIVLINE_RE.match(lines[i])
       m3 = DIVLINENUMBER_RE.match(lines[i])
@@ -320,7 +326,7 @@ class TranscriptionFile:
       if m1 or m2 or m3:
         if m2 or m3:
           if m3:
-            self.errors.append(errors(str(current_page), i, lines[i], version, 6))
+            #self.errors.append(errors(str(current_page), i, lines[i], original_version, 6))
             logging.warning(" There may be an incorrectly formatted DivLine on page " +
                             str(current_page) + ". Make sure the line number is not included.")
             
@@ -331,10 +337,6 @@ class TranscriptionFile:
       
       #Process rest, updating tf syntax where necessary and recording any errors.    
       else:
-        mA = MARGINLINELIST_RE.match(lines[i])
-        mB = MARGINLINERANGE_RE.match(lines[i])
-        mC = VERSION_RE.match(lines[i])
-        
         m4 = PAGE_RE.match(lines[i])
         m5 = PAGENOTES_RE.match(lines[i])
         m6 = PAGETABBED_RE.match(lines[i])
@@ -348,39 +350,27 @@ class TranscriptionFile:
             current_page = 1
           else:
             current_page += 1
-          in_body_uprev = False
           logging.debug("Page number " + str(current_page))  
-        elif mA or mB:
-          self.errors.append(errors(str(current_page), i, lines[i], version, 4))
-        elif not in_body_uprev:
-          if mC: #find version line and skip it
-            continue
-          elif m7:
-            lines[i] = '\tNotes:'
-            # margin note, if not error in head
-          elif lines[i].strip() == "":
-            in_body_uprev = True
-          if m9 and not text:
+      
+        elif m7:
+          lines[i] = '\tNotes:'
+        elif m8:
+          divlines -= 1
+          #print(temp_div_headers[0], file=sys.stderr)
+          if len(temp_div_headers) >= 1:
+            version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
+            temp_div_headers.pop(0)
+          else: 
+            v1_errors.append(incorrect_stars_error(str(current_page))) 
+          lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
+          #appending at end could pose a problem adding multiple lines.
+        elif text and m9:
+          lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
+          #multi_headers = True   
+        else:
+          text = False
+          if m9:
             lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
-          else:
-            self.errors.append(errors(str(current_page), i, lines[i], version, 1))
-        else: # process body
-          if m8:
-            divlines -= 1
-            if len(temp_div_headers) >= 1:
-              version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
-              temp_div_headers.pop(0)
-            else: 
-              v1_errors.append(incorrect_stars_error(str(current_page))) 
-            lines[i] = re.sub('\*', '', lines[i]) #removes *, need to remove that later in code since not here
-            #appending at end could pose a problem adding multiple lines.
-          elif text and m9:
-            lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
-            #multi_headers = True   
-          else:
-            text = False
-            #if m9:
-             # lines[i] = re.sub('^\s*', '\tMargin ', lines[i])
         version1_lines.append(lines[i].rstrip())          
     if divlines != 0:
       v1_errors.append(incorrect_stars_error(str(current_page)))  
@@ -447,7 +437,7 @@ class TranscriptionPage:
       m5 = MARGINNOTE_RE.match(lines[i])
       m6 = FOOTNOTE_RE.match(lines[i])  
       if m1 or m2:
-        self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 4))
+        self.errors.append(errors(self.num, i, lines[i], original_version, 4))
       #process header
       elif not in_body:
         logging.debug("IN HEAD") 
@@ -458,7 +448,7 @@ class TranscriptionPage:
         elif lines[i].strip() == "":
           in_body = True
         else:
-          self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 1))
+          self.errors.append(errors(self.num, i, lines[i], original_version, 1))
       #process body
       else:
         logging.debug("IN BODY")
@@ -487,7 +477,7 @@ class TranscriptionPage:
                              self.num + ". Make sure the line number is not included.")
           b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
         elif m4 or m5 or m6:
-          self.errors.append(errors(self.num, i, lines[i], CURRENT_VERSION, 2))
+          self.errors.append(errors(self.num, i, lines[i], original_version, 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
             
@@ -500,7 +490,7 @@ def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
   asterisks. Contains the page number."""
 
-  return "The number of asterisks in the body does not match the number"+\
+  return "The number of asterisks in the body does not match the number "+\
          "of DivLines in the header on page "+ page_num +"."
 
 #Processes all other errors
