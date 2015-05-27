@@ -67,6 +67,10 @@ PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 DIVLINENUMBER_RE = re.compile('\s*DivLine\s+(\d+):?\s*(.*)$', re.IGNORECASE)
 
+PAGECOLON_RE = re.compile('^Page:\s+(\d+)')
+PAGESPLURAL_RE = re.compile('^Pages\s+(\d+)')
+
+
 ## version 0 regexes
 DIVLINE_RE = re.compile('\s*DivLine:?\s*(.*)$', re.IGNORECASE)
 STAR_RE = re.compile('^\s*\*(.*)$')
@@ -87,6 +91,7 @@ SUBSECTION_RE = re.compile('^\s*Subsection:?\s*(.*)$')
 SUBSECTIONNUMBER_RE = re.compile('^\s*Subsection:?\s*\d+:(.*)$') #take out once problem is fixed? 
 
 
+ 
 #Sets version for document so it is accessible throughout program. If specified,
 #will also set the original version as passed in (only done once at the beginning)
 def set_version(value, original=False):
@@ -232,6 +237,9 @@ class TranscriptionFile:
       set_version(0, True)  
     
     
+    #check for errors in lines, to ensure proper format.
+    #
+    
     while version < CURRENT_VERSION:
       lines, new_errors = self.uprev(lines)
       if len(new_errors) > 0:
@@ -253,8 +261,8 @@ class TranscriptionFile:
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
       
-      if m2:
-        self.errors.append(errors(m2.group(1), -1, lines[0], CURRENT_VERSION, 5))
+      #if m2:
+        #self.errors.append(errors(m2.group(1), -1, lines[0], CURRENT_VERSION, 5))
       if m1:
         # m.group(0) should be the entire matching string
         # m.group(1) should be the page number
@@ -270,7 +278,7 @@ class TranscriptionFile:
           n = int(m1.group(1))
           lines.pop(0)
       elif m3:
-        self.errors.append(errors(m3.group(1), -1, lines[0], CURRENT_VERSION, 5))
+        #self.errors.append(errors(m3.group(1), -1, lines[0], CURRENT_VERSION, 5))
         self.pages.append(TranscriptionPage(str(n), p))
         p = []
         n = int(m3.group(1))
@@ -436,10 +444,10 @@ class TranscriptionPage:
       m4 = NOTES_RE.match(lines[i])
       m5 = MARGINNOTE_RE.match(lines[i])
       m6 = FOOTNOTE_RE.match(lines[i])  
-      if m1 or m2:
-        self.errors.append(errors(self.num, i, lines[i], original_version, 4))
+      #if m1 or m2:
+        #self.errors.append(errors(self.num, i, lines[i], original_version, 4))
       #process header
-      elif not in_body:
+      if not in_body:
         logging.debug("IN HEAD") 
         if m3: #How do we make sure it is at the beginning of first page?
           continue
@@ -447,23 +455,23 @@ class TranscriptionPage:
           h.append(lines[i].rstrip())
         elif lines[i].strip() == "":
           in_body = True
-        else:
-          self.errors.append(errors(self.num, i, lines[i], original_version, 1))
+        #else:
+         # self.errors.append(errors(self.num, i, lines[i], original_version, 1))
       #process body
       else:
         logging.debug("IN BODY")
         #Handle double spacing
-        if double_spacing == 3 and double_spacing_found == False:
-          logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
-          double_spacing_found = True
-        elif double_spacing < 3:
-          if lines[i].strip() == "":
-            empty = True
-          elif empty == True:
-            double_spacing += 1
-            empty = False
-          elif empty == False:
-            double_spacing = 0    
+       # if double_spacing == 3 and double_spacing_found == False:
+        #  logging.warning(" There may be unintentional double spacing on page " + self.num + ".") 
+         # double_spacing_found = True
+        #elif double_spacing < 3:
+         # if lines[i].strip() == "":
+          #  empty = True
+          #elif empty == True:
+           # double_spacing += 1
+            #empty = False
+          #elif empty == False:
+           # double_spacing = 0    
         #if not m4:
           #self.errors.append(errors(self.num, i, lines[i], 3))
           
@@ -472,18 +480,21 @@ class TranscriptionPage:
         m8 = SUBSECTION_RE.match(lines[i])
         m9 = SUBSECTIONNUMBER_RE.match(lines[i])
         if m7 or m8 or m9:      
-          if m9:
-            logging.warning(" There may be an incorrectly formatted DivLine on page " +
+          #if m9:
+          logging.warning(" There may be an incorrectly formatted DivLine on page " +
                              self.num + ". Make sure the line number is not included.")
           b.append(lines[i].rstrip()) #could pose a problem adding multiple lines.
-        elif m4 or m5 or m6:
-          self.errors.append(errors(self.num, i, lines[i], original_version, 2))
+        #elif m4 or m5 or m6:
+          #self.errors.append(errors(self.num, i, lines[i], original_version, 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
             
     self.head = h
     self.body = b
     #self.printAfter()
+
+
+
 
 #Processes error with incorrect number of stars
 def incorrect_stars_error(page_num):
@@ -494,10 +505,18 @@ def incorrect_stars_error(page_num):
          "of DivLines in the header on page "+ page_num +"."
 
 #Processes all other errors
-def errors(page_num, line_num, line, version, error_code):
+def log_error(page_num, line_num, line, error_code, general=False):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
-
+  logging.debug("IN LOG_ERROR")
+  general_errors = {1 : "Page notation error. Please be sure to indicate a new"+\
+                    " page using the tag \"Page #:\". Do not add other notes to "+\
+                    "to this line, give a page range, refer to more than one page, "+\
+                    " or misplace the colon.\n",
+                    2 : "Text included prior to the first page. Be sure to mark a "+\
+                    "beginning page for your document before proceeding with the "+\
+                    "transcription.\n"}
+                    
   v0_errors = {1 : "Error with head section. Please add either \"Line #\" "+\
                "or \"DivLine\" to the indicated line.\n" +\
                "If this line belongs in the body, please remember to put"+\
@@ -517,9 +536,9 @@ def errors(page_num, line_num, line, version, error_code):
                "\"Lines #-#\" or any similar format.\nEach part of the"+\
                " line must get its own line and must begin with \"Line #:\".\n",
              5 : "This line must be formatted \"Page #\". No additional "+\
-               "formatting is allowed.\n",
-             6 : "DivLines cannot be formatted like \"Divline #: or in any similar format.\n" +\
-               "This should be formatted without a line number, simply as \"Divline: <text>\"\n"}
+               "formatting is allowed.\n"}
+             #6 : "DivLines cannot be formatted like \"Divline #: or in any similar format.\n" +\
+              # "This should be formatted without a line number, simply as \"Divline: <text>\"\n"}
                
   v1_errors = {1 : "Error with head section. Please add \"Margin Line #\" "+\
                "to the indicated line.\n" +\
@@ -544,11 +563,168 @@ def errors(page_num, line_num, line, version, error_code):
 
   err_str = "An error was found on page " + str(page_num) +\
             ", line " +  str(line_num + 1) + ", displayed below: \n\t\t" + line.strip() + "\n"
-  if version == 0:
+  if general:
+    err_str += general_errors[error_code]
+  elif version == 0: #version is a global variable
     err_str += v0_errors[error_code]
   elif version == 1:
     err_str += v1_errors[error_code]
+  #logging.debug(err_str)
   return err_str
+
+
+
+def verify_format(line, in_body, page_num, line_num, errors, general=False):
+  if version == 0: 
+     return verify_v1(line, in_body, page_num, line_num, general)
+  elif version == 1:
+    return verify_v1(line, in_body, page_num, line_num, general)
+  #if result != None:
+   # errors.append([result])
+  
+  
+def verify_v0(line):
+  x = 1
+  #to complete
+
+
+def verify_v1(line, in_body, page_num, line_num, general=False): # version global, do we need general?
+  result = ""
+  
+  m1 = V1_MARGINLINELIST_RE.match(line)
+  m2 = V1_MARGINLINERANGE_RE.match(line)
+  m3 = NOTES_RE.match(line)
+  m4 = MARGINNOTE_RE.match(line)
+  m5 = FOOTNOTE_RE.match(line)
+    
+  m7 = SECTION_RE.match(line)
+  m8 = SUBSECTION_RE.match(line)
+  m9 = SUBSECTIONNUMBER_RE.match(line)  #shouldn't need this, vestige of old format
+  if not in_body: # in head
+    logging.debug("IN V1 HEAD")
+    if m1 or m2:
+      result = log_error(page_num, line_num, line, 4)
+    elif m3 or m4 or m5:
+      x = 3 # REMOVE LATER
+    else:
+      logging.debug("ERROR IN HEAD")
+      result = log_error(page_num, line_num, line, 1)
+      logging.debug("RESULT AFTER HEAD ERROR: " + result)
+  else: # in body
+    logging.debug("IN V1 BODY")
+    #Check for double spacing and produce warning if found
+    
+          
+    #Check for other structural errors      
+    if m7 or m8 or m9:      
+       if m9:
+         logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                          str(page_num) + ". Make sure the line number is not included.")
+    elif m3 or m4 or m5:
+      result = log_error(page_num, line_num, line, 2)
+  logging.debug("VERIFY_V1 RESULT: " + result)
+  return result
+    #formerly else statement and continue
+    
+    
+    
+    
+    
+#Checks for transcription format errors in a given transcription file. Returns errors if 
+#there are any, or returns null if the transcription file is well formatted.
+def check_errors(lines):
+  """header is all lines up to the first empty one, rest is body"""
+  errors = []
+  in_body = False #false if still in head
+  length = len(lines)
+  empty = False #true if previous line in body was empty
+  double_spacing = 0 #number of double spaced lines found in body
+  double_spacing_found = False #true if double spacing found
+  linecount = 0
+  pagecount = -1
+    
+    
+  # Check for common errors. e# indicates the match for an error.
+  for i in range(0, length):
+    linecount+=1
+    #set version once
+    if version == -1:
+      version_found = VERSION_RE.match(lines[i])
+      if version_found:
+        set_version(int(version_found.group(1)), True)
+    
+      if version > CURRENT_VERSION:
+        set_version(CURRENT_VERSION) #should avoid passing constant?
+        logging.warning("""Specified version is greater than the current version. Possibly
+                            typo or an update to the autotagger is necessary before usage""")
+      elif (version == -1):
+        set_version(0, True)  
+      
+      
+      
+    #check page
+    version_found = VERSION_RE.match(lines[i])
+    new_page = PAGE_RE.match(lines[i])
+    m1 = PAGENOTES_RE.match(lines[i])
+    m2 = PAGETABBED_RE.match(lines[i])
+    m3 = PAGECOLON_RE.match(lines[i])
+    m4 = PAGESPLURAL_RE.match(lines[i])
+    if version_found:
+      continue
+    elif new_page or m1 or m2 or m3 or m4:
+      if new_page:
+        pagecount = int(new_page.group(1)) #page count issue?? see transcriptionfile
+      elif m1 or m2 or m3 or m4: 
+        if m1:
+          pagecount = int(m1.group(1))
+        elif m2:
+          pagecount = int(m2.group(1))
+        elif m3:
+          pagecount = int(m3.group(1))
+        elif m4:
+          pagecount = int(m4.group(1))
+        errors.append(log_error(pagecount, linecount, lines[i], 1, general=True))
+      in_body = False 
+      linecount = 1 #reset linecount to start of that transcription page
+    elif pagecount == -1:
+      errors.append(log_error(pagecount, linecount, lines[i], 2, general=True)) #text prior error
+      
+      
+    elif not in_body: #scan for errors in the head 
+      logging.debug("IN HEAD - ERROR CHECKING") 
+      if lines[i].strip() == "":
+        in_body = True
+      else:
+        error_report = verify_format(lines[i], in_body, pagecount, linecount, errors)
+        if error_report != "":
+          errors.append(error_report)
+    else: #scan for errors in body text 
+      logging.debug("IN BODY - ERROR CHECKING") 
+      
+      if double_spacing == 3 and double_spacing_found == False:
+        logging.warning(" There may be unintentional double spacing on page " + str(pagecount) + ".") 
+        double_spacing_found = True
+      elif double_spacing < 3:
+        if lines[i].strip() == "":
+          empty = True
+        elif empty == True:
+          double_spacing += 1
+          empty = False
+        elif empty == False:
+          double_spacing = 0    
+          #if not m4:
+            #self.errors.append(errors(self.num, i, lines[i], 3))
+          
+      error_report = verify_format(lines[i], in_body, pagecount, linecount, errors)
+      if error_report != "":
+        errors.append(error_report)
+    if len(errors) > 0:
+      logging.debug(errors[0])
+  logging.debug("LOOP FINISHED")
+  return errors
+
+
+
 
 #WHEN IS THE RETURN HEAD EVER USED?	
 #Creates a div of a specified number, type (1 or 2), and if applicable, part (I, M, or F)
@@ -846,17 +1022,37 @@ if __name__ in "__main__":
   logging.basicConfig(format='%(levelname)s:%(message)s',
                           level=50-(args.verbosity*10)) 
 
-  # Compile a TranscriptionFile out of the inputed text.
-  tf = TranscriptionFile(infilelines)
-  logging.info(" found "+str(len(tf.pages))+" transcription pages")
+  # Determine version and ensure transcription file is well formatted. If errors are found, 
+  # reports these to the user. Any errors found must first be resolved by the user before 
+  # process can continue.
+  errors = [] 
+  errors = check_errors(infilelines)
+  if len(errors) > 0:
+    logging.debug("ERRORS FOUND")
+    print("Errors found. Please check error log and try again later.")
+    #print('\n'.join(errors), file=sys.stderr)
+    for e in errors:
+      print(e,file=sys.stderr)
+      
+  # If transcription is properly formatted, compile a TranscriptionFile out 
+  # of the inputed text. Convert TranscriptionFile to XML and print output
+  else:
+    logging.debug("NO ERRORS FOUND")
+    tf = TranscriptionFile(infilelines)
+    logging.info(" found "+str(len(tf.pages))+" transcription pages")
+    document = run(tf, cfg)
+    print(document.toprettyxml('\t', '\n', None))
+  
+
+
 
   # Any errors found must first be resolved by the user before process can continue. 
   # If the TranscriptionFile properly follows the format, inputed text is converted
   # to XML and printed.
-  if len(tf.errors) > 0:
-    print("Errors found. Please check error log and try again later.")
-    for e in tf.errors:
-      print(e,file=sys.stderr)
-  else:
-    document = run(tf, cfg)
-    print(document.toprettyxml('\t', '\n', None))
+  #if len(tf.errors) > 0:
+   # print("Errors found. Please check error log and try again later.")
+    #for e in tf.errors:
+     # print(e,file=sys.stderr)
+  #else:
+   # document = run(tf, cfg)
+    #print(document.toprettyxml('\t', '\n', None))
