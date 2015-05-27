@@ -672,6 +672,8 @@ def check_errors(lines):
     if version_found:
       continue
     elif new_page or m1 or m2 or m3 or m4:
+      in_body = False 
+      linecount = 0 #reset linecount to start of that transcription page 
       if new_page:
         pagecount = int(new_page.group(1)) #page count issue?? see transcriptionfile
       elif m1 or m2 or m3 or m4: 
@@ -684,8 +686,6 @@ def check_errors(lines):
         elif m4:
           pagecount = int(m4.group(1))
         errors.append(log_error(pagecount, linecount, lines[i], 1, general=True))
-      in_body = False 
-      linecount = 1 #reset linecount to start of that transcription page
     elif pagecount == -1:
       errors.append(log_error(pagecount, linecount, lines[i], 2, general=True)) #text prior error
       
