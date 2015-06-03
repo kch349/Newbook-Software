@@ -583,11 +583,77 @@ def verify_format(line, in_body, page_num, line_num, errors, general=False):
    # errors.append([result])
   
   
-def verify_v0(line):
-  x = 1
+def verify_v0(line, in_body, page_num, line_num, general=False):
+####################
+  result = ""
+
+  m1 = MARGINLINELIST_RE.match(line)
+  m2 = MARGINLINERANGE_RE.match(line)
+  m3 = MARGINS_RE.match(line)
+  m4 = LINE_RE.match(line)
+  
+  m5 = TEXT_RE.match(lines[i])
+  m6 = DIVLINE_RE.match(lines[i])
+  m7 = DIVLINENUMBER_RE.match(lines[i])
+  m8 = STAR_RE.match(lines[i])
+  m9 = LINE_RE.match(lines[i])
+    
+  if not in_body:
+    logging.debug("IN V1 HEAD")
+    
+    if m1 or m2:
+      result = log_error(page_num, line_num, line, 4)
+    elif m3 or m9 or m6: #m6 = divline
+      x = 3 #remove later
+    elif m7:
+      self.errors.append(errors(str(current_page), i, lines[i], original_version, 6))
+      #logging.warning(" There may be an incorrectly formatted DivLine on page " +
+                      #str(current_page) + ". Make sure the line number is not included.")
+    else: #not a line from the head
+      logging.debug("ERROR IN HEAD")
+      result = log_error(page_num, line_num, line, 1)
+      logging.debug("RESULT AFTER HEAD ERROR: " + result)
+    
+    else:
+      logging.debug("IN V1 BODY")
+      if m5:
+        text = True #(need to pass back)
+      else:
+        text = False
+      if m8: #star found 
+        x = 5 #remove later
+      elif text and m9:
+        #error check regarding lines....?
+        lines[i] = '\tSection: ' + re.sub('\s*Line:?\s+(\d+):?\s*', '', lines[i].rstrip())
+        #multi_headers = True   
+      else:
+        text = False
+        elif m1 or m2 or m3 or m6 or m7 or m9:
+          result = log_error(page_num, line_num, line, 2)
+  logging.debug("VERIFY_V0 RESULT: " + result)
+  return result
   #to complete
 
+###################
 
+#Determine if a specified line marks a new div header or its position.
+#Returns 1 if there is a new div header, -1 if a star marking 
+#a div's position is found, and 0 otherwise 
+def count_divlines(lines[i], in_body):
+  result = 0
+  
+  m1 = DIVLINE_RE.match(lines[i])
+  m2 = DIVLINENUMBER_RE.match(lines[i])
+  m3 = STAR_RE.match(lines[i])
+  if not in_body:
+    if m1 or m2:
+      result = 1
+  else:
+    if m3:
+      result = -1
+      
+  return result
+  
 def verify_v1(line, in_body, page_num, line_num, general=False): # version global, do we need general?
   result = ""
   
@@ -611,10 +677,7 @@ def verify_v1(line, in_body, page_num, line_num, general=False): # version globa
       result = log_error(page_num, line_num, line, 1)
       logging.debug("RESULT AFTER HEAD ERROR: " + result)
   else: # in body
-    logging.debug("IN V1 BODY")
-    #Check for double spacing and produce warning if found
-    
-          
+    logging.debug("IN V1 BODY") 
     #Check for other structural errors      
     if m7 or m8 or m9:      
        if m9:
@@ -642,6 +705,8 @@ def check_errors(lines):
   double_spacing_found = False #true if double spacing found
   linecount = 0
   pagecount = -1
+  
+  divlines = 0
     
     
   # Check for common errors. e# indicates the match for an error.
@@ -663,7 +728,7 @@ def check_errors(lines):
       
       
     #check page
-    version_found = VERSION_RE.match(lines[i])
+    version_found = VERSION_RE.match(lines[i]) # is this necessary when above? limit of scope?
     new_page = PAGE_RE.match(lines[i])
     m1 = PAGENOTES_RE.match(lines[i])
     m2 = PAGETABBED_RE.match(lines[i])
@@ -695,7 +760,9 @@ def check_errors(lines):
       if lines[i].strip() == "":
         in_body = True
       else:
-        error_report = verify_format(lines[i], in_body, pagecount, linecount, errors)
+        if version == 0:
+          divlines = count_divlines(lines[i], in_body)
+        error_report = verify_format(lines[i], in_body, pagecount, linecount, errors, divlines)
         if error_report != "":
           errors.append(error_report)
     else: #scan for errors in body text 
@@ -715,9 +782,16 @@ def check_errors(lines):
           #if not m4:
             #self.errors.append(errors(self.num, i, lines[i], 3))
           
-      error_report = verify_format(lines[i], in_body, pagecount, linecount, errors)
+      if version == 0:
+        divlines += count_divlines(lines[i], in_body)
+        
+      error_report = verify_format(lines[i], in_body, pagecount, linecount, errors, divlines)
       if error_report != "":
         errors.append(error_report)
+    
+    if divlines != 0:
+      errors.append(incorrect_stars_error(str(pagecount))) 
+    
     if len(errors) > 0:
       logging.debug(errors[0])
   logging.debug("LOOP FINISHED")
