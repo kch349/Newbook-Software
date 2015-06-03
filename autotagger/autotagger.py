@@ -592,11 +592,11 @@ def verify_format(line, in_body, page_num, line_num): #, general=False):
 #Returns 1 if there is a new div header, -1 if a star marking 
 #a div's position is found, and 0 otherwise 
 #Note: used for version 0 documents only
-def count_divlines(lines[i], in_body):
+def count_divlines(line, in_body):
   result = 0
-  m1 = DIVLINE_RE.match(lines[i])
-  m2 = DIVLINENUMBER_RE.match(lines[i])
-  m3 = STAR_RE.match(lines[i])
+  m1 = DIVLINE_RE.match(line)
+  m2 = DIVLINENUMBER_RE.match(line)
+  m3 = STAR_RE.match(line)
   if not in_body:
     if m1 or m2:
       result = 1
@@ -648,7 +648,13 @@ def verify_v0(line, in_body, page_num, line_num, text_header): #, general=False)
     #if m4 or m1 or m6 or m2 or m3: #m6 = divline
      # x = 3 #remove later
     if m7:
-      result = log_error(errors(str(page_num), line_num, line, 6))
+      #result = log_error(errors(str(page_num), line_num, line, 6))
+      
+      
+      
+      
+      
+      
       #logging.warning(" There may be an incorrectly formatted DivLine on page " +
                       #str(current_page) + ". Make sure the line number is not included.")
     #else: #not a line from the head
