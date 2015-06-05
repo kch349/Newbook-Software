@@ -54,7 +54,7 @@ version = -1
 original_version = -1
 
 ## overall regexes
-PAGE_RE = re.compile('^Page\s+(\d+)')
+PAGE_RE = re.compile('^Page\s+(\d+):?\s*$')
 PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
@@ -63,7 +63,8 @@ VERSION_RE = re.compile('^Version\s*(\d+.*)')
 ## regexes for incorrect formatting (e.g. Line #, #, #:)
 LINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
 LINERANGE_RE = re.compile('\s*Line\s+(\d+)-')
-PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
+#PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\s*-')
+PAGENOTES_RE = re.compile('^Pages?\s+(\d+)\S+')
 PAGETABBED_RE = re.compile('^\s+Page\s+(\d+)')
 DIVLINENUMBER_RE = re.compile('\s*DivLine\s+(\d+):?\s*(.*)$', re.IGNORECASE)
 
@@ -510,9 +511,10 @@ def log_error(page_num, line_num, line, error_code, general=False):
   faulty line, and what the error is."""
   logging.debug("IN LOG_ERROR")
   general_errors = {1 : "Page notation error. Please be sure to indicate a new"+\
-                    " page using the tag \"Page #:\". Do not add other notes to "+\
-                    "to this line, give a page range, refer to more than one page, "+\
-                    " or misplace the colon.\n",
+                    " page using the tag \"Page #:\". \n Do not add other notes to "+\
+                    "to this line, give a page range, refer to more than \n one page, "+\
+                    " or misplace the colon. Furthermore, be sure the page marking is \n"+\
+                    "flush left. Do not include added tabs or spacing prior to the label.\n",
                     2 : "Text included prior to the first page. Be sure to mark a "+\
                     "beginning page for your document before proceeding with the "+\
                     "transcription.\n"}
@@ -521,10 +523,10 @@ def log_error(page_num, line_num, line, error_code, general=False):
                "or \"DivLine\" to the indicated line.\n" +\
                "If this line belongs in the body, please remember to put"+\
                " an empty line before it.\n",
-             2 : "Based on its formatting, this line belongs in the head. " +\
+             2 : "Based on its formatting, this line belongs in the head. \n" +\
                "\t-If you meant for this to be in the head," +\
                " there may be an issue with the spacing. \n\t Make sure there "+\
-               "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
+               "are no spaces between the lines \"Page #:\" and \"Margin:\"\n"+\
                " and that you don't use double spacing.\n"+\
                "\t-If this is a diary entry header, make sure to use \"*\" " +\
                "rather than \"DivLine\".\n " +\
@@ -540,10 +542,10 @@ def log_error(page_num, line_num, line, error_code, general=False):
              6 : "DivLines cannot be formatted like \"Divline #: or in any similar format.\n" +\
                "This should be formatted without a line number, simply as \"Divline: <text>\"\n",
              7 : "A line marking was found out of place.\n" +\
-               "\t-If this line indicates a marginal note, be sure to include this in the" +\
+               "\t-If this line indicates a marginal note, be sure to include this in the\n" +\
                " head as opposed to the body.\n" +\
-               "\t-If this line indicates a section header, be sure to include the line \"Text:\"" +\
-               " prior to it or prior to the list of \"Line #: \" markings of the section" +\
+               "\t-If this line indicates a section header, be sure to include the line \"Text:\"\n" +\
+               " prior to it or prior to the list of \"Line #: \" markings of the section\n" +\
                " header title.\n"}
                
   v1_errors = {1 : "Error with head section. Please add \"Margin Line #\" "+\
@@ -580,9 +582,12 @@ def log_error(page_num, line_num, line, error_code, general=False):
 
 
 
-def verify_format(line, in_body, page_num, line_num): #, general=False):
+#Takes in a line and identifying information, and verifies that it matches the file's
+#transcription format. Returns an error message if an error was found, otherwise
+#returns an empty string.
+def verify_format(line, in_body, page_num, line_num, text_header): #, general=False):
   if version == 0: 
-     return verify_v1(line, in_body, page_num, line_num) #, general)
+     return verify_v0(line, in_body, page_num, line_num, text_header) #, general)
   elif version == 1:
     return verify_v1(line, in_body, page_num, line_num) #general)
   #if result != None:
@@ -605,14 +610,26 @@ def count_divlines(line, in_body):
       result = -1   
   return result
 
+#Finds "Text:" headers. Returns true if found, false if not.
+#Note: used for version 0 documents only
 def find_section_header(line, in_body):
   m1 = TEXT_RE.match(line)
-  if m1 and in_body:
-    return True
-  return False
+  return (m1 and in_body)
+ 
+#Finds section titles after "Text:" headers. These are marked as "Line #: <text>,"
+#Though if a line list or range is given, line is still treated as a section title.
+#Returns true if a section title line was found, false otherwise. 
+#Note: used for version 0 documents only
+def find_section_title(line, in_body):
+  m1 = LINE_RE.match(line)
+  m2 = LINELIST_RE.match(line)
+  m3 = LINERANGE_RE.match(line)
+  return (m1 or m2 or m3) and in_body
 
+#Given a line in the version 0 format, and various identification information,
+#determines whether the line is properly formatted and placed in the file or not.
+#If it is, returns "", otherwise returns the relevant error message.
 def verify_v0(line, in_body, page_num, line_num, text_header): #, general=False):
-####################
   result = ""
 
   m1 = LINE_RE.match(line)
@@ -625,19 +642,6 @@ def verify_v0(line, in_body, page_num, line_num, text_header): #, general=False)
   m7 = DIVLINENUMBER_RE.match(line)
   m8 = STAR_RE.match(line)
 
-##########
-
-  m1 = MARGINLINELIST_RE.match(line)
-  m2 = MARGINLINERANGE_RE.match(line)
-  m3 = MARGINS_RE.match(line)
-  m4 = LINE_RE.match(line)
-  
-  m5 = TEXT_RE.match(line)
-  m6 = DIVLINE_RE.match(line)
-  m7 = DIVLINENUMBER_RE.match(line)
-  m8 = STAR_RE.match(line)
-  m9 = LINE_RE.match(line)
-  
   if m2 or m3:
     result = log_error(page_num, line_num, line, 4)
   if not in_body:
@@ -647,24 +651,22 @@ def verify_v0(line, in_body, page_num, line_num, text_header): #, general=False)
       #result = log_error(page_num, line_num, line, 4)
     #if m4 or m1 or m6 or m2 or m3: #m6 = divline
      # x = 3 #remove later
-    if m7:
-      #result = log_error(errors(str(page_num), line_num, line, 6))
-      
-      
-      
-      
-      
-      
+    if m7: #or m1 or m2 or m3 or m4 or m6
+      #logging.debug("found header line")
+      #if m7:
+      x = 7
+      #result = log_error(page_num, line_num, line, 6)
       #logging.warning(" There may be an incorrectly formatted DivLine on page " +
-                      #str(current_page) + ". Make sure the line number is not included.")
+          #str(current_page) + ". Make sure the line number is not included.")
     #else: #not a line from the head
-    elif not (m1 or m2 or m3 or m4 or m6): # if not a line that should be in the head
+    #elif not m1 and not m2 and not m3 and not m4 and not m6: # if not a line that should be in the head
+    elif not(m1 or m2 or m3 or m4 or m6):
       logging.debug("ERROR IN HEAD")
       result = log_error(page_num, line_num, line, 1)
       logging.debug("RESULT AFTER HEAD ERROR: " + result)
     
   else:
-    logging.debug("IN V1 BODY")
+    #logging.debug("IN V1 BODY")
     #if m5 or m8:
      # x = 5 #remove later
     #elif text_header and (m1 or m2 or m3):
@@ -677,7 +679,7 @@ def verify_v0(line, in_body, page_num, line_num, text_header): #, general=False)
       result = log_error(page_num, line_num, line, 2)
     
     #else, (if not (m5, m8, or (m1 m2 m3 with textheader) no error)
-  logging.debug("VERIFY_V0 RESULT: " + result)
+  #logging.debug("VERIFY_V0 RESULT: " + result)
   return result
   #to complete
 
@@ -787,18 +789,23 @@ def check_errors(lines):
       
       
     elif not in_body: #scan for errors in the head 
-      logging.debug("IN HEAD - ERROR CHECKING") 
+      #logging.debug("IN HEAD - ERROR CHECKING") 
+      
+     #Move on if reached the end of the head
       if lines[i].strip() == "":
         in_body = True
-      else:
+      else: #Otherwise scan for errors
+        error_report = verify_format(lines[i], in_body, pagecount, linecount, text_header)
+        #Keep track of div lines and section "Text:" headers if in version 0
         if version == 0:
           divlines += count_divlines(lines[i], in_body)
-          text_header = find_section_header(lines[i], in_body)
-        error_report = verify_format(lines[i], in_body, pagecount, linecount, text_header)
+          #multi_section_titles = find_section_title(lines[i], in_body)
+          #if not multi_section_titles:
+          #  text_header = find_section_header(lines[i], in_body)
         if error_report != "":
           errors.append(error_report)
     else: #scan for errors in body text 
-      logging.debug("IN BODY - ERROR CHECKING") 
+      #logging.debug("IN BODY - ERROR CHECKING") 
       
       if double_spacing == 3 and double_spacing_found == False:
         logging.warning(" There may be unintentional double spacing on page " + str(pagecount) + ".") 
@@ -814,10 +821,14 @@ def check_errors(lines):
           #if not m4:
             #self.errors.append(errors(self.num, i, lines[i], 3))
           
+      
+      error_report = verify_format(lines[i], in_body, pagecount, linecount, text_header)
+      #Keep track of div lines and section "Text:" headers if in version 0
       if version == 0:
         divlines += count_divlines(lines[i], in_body)
-        text_header = find_section_header(lines[i], in_body)
-      error_report = verify_format(lines[i], in_body, pagecount, linecount, text_header)
+        multi_section_titles = find_section_title(lines[i], in_body)
+        if not multi_section_titles:
+          text_header = find_section_header(lines[i], in_body)
       if error_report != "":
         errors.append(error_report)
     if len(errors) > 0:
