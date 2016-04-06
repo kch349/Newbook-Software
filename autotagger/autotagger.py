@@ -185,7 +185,9 @@ class TranscriptionFile:
   def __init__(self, lines):
     m4 = VERSION_RE.match(lines[0])
     if m4:
-      set_version(int(m4.group(1)))
+      # set version to the integer main version, ignoring incremental fix
+      # identification numbers after the decimal point
+      set_version(int(m4.group(1).split(".")[0]))
       if version > CURRENT_VERSION:
         set_version(CURRENT_VERSION) #should avoid passing constant?
         logging.warning("""Specified version is greater than the current version. Possibly
@@ -436,7 +438,7 @@ class TranscriptionPage:
           self.errors.append(errors(self.num, i, lines[i], 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
-            
+
     self.head = h
     self.body = b
     #self.printAfter()
