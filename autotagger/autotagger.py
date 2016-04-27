@@ -11,6 +11,34 @@
 ## justin yoon
 ## ... (add your names as you edit this file)
 
+# Currently supported transcription formats:
+# Version 0.0
+# Version 1.0
+
+# The autotagger converts plain text documents written the Svoboda Diaries Transcription
+# Format (STDF) into valid TEI-XML documents by completing rudimentary structural
+# tagging. XML tagging supports the following structural elements:
+#			- Sections
+#			- Subsections
+# 		- Pages
+# 		- Marginal notes
+#			- Line breaks
+
+# Is backwards compatible with earlier versions of the STDF format (listed above). 
+# Encoding is in UTF-8. Any text in non-latin alphabets (such as Arabic) is left untouched
+# by this program, and is only placed in its proper location within the text.
+
+# To run this program in the command line from the same directory as the autotagger, enter:
+#    cat <transcriptionFile.txt> | ./autotagger.py 1>err.txt 0>out.xml
+
+#### ADD INFO ON CONFIGURATION USAGE ###
+# TEI Header information either is filled with default placeholders, or with custom 
+# metadata provided through a separate config.json file supplied by the user.
+
+
+# The autotagger can also be accessed online at ________. This interface further includes
+# conversions to HTML and LaTeX.
+
 
 import sys
 import re
@@ -18,7 +46,6 @@ import logging
 import argparse
 from config import AutotaggerConfiguration
 from xml.dom.minidom import *
-
 
 
 ## input document and transcription format data
@@ -165,10 +192,13 @@ def setup_DOM(cfg):
   text = newdoc.createElement('text')
   document.appendChild(text)
 
+  #Commented out code for processing front and back material if ever necessary
   #front = newdoc.createElement('front')
   #text.appendChild(front)
+  
   body = newdoc.createElement('body')
   text.appendChild(body)
+  
   #back = newdoc.createElement('back')
   #text.appendChild(back)
   return newdoc
@@ -178,16 +208,13 @@ class TranscriptionFile:
 
   pages = []
   errors = []
-  #version = -1
 
   #Constructs a TranscriptionFile. Determines document version and updates it to the
   #current version. Processes document into TranscriptionFile
   def __init__(self, lines):
     m4 = VERSION_RE.match(lines[0])
     if m4:
-      # set version to the integer main version, ignoring incremental fix
-      # identification numbers after the decimal point
-      set_version(int(m4.group(1).split(".")[0]))
+      set_version(int(m4.group(1)))
       if version > CURRENT_VERSION:
         set_version(CURRENT_VERSION) #should avoid passing constant?
         logging.warning("""Specified version is greater than the current version. Possibly
@@ -206,9 +233,7 @@ class TranscriptionFile:
        a series of Transcription Page objects"""
     p = []
     n = -1
-    #version = -1
     while len(lines) > 0:
-      #print("n = " + str(n), file=sys.stderr)
       m1 = PAGE_RE.match(lines[0])
       m2 = PAGENOTES_RE.match(lines[0])
       m3 = PAGETABBED_RE.match(lines[0])
@@ -222,7 +247,6 @@ class TranscriptionFile:
         # if n is already defined, we've found a new page, so
         #    process the old one
         if n > -1:
-          # print(m1.group(1) + " found page", file=sys.stderr)
           self.pages.append(TranscriptionPage(str(n), p))
           p = []
           lines.pop(0)
@@ -257,6 +281,9 @@ class TranscriptionFile:
     if version == 0:
       uprev_lines, uprev_errors = self.version0to1(lines)
       set_version(1)
+      
+    #Uncomment line below to print out the file in the most current transcription format
+    #to stderr
     #self.print(uprev_lines)
     return uprev_lines, uprev_errors #or should this be a different return statement each time?
 
@@ -314,7 +341,6 @@ class TranscriptionFile:
           lines[i] = '\tNotes:'
         elif m8:
           divlines -= 1
-          #print(temp_div_headers[0], file=sys.stderr)
           if len(temp_div_headers) >= 1:
             version1_lines.append('\tSubsection: ' + temp_div_headers[0].rstrip())
             temp_div_headers.pop(0)
@@ -438,7 +464,7 @@ class TranscriptionPage:
           self.errors.append(errors(self.num, i, lines[i], 2))
         else:
           b.append(lines[i].rstrip())# combine with one up 4 lines for less redundancy?
-
+            
     self.head = h
     self.body = b
     #self.printAfter()
@@ -448,35 +474,42 @@ def incorrect_stars_error(page_num):
   """Produces an error message saying there are too many or too few
   asterisks. Contains the page number."""
 
-  return "The number of asterisks in the body does not match the number"+\
-         "of DivLines in the header on page "+ page_num +"."
+  return "Error: Page " + str(page_num) + ", Full Page: \n The number of asterisks in the body does not match the number"+\
+         "of DivLines in the header."
 
 #Processes all other errors
 def errors(page_num, line_num, line, error_code):
   """Produces an error message. Contains the line and page number, the
   faulty line, and what the error is."""
 
-  err_str = "An error was found on page " + str(page_num) +\
-            ", line " +  str(line_num + 1) + ": " + line.strip()
+  err_str = "Error: Page " + str(page_num) +\
+            ", Line " +  str(line_num + 1) + ": \n \t" + line.strip() + "\n"
 
   if error_code == 1:
-    err_str += "Error with head section. Please add either \"Line #\" "+\
-               "or \"DivLine\" to the indicated line.\nPlease make sure"+\
-               " to format these exactly as shown.\n" +\
-               "If this line belongs in the body, please remember to put"+\
-               " a space before it.\n"
+    err_str += "Error with head section. Please add either \"Notes: \" or " +\
+               "\"Margin Line #: <text>\". If this line belongs in the body, \n please remember to put"+\
+               " a line break before it.\n"
+               # \"Line #\" "+\
+               #"or \"DivLine\" to the indicated line.\nPlease make sure"+\
+               #" to format these exactly as shown.\n" +\
+               #"If this line belongs in the body, please remember to put"+\
+               #" a space before it.\n"
   elif error_code == 2:
     err_str += "This line belongs in the head. If you meant for this to "+\
                "be in the head," +\
                " there may be an issue with the spacing.\nMake sure there "+\
-               "are no spaces between the lines \"Page #:\" and \"Margin:\""+\
+               "are no spaces between the lines \"Page #:\" and \"Notes:\""+\
                " and that you don't use double spacing.\n"+\
-               "If this is a diary entry header, make sure to use \"*\" " +\
-               "rather than \"DivLine\".\nIf this is a journey header, add "+\
-               " the line \"Text:\" before it.\n"
+               "If this is a diary entry header, put it in the body," +\
+               " and make sure to use \"Subsection:\". \n" +\
+               "If this is a journey header, put it in the body and add \"Section:\" before it.\n"              
+
+               # "If this is a diary entry header, make sure to use \"*\" " +\
+               #"rather than \"DivLine\".\nIf this is a journey header, add "+\
+               #" the line \"Text:\" before it.\n"
   elif error_code == 3:
     err_str += "This line should be a journey header. If it is, please make "+\
-               "sure to begin it with \"Line #\". If not, please put in a "+\
+               "sure to begin it with \"Section: \". If not, please put in a "+\
                "journey header before this line."
   elif error_code == 4:
     err_str += "Lines cannot be formatted like \"Line #, #, #:\" or "+\
@@ -487,33 +520,26 @@ def errors(page_num, line_num, line, error_code):
                "formatting is allowed.\n"
   return err_str
 
+#WHEN IS THE RETURN HEAD EVER USED?	
 #Creates a div of a specified number, type (1 or 2), and if applicable, part (I, M, or F)
 def create_div(document, n, div_type, part):
   """Creates div element of specified type and returns that div and its head node"""
   div = document.createElement(div_type)
-  #div.setAttribute('type','insert type (letter/diary, etc) here')
   div.setAttribute('n', n)
   if part is not None:
     div.setAttribute('part', part)
   head = document.createElement('head')
   div.appendChild(head)
-  #head.setAttribute('type', 'type here') #is this necessary if the div itself has an attr?
   return head, div
 
 #Creates first div of given type if necessary
-def create_generic_div(document, div_count, type):
-  #title = "First "
-  part = None
-  #if type == 'div1':
-   # title += "section; "
-  if type == 'div2':
-    #title += "subsection; "
-    part = "N"
-  #title += "no title given in text."
-  div_head, div = create_div(document, str(div_count), type, part)
-  #div_head.appendChild(document.createTextNode(title))
-  div_count +=1
-  return div, div_count
+#def create_generic_div(document, div_count, type):
+ # part = None
+  #if type == 'div2':
+   # part = "N"
+  #div_head, div = create_div(document, str(div_count), type, part)
+  #div_count +=1
+  #return div, div_count
 
 #Creates a new paragraph
 def create_p(document,current_prose, cfg,first_line=None, fresh=False):
@@ -681,7 +707,9 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
         continue
       else:
         if current_div1 == None:
-          current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
+          current_div1_head, current_div1 = create_div(document, str(div1_count), 'div1', None)
+          div1_count += 1
+          #current_div1, div1_count = create_generic_div(document, div1_count, 'div1')
           body.appendChild(current_div1)
         section_found = False
    
@@ -714,7 +742,10 @@ def process_body(document, tf, marginheaders, footnotes, xml_ids_dict, cfg):
         continue
       else: 
         if current_div2 == None:
-          current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
+          current_div2_head, current_div2 = create_div(document, str(div2_count), 'div2',
+          part = "N")
+          div2_count += 1
+          #current_div2, div2_count = create_generic_div(document, div2_count, 'div2')
           current_div2.childNodes.extend(margin_queue)
           current_div1.appendChild(current_div2)
         subsection_found = False

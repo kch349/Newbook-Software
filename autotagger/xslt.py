@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import shlex,subprocess
 
-def tei2html(infile,outfile):
+def tei2html(infile,outfile,xsltfile):
   of = open(outfile,'w',encoding='utf-8')
-  args = shlex.split("xsltproc --nonet xslt/tei2html.xslt %(infile)s" 
+  #if xsltfile == lb:
+  args = shlex.split("xsltproc --nonet xslt/tei2html_"+xsltfile+".xslt %(infile)s" 
                       % {'infile': infile })
   p = subprocess.Popen(args, stdout=of)
   p.wait()
