@@ -30,7 +30,7 @@ PAGE_RE = re.compile('^Page\s+(\d+)')
 PARA_RE = re.compile('^\s+(\S+)')
 EMPTYLINE_RE = re.compile('^\s*$')
 AMP_RE = re.compile('\&')
-VERSION_RE = re.compile('^Version\s*(\d+.*)')
+VERSION_RE = re.compile('^Version\s*(\d+.?\d*)$') # accepts 1, 1.,  1.02323
 
 ## regexes for incorrect formatting (e.g. Line #, #, #:)
 MARGINLINELIST_RE = re.compile('\s*Line\s+(\d+),') ##change to line list (for journeys too)
@@ -187,6 +187,7 @@ class TranscriptionFile:
     if m4:
       # set version to the integer main version, ignoring incremental fix
       # identification numbers after the decimal point
+
       set_version(int(m4.group(1).split(".")[0]))
       if version > CURRENT_VERSION:
         set_version(CURRENT_VERSION) #should avoid passing constant?
