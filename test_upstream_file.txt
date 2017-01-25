@@ -1,0 +1,1 @@
+Test different strategies of merging this change into forked repository.
