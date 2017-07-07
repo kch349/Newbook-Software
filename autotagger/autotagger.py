@@ -46,6 +46,7 @@ import logging
 import argparse
 from config import AutotaggerConfiguration
 from xml.dom.minidom import *
+import os
 
 
 ## input document and transcription format data
@@ -804,10 +805,52 @@ if __name__ in "__main__":
   ap = setup_argparse()
   args = ap.parse_args()
   if args.file:
+    # HOW IS THIS RUN WITH A FILE?
+    # Remove the bomb if there is one.
+    os.system('vim -s remove_bomb_script.vim ' + args.file)
+    print('from file ******************')
+
+    # Now open the file.
     infile = open(args.file, encoding="utf-8")
     infilelines = infile.readlines()
   else:
+    # What about if there is a bomb here...
+    # Tis is the main case. Need to something with the lines here.
     infilelines = sys.stdin.readlines()
+  
+  # Try reading line as binary, check for bomb, and remove
+  #line = infilelines[0]
+  #print(' '.join(format(ord(x), 'b') for x in line))
+  # Then look for bomb sequence, then remove, then convert back to string, and do
+  #infilelines[0] = nobomb_line
+
+  
+  # http://stackoverflow.com/questions/18860020/executing-vim-commands-in-a-shell-script
+  # http://stackoverflow.com/questions/8898294/convert-utf-8-with-bom-to-utf-8-with-no-bom-in-python
+  #print(infilelines[0])
+  #vim.command('-s')
+
+  """
+  import os, sys, codecs
+
+  BUFSIZE = 4096
+  BOMLEN = len(codecs.BOM_UTF8)
+
+  path = sys.argv[1]
+  with open(path, "r+b") as fp:
+      chunk = fp.read(BUFSIZE)
+      if chunk.startswith(codecs.BOM_UTF8):
+          i = 0
+          chunk = chunk[BOMLEN:]
+          while chunk:
+              fp.seek(i)
+              fp.write(chunk)
+              i += len(chunk)
+              fp.seek(BOMLEN, os.SEEK_CUR)
+              chunk = fp.read(BUFSIZE)
+          fp.seek(-BOMLEN, os.SEEK_CUR)
+          fp.truncate()
+  """
   
   # if we got a user config file on the path, use that, otherwise
   # create a default config object
